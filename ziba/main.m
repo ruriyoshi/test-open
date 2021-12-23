@@ -3,7 +3,7 @@ clear all
 date=211223;
 TF_shot = 30 ;
 offset_TF = true;
-shot = 37  ;
+shot = 39  ;
 
 % ********* ALWAYS RUN THIS FUNCTION FIRST ***********
 % parameters:(date,TF_shot,shot,offset_TF,offset_EF)
