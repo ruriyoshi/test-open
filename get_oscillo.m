@@ -1,10 +1,9 @@
 function [ch1,ch2,ch3,ch4,ch5,ch6,ch7,ch8] = get_oscillo(date,TF_only,shot,offset_TF,offset_EF)
 %GET_IP 
 % input:
-%   string: directory of the interested raw data rgw file
-%   string: directory of TF discharge only raw data rgw file
+%   date:実験日, TF_only:未使用, shot：ショット番号, offset_TF:未使用, offset_EF:未使用
 % output:
-%   3d array of double: B_z (r,z,t), offsetted at zero and smoothed
+%   各チャンネルのオシロの出力
 
 % read file
 
