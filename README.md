@@ -3,22 +3,22 @@
 ### testの変更
 ### branch2を作成
 
-#秋光参加テスト
+
 # 簡単なやりかた
-##アカウントをつくる
+## アカウントをつくる
 https://qiita.com/ayatokura/items/9eabb7ae20752e6dc79d
 
-##Github Desktopのインストール
+## Github Desktopのインストール
 https://docs.github.com/ja/desktop/installing-and-configuring-github-desktop/installing-and-authenticating-to-github-desktop/installing-github-desktop
-##編集したいレポジトリを用意する
-###repositoryを作成（新規作成、または、ローカルからオンライン）
+## 編集したいレポジトリを用意する
+### repositoryを作成（新規作成、または、ローカルからオンライン）
 *DesktopアプリからはFile> New repository（新規作成)　か　Add local repository(ローカルにあるフォルダをレポジトリにする)
 
-###repositoryをクローン（オンラインからローカルで編集できるようにする）
+### repositoryをクローン（オンラインからローカルで編集できるようにする）
 *DesktopアプリからはFile> Clone repository > URL　でオンラインのレポジトリをクローンしてくることができる
 *編集するときは権限が必要なので権限のある人からinvitationを送ってもらう
 
-##repositoryを編集する
+## repositoryを編集する
 参考⇒　https://docs.github.com/ja/desktop/contributing-and-collaborating-using-github-desktop
 
 各レポジトリはmainが本体で、各自がそれをクローン（フォルダのコピー）して編集する。この時本体のmainをみんなで編集してごちゃごちゃにならないように、mainからブランチ（編集する際の枝分かれ）を作ってそこで編集をする。編集したブランチを最終的にmainにマージ（合体）させることで本体のmainのコードを発展させていくイメージ。ブランチは始めはmainから枝分かれするが、branchの中でも編集を分けたいときはブランチからさらに枝分かれしたブランチを切ることができる。（２.参照）
