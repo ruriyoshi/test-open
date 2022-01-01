@@ -13,7 +13,7 @@ function [B_z,r_probe,z_probe,ch_dist,B_z_return,data_return,shot_num] = get_B_z
 
 %************** Folder directory *****************
 %folder_directory = 'C:/Users/take_/OneDrive/デスクトップ/program/fluctuation/data/';
-folder_directory_Bz = 'E:/experiment/results/ts-3u/';
+folder_directory_Bz = 'X:/results/ts-3u/';
 
 %************** Physical Constants ***************
 mu0   = 4*pi*10^(-7);   % vacuum permeability (H/m)
@@ -346,7 +346,7 @@ end
     data(222,:) = (data(221,:) + data(223,:))/2;
     data(227,:) = (data(228,:) + data(226,:))/2;
 
-    elseif date >= 201016
+    elseif date >= 201016 && date < 210630%???日にちはテキトー
     data(55,:) = (data(54,:) + data(56,:))/2;
     data(58,:) = (data(57,:) + data(59,:))/2;
     data(93,:) = (data(92,:) + data(94,:))/2;
@@ -359,10 +359,14 @@ end
     data(243,:) = 2*data(242,:) - data(259,:);
     data(259,:) = (data(242,:) + data(240,:))/2;
     data(266,:) = (data(265,:) + data(267,:))/2;
-
+    elseif date >= 210630 %???日にちテキトー
+        broken_channels = [173,259,233,114,58,55];
     else
         disp('Wrong date!!!');
         return
+    end
+    for ch_i = broken_channels
+        data(ch_i,:) = NaN;
     end
     end
 
