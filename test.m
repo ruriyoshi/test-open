@@ -39,7 +39,7 @@ filepath.SXR=strcat(pathname.NIFS,'\X-ray\',string(date),'\shots\',string(date),
 cd magneticprobe
 [B_z,r_probe,z_probe,ch_dist,B_z_return,data_return,shot_num] = get_B_z(date,TF_shot,shot,offset_TF,T.EF_A_(IDX),pathname.ts3u);
 B_z = B_z([2,3,4,6,7,8],2:end,:);
-data = data([2,3,4,6,7,8],2:end,:);
+%data = data([2,3,4,6,7,8],2:end,:);
 z_probe = z_probe(2:end);
 ch_dist = ch_dist([2,3,4,6,7,8],2:end);
 r_probe = r_probe([2,3,4,6,7,8]);
