@@ -26,15 +26,23 @@ pathname.ts3u=getenv('ts3u_path');%old-koalaのts-3uまでのパス
 pathname.fourier='I:';%md0までのpath
 pathname.NIFS=getenv('NIFS_path');%resultsまでのpath
 %共有フォルダ以下から目的ショットのファイルを探す
-filepath.mrd=strcat(pathname.ts3u, '\', string(date),'\' ...
-    ,string(date),num2str(shot,'%03i'),'.mrd');
-filepath.tfmrd=strcat(pathname.ts3u, '\', string(date),'\' ...
-    ,string(date),num2str(TF_shot,'%03i'),'.mrd');
+% filepath.mrd=strcat(pathname.ts3u, '\', string(date),'\' ...
+%     ,string(date),num2str(shot,'%03i'),'.mrd');
+% filepath.tfmrd=strcat(pathname.ts3u, '\', string(date),'\' ...
+%     ,string(date),num2str(TF_shot,'%03i'),'.mrd');
 filepath.rgw=strcat(pathname.ts3u, '\', string(date),'\' ...
     ,string(date),num2str(shot,'%03i'),'.rgw');
 filepath.D288=dir(strcat(pathname.fourier,'\Doppler\288CH\20',string(date),'\*shot',num2str(shot),'*.asc'));
 filepath.Dhighspeed=dir(strcat(pathname.NIFS,'\Doppler\Photron\',string(date),'\**\*shot',num2str(shot),'*.tif'));
 filepath.SXR=strcat(pathname.NIFS,'\X-ray\',string(date),'\shots\',string(date),num2str(shot,'%03i'),'.tif');
+
+cd magneticprobe
+[B_z,r_probe,z_probe,ch_dist,B_z_return,data_return,shot_num] = get_B_z(date,TF_shot,shot,offset_TF,T.EF_A_(IDX),pathname.ts3u);
+B_z = B_z([2,3,4,6,7,8],2:end,:);
+data = data([2,3,4,6,7,8],2:end,:);
+z_probe = z_probe(2:end);
+ch_dist = ch_dist([2,3,4,6,7,8],2:end);
+r_probe = r_probe([2,3,4,6,7,8]);
 
 
 

@@ -4,7 +4,7 @@ clear
 %%%%%%%%%%%%%%%%%%%%%%%%
 
 
-DOCID='1wG5fBaiQ7-jOzOI-2pkPAeV6SDiHc_LrOdcbWlvhHBw';
+DOCID='1NUKzhcQhsUweIOgIvvygiORYQi11SLQOp-wlVy0MHVQ';%
 T=getTS6log(DOCID);% ログのテーブルを取得
 
  node='date';  % 検索する列の名前. T.Properties.VariableNamesで一覧表示できる
@@ -13,19 +13,19 @@ T=getTS6log(DOCID);% ログのテーブルを取得
 searchlog(T,node,pat)% ログのテーブルから当てはまるものを抽出した新しいテーブルを作成
 
 %logからshot,TFshot,などのオペレーション設定を読む
-prompt = 'number: ';
-IDX=input(prompt) ;%表示したいショットのnumberの値（通し番号）を入力
+prompt = 'number: ';%表示したいショットのnumberの値（通し番号）を入力
+IDX=input(prompt) ;
 date=T.date(IDX);
 shot=T.shot(IDX);
 TF_shot = T.TFoffset(IDX) ;
 offset_TF = true;
 
 %%ファイルへのパスを作る
-%
-pathname.ts3u=getenv('ts3u_path');
+%それぞれのPCから共有フォルダまでのパスはそれぞれ異なるので各自で設定
+pathname.ts3u=getenv('ts3u_path');%old-koalaのts-3uまでのパス
 pathname.fourier='I:';%md0までのpath
 pathname.NIFS=getenv('NIFS_path');%resultsまでのpath
-
+%共有フォルダ以下から目的ショットのファイルを探す
 filepath.mrd=strcat(pathname.ts3u, '\', string(date),'\' ...
     ,string(date),num2str(shot,'%03i'),'.mrd');
 filepath.tfmrd=strcat(pathname.ts3u, '\', string(date),'\' ...
