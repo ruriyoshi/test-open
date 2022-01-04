@@ -13,19 +13,19 @@ T=getTS6log(DOCID);% ログのテーブルを取得
 searchlog(T,node,pat)% ログのテーブルから当てはまるものを抽出した新しいテーブルを作成
 
 %logからshot,TFshot,などのオペレーション設定を読む
-prompt = 'number: ';%表示したいショットのnumberの値（通し番号）を入力
-IDX=input(prompt) ;
+prompt = 'number: ';
+IDX=input(prompt) ;%表示したいショットのnumberの値（通し番号）を入力
 date=T.date(IDX);
 shot=T.shot(IDX);
 TF_shot = T.TFoffset(IDX) ;
 offset_TF = true;
 
 %%ファイルへのパスを作る
-%それぞれのPCから共有フォルダまでのパスはそれぞれ異なるので各自で設定
-pathname.ts3u=getenv('ts3u_path');%old-koalaのts-3uまでのパス
+%
+pathname.ts3u=getenv('ts3u_path');
 pathname.fourier='I:';%md0までのpath
 pathname.NIFS=getenv('NIFS_path');%resultsまでのpath
-%共有フォルダ以下から目的ショットのファイルを探す
+
 filepath.mrd=strcat(pathname.ts3u, '\', string(date),'\' ...
     ,string(date),num2str(shot,'%03i'),'.mrd');
 filepath.tfmrd=strcat(pathname.ts3u, '\', string(date),'\' ...
