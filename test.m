@@ -4,7 +4,14 @@ clear
 %　 test-openで実行する。ログから読み込んで、それぞれのパスを設定するコード
 %%　参考　https://jp.mathworks.com/help/matlab/matlab_prog/access-data-in-a-table.html
 %%%%%%%%%%%%%%%%%%%%%%%%
-cd 'C:\Users\Moe Akimitsu\Documents\GitHub\test-open'
+
+yourpath = 'C:\Users\---\';
+f = fullfile(yourname,'Documents','GitHub','test-open','magneticprobe');
+addpath(f);
+f = fullfile(yourname,'Documents','GitHub','test-open','SXR_test');
+addpath(f);
+%%%適宜変更
+
 
 DOCID='';
 T=getTS6log(DOCID);% ログのテーブルを取得
@@ -38,7 +45,8 @@ filepath.Dhighspeed=dir(strcat(pathname.NIFS,'\Doppler\Photron\',string(date),'\
 filepath.SXR=strcat(pathname.NIFS,'\X-ray\',string(date),'\shots\',string(date),num2str(shot,'%03i'),'.tif');
 
 
-cd magneticprobe
+
+
 %[B_z,r_probe,z_probe,ch_dist,B_z_return,data_return,shot_num] 
 [B_z,r_probe,z_probe,ch_dist,data,data_raw,shot_num]= get_B_z(date,TF_shot,shot,offset_TF,T.EF_A_(IDX),pathname.ts3u);
 B_z = B_z([2,3,4,6,7,8],2:end,:);
@@ -48,7 +56,7 @@ ch_dist = ch_dist([2,3,4,6,7,8],2:end);
 r_probe = r_probe([2,3,4,6,7,8]);
 
 
-cd SXR_test
+
 %plot_B_z_in_time(B_z,ch_dist,350,600);
 %plot_psi_SXR_multi(B_z,r_probe,z_probe,date,shot,layer,area,start,exposure,SXRfilename)
 plot_psi_SXR_multi(B_z,r_probe,z_probe,date,shot,true,true,T.Period_StartTime_(IDX),2,filepath.SXR)
