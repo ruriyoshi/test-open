@@ -1,4 +1,4 @@
-function [B_z,r_probe,z_probe,ch_dist,B_z_return,data_return,shot_num] = get_B_z(date,TF_shot,shot,offset_TF,offset_EF)
+function [B_z,r_probe,z_probe,ch_dist,B_z_return,data_return,shot_num] = get_B_z(date,TF_shot,shot,offset_TF,i_EF,folder_path)
 % input:
 %   integer: date of experiment. Example:(2019 Aug. 01->190801)
 %   integer: TF shot number. Example:(2)
@@ -13,7 +13,7 @@ function [B_z,r_probe,z_probe,ch_dist,B_z_return,data_return,shot_num] = get_B_z
 
 %************** Folder directory *****************
 %folder_directory = 'C:/Users/take_/OneDrive/デスクトップ/program/fluctuation/data/';
-folder_directory_Bz = 'X:/results/ts-3u/';
+folder_directory_Bz = strcat(folder_path,'/');
 
 %************** Physical Constants ***************
 mu0   = 4*pi*10^(-7);   % vacuum permeability (H/m)
@@ -23,7 +23,7 @@ z1_EF = 0.680;  % EF z1 location (m)
 z2_EF = -0.680; % EF z2 location (m)
 r_EF = 0.5;     % EF radius (m)
 n_EF = 234;     % EF turns
-i_EF = 150;     % EF current (A)
+%i_EF = 150;     % EF current (A)
 
 %************** B_z Probe Properties**************
 ch_per_module = 4;                              % 4 channels per module
@@ -112,14 +112,14 @@ end
 % EF Calculation
 % 2d mesh indicating probe location ([r][z])
 
-if offset_EF
+%if i_EF
     [probe_mesh_z,probe_mesh_r] = meshgrid(z_probe,r_probe);
     % Bz and Br due to EF current at B_z probe positions
     [Bz_EF,Br_EF] = B_EF(z1_EF,z2_EF,r_EF,i_EF,n_EF,probe_mesh_r,probe_mesh_z,false);
     
     % total B_z = probe_B_z + Bz_EF
     B_z = -Bz_EF+B_z;
-end
+%end
 
     function [data_dir,data_TF_dir] = directory_generation(date,TF_shot,shot)
     if shot < 10
@@ -359,6 +359,7 @@ end
     data(243,:) = 2*data(242,:) - data(259,:);
     data(259,:) = (data(242,:) + data(240,:))/2;
     data(266,:) = (data(265,:) + data(267,:))/2;
+    
     elseif date >= 210630 %???日にちテキトー
         broken_channels = [173,259,233,114,58,55];
     else
