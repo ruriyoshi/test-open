@@ -6,7 +6,7 @@ clear
 %%%%%%%%%%%%%%%%%%%%%%%%
 cd 'C:\Users\Moe Akimitsu\Documents\GitHub\test-open'
 
-DOCID='1wG5fBaiQ7-jOzOI-2pkPAeV6SDiHc_LrOdcbWlvhHBw';
+DOCID='';
 T=getTS6log(DOCID);% ログのテーブルを取得
 
  node='date';  % 検索する列の名前. T.Properties.VariableNamesで一覧表示できる
