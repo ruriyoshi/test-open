@@ -5,7 +5,7 @@ clear
 %%　参考　https://jp.mathworks.com/help/matlab/matlab_prog/access-data-in-a-table.html
 %%%%%%%%%%%%%%%%%%%%%%%%
 
-yourpath = 'C:\Users\---\';
+yourname = 'C:\Users\---\';
 f = fullfile(yourname,'Documents','GitHub','test-open','magneticprobe');
 addpath(f);
 f = fullfile(yourname,'Documents','GitHub','test-open','SXR_test');
