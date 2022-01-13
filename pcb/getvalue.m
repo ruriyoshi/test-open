@@ -7,7 +7,7 @@ import MDSplus.*
 setenv('a038_path','F:\a038');
 %mdsipのポートに接続してa038のツリーを開く。
 mdsconnect('192.168.1.140');
-mdsopen('a038', shot); %a038ツリーのショット番号=shotのショットを開く
+mdsopen('a038', shot); %a038ツリーの1768ショットを開く
 %「.AI:CH001」というノードを指定してxにCH001のデータを出力してプロット
 
 
@@ -16,6 +16,11 @@ for i=1:ch_num
     chname=".AI:CH"+num2str(transpose(i),'%03i');
     % num2strで数値データをstrデータに変換。この時'%03i'で左側を(0)で埋めた(3)桁の整数(i)という形を指定できる。
     x(:,i)=mdsvalue(chname);
+
+    %データがとれていないときエラーメッセージが多分237文字で帰ってくるので、1000以下の要素はデータなしとしてリターンする
+    if numel(x(:,i)) <1000
+        return
+    end
     x(:,i)=x(:,i)-x(1,i);% オフセット調整
 end
 if exist("tfshot")==1 
