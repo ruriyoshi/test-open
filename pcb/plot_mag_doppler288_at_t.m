@@ -1,6 +1,6 @@
 clear
 %%%%%%%%%%%%%%%%%%%%%%%%
-%  288chDopplerとpcbデータを重ねてプロットして保存するコード
+%  288chDopplerとmrdの磁気面を重ねてプロットして保存するコード
 %　288chDopplerはIDLで作ったsavのデータをあらかじめI:\makimitsu\yyddmmに保存してあるものを読み込む
 %
 %%%%%%%%%%%%%%%%%%%%%%%%
@@ -24,61 +24,25 @@ IDXlist=shotlist(isfinite(subT.DopplerDelay)&isfinite(subT.d_tacq));
 for IDX=IDXlist%(1,49:end)  %
 date=T.date(IDX);
 shot=T.shot(IDX);
-d_tacq=T.d_tacq(IDX);
-d_tacqTF=T.TFdtacq(IDX);
+TF_shot=T.TFoffset(IDX);
 if isnan(T.EF_A_(IDX))%%NaNでないことを確認（ログが空白だとNaNになる）
     i_EF=150;
 else  %NaNなら150をとりあえず代入、記入されているときはその値を使う
     i_EF=T.EF_A_(IDX);
 end
-trange=460:490;
 t=T.DopplerDelay(IDX);
 n=50;
-[grid2D, data2D] = pcbdata(date, d_tacq,d_tacqTF,trange, [], n,i_EF);
-if isstruct(grid2D)==0 %もしdtacqデータがない場合次のloopへ(データがない場合NaNを返しているため)
-    continue
-end
-    maxrange=max(abs(data2D.Jt),[],'all');
-[psimid,mid]=min(data2D.psi,[],2);
-[opoint,p]=islocalmin(psimid,1);
-[xpoint,~]=islocalmax(psimid,1);
-[xp_psi,maxxp]=max(squeeze(psimid),[],1);
-% onum=squeeze(sum(opoint,1));
-% trange(onum~=0)
-    %maxrange=2e6;
+[B_z,r_probe,z_probe,ch_dist,data,data_raw,shot_num] = get_B_z(date,TF_shot,shot,offset_TF,i_EF,folder_path);
 
-%%磁気面時間発展プロット
-% figure
-% start=8; %460+?
-% for m=1:10 
-%     i=start+m;
-%     t=trange(i);
-%     subplot(2,5,m)
-%     contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.Jt(:,:,i),10,'LineStyle','none')
-%     colormap(jet)
-%     axis image
-%     axis tight manual
-%     %     xlim([-0.02 0.02])
-%     %     ylim([0.12 0.27])
-%     caxis([-maxrange,maxrange])
-%     colorbar('Location','eastoutside')
-%     %zlim([-1 1])
-%     %colormap(bone)
-%     hold on
-%     plot(grid2D.zq(1,squeeze(mid(:,:,i))),grid2D.rq(:,1))
-%     contour(grid2D.zq(1,:),grid2D.rq(:,1),squeeze(data2D.psi(:,:,i)),50,'black')
-%     plot(grid2D.zq(1,squeeze(mid(opoint(:,:,i),:,i))),grid2D.rq(opoint(:,:,i),1),"ro")
-%     plot(grid2D.zq(1,squeeze(mid(xpoint(:,:,i),:,i))),grid2D.rq(xpoint(:,:,i),1),"rx")
-%     hold off
-%     title(string(t)+'us')
-%     xlabel('z')
-%     ylabel('r')
-% end
-
+B_z = B_z([2,3,4,6,7,8],2:end,:);
+data = data([2,3,4,6,7,8],2:end,:);
+z_probe = z_probe(2:end);
+ch_dist = ch_dist([2,3,4,6,7,8],2:end);
+r_probe = r_probe([2,3,4,6,7,8]);
 
 %%ファイルへのパスを作る
 %それぞれのPCから共有フォルダまでのパスはそれぞれ異なるので各自で設定
-%pathname.ts3u=getenv('ts3u_path');%old-koalaのts-3uまでのパス
+pathname.ts3u=getenv('ts3u_path');%old-koalaのts-3uまでのパス
 pathname.fourier='I:';%md0までのpath
 pathname.NIFS=getenv('NIFS_path');%resultsまでのpath
 
@@ -92,13 +56,18 @@ else
     filepath.D288=dir(strcat(pathname.fourier,'\makimitsu\',string(date),'\doppler2D_shot',num2str(shot),'.sav'));
 end    
     %filepath.Dhighspeed=dir(strcat(pathname.NIFS,'\Doppler\Photron\',string(date),'\**\*shot',num2str(shot),'*.tif'));
-filepath.SXR=strcat(pathname.NIFS,'\X-ray\',string(date),'\shots\',string(date),num2str(shot,'%03i'),'.tif');
+    %filepath.SXR=strcat(pathname.NIFS,'\X-ray\',string(date),'\shots\',string(date),num2str(shot,'%03i'),'.tif');
 if numel(filepath.D288)==0
     continue
 end
 
 if isfile( fullfile(filepath.D288.folder,filepath.D288.name))
-    i=t-459;
+    psi = get_psi(B_z,r_probe,t);
+    z_space = linspace(z_probe(1),z_probe(end),50);
+    r_space = linspace(r_probe(1),r_probe(end),50);
+    [psi_mesh_z,psi_mesh_r] = meshgrid(z_space,r_space);
+    [probe_mesh_z,probe_mesh_r] = meshgrid(z_probe,r_probe);
+    psi = griddata(z_probe,r_probe,psi,psi_mesh_z,psi_mesh_r,'cubic');
     restore_idl( fullfile(filepath.D288.folder,filepath.D288.name),'lowercase','create'); %.savファイルを読み込む
     
     f = figure;
@@ -115,10 +84,7 @@ if isfile( fullfile(filepath.D288.folder,filepath.D288.name))
     axis tight manual
     colorbar('Location','eastoutside')
     hold on
-    plot(grid2D.zq(1,squeeze(mid(:,:,i))),grid2D.rq(:,1))
-    contour(grid2D.zq(1,:),grid2D.rq(:,1),squeeze(data2D.psi(:,:,i)),30,'black')
-    plot(grid2D.zq(1,squeeze(mid(opoint(:,:,i),:,i))),grid2D.rq(opoint(:,:,i),1),"ro")
-    plot(grid2D.zq(1,squeeze(mid(xpoint(:,:,i),:,i))),grid2D.rq(xpoint(:,:,i),1),"rx")
+    contour(psi_mesh_z,psi_mesh_r,psi,30,'-b');
     hold off
     title(string(t)+'us,emiision')
     xlabel('z')
@@ -132,10 +98,7 @@ if isfile( fullfile(filepath.D288.folder,filepath.D288.name))
     axis tight manual
     colorbar('Location','eastoutside')
     hold on
-    plot(grid2D.zq(1,squeeze(mid(:,:,i))),grid2D.rq(:,1))
-    contour(grid2D.zq(1,:),grid2D.rq(:,1),squeeze(data2D.psi(:,:,i)),30,'black')
-    plot(grid2D.zq(1,squeeze(mid(opoint(:,:,i),:,i))),grid2D.rq(opoint(:,:,i),1),"ro")
-    plot(grid2D.zq(1,squeeze(mid(xpoint(:,:,i),:,i))),grid2D.rq(xpoint(:,:,i),1),"rx")
+    contour(psi_mesh_z,psi_mesh_r,psi,30,'-b');
     hold off
     caxis([-300,300])
     title(string(t)+'us,ti')

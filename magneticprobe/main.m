@@ -1,5 +1,5 @@
 clear all
-
+folder_path='';%ts-3uまでのパス
 date=211230;
 TF_shot = 15 ;
 offset_TF = true;
@@ -10,8 +10,8 @@ shot = 17 ;
 %[B_z,r_probe,z_probe,ch_dist,data] = get_B_z(200130,4,12,true,150);
 %[B_z,r_probe,z_probe,ch_dist,data] = get_B_z(200202,7,6,true,0);
 %[B_z,r_probe,z_probe,ch_dist,data,data_raw] = get_B_z(200718,27,30,true,70);
-[B_z,r_probe,z_probe,ch_dist,data,data_raw,shot_num] = get_B_z(date,TF_shot,shot,true,true);
-
+%[B_z,r_probe,z_probe,ch_dist,data,data_raw,shot_num] = get_B_z(date,TF_shot,shot,true,true);
+[B_z,r_probe,z_probe,ch_dist,data,data_raw,shot_num] =get_B_z(date,TF_shot,shot,offset_TF,i_EF,folder_path);
 %########## Raed oscilloscope (DL716) file ##########
 % parameters:(date,shot,TF_shot,offset_TF)
 %[low_n_data] = low_n_mode(date,shot,TF_shot,offset_TF);
