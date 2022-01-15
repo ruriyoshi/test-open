@@ -21,7 +21,7 @@ shotlist=[2692:2950];
 subT=T(shotlist,:);
 IDXlist=shotlist(isfinite(subT.DopplerDelay)&isfinite(subT.d_tacq));
 %IDX=IDXlist(1,88);
-for IDX=IDXlist%(1,49:end)  %
+for IDX=IDXlist(1,114:end)  %
 date=T.date(IDX);
 shot=T.shot(IDX);
 TF_shot=T.TFoffset(IDX);
@@ -32,13 +32,7 @@ else  %NaNなら150をとりあえず代入、記入されているときはそ�
 end
 t=T.DopplerDelay(IDX);
 n=50;
-[B_z,r_probe,z_probe,ch_dist,data,data_raw,shot_num] = get_B_z(date,TF_shot,shot,offset_TF,i_EF,folder_path);
 
-B_z = B_z([2,3,4,6,7,8],2:end,:);
-data = data([2,3,4,6,7,8],2:end,:);
-z_probe = z_probe(2:end);
-ch_dist = ch_dist([2,3,4,6,7,8],2:end);
-r_probe = r_probe([2,3,4,6,7,8]);
 
 %%ファイルへのパスを作る
 %それぞれのPCから共有フォルダまでのパスはそれぞれ異なるので各自で設定
@@ -60,8 +54,20 @@ end
 if numel(filepath.D288)==0
     continue
 end
+ f = fullfile(pathname.ts3u,num2str(date),strcat(num2str(date),num2str(shot,'%03i'),'.mrd'));
+if isfile(f)==0
+    continue
+end
 
 if isfile( fullfile(filepath.D288.folder,filepath.D288.name))
+    [B_z,r_probe,z_probe,ch_dist,data,data_raw,shot_num] = get_B_z(date,TF_shot,shot,true,i_EF,pathname.ts3u);
+
+    B_z = B_z([2,3,4,6,7,8],2:end,:);
+    data = data([2,3,4,6,7,8],2:end,:);
+    z_probe = z_probe(2:end);
+    ch_dist = ch_dist([2,3,4,6,7,8],2:end);
+    r_probe = r_probe([2,3,4,6,7,8]);
+
     psi = get_psi(B_z,r_probe,t);
     z_space = linspace(z_probe(1),z_probe(end),50);
     r_space = linspace(r_probe(1),r_probe(end),50);
@@ -78,34 +84,34 @@ if isfile( fullfile(filepath.D288.folder,filepath.D288.name))
     pos2 = [0.58,0.2,0.35,0.6];
 
     subplot('Position',pos1);
-    contourf(doppler.z,doppler.yy,doppler.emission,10,'LineStyle','none')
+    contourf(doppler.z,doppler.yy,doppler.emission,30,'LineStyle','none')
     colormap(jet)
-    axis image
-    axis tight manual
     colorbar('Location','eastoutside')
     hold on
     contour(psi_mesh_z,psi_mesh_r,psi,30,'-b');
     hold off
+    axis image
+    axis tight manual
     title(string(t)+'us,emiision')
     xlabel('z')
     ylabel('r')
-    caxis([-2e5,2e5])
+    caxis([-3e5,3e5])
 
     subplot('Position',pos2);
     contourf(doppler.z,doppler.yy,doppler.ti_2d,30,'LineStyle','none')
     colormap(jet)
-    axis image
-    axis tight manual
     colorbar('Location','eastoutside')
     hold on
     contour(psi_mesh_z,psi_mesh_r,psi,30,'-b');
     hold off
+    axis image
+    axis tight manual
     caxis([-300,300])
     title(string(t)+'us,ti')
     xlabel('z')
     ylabel('r')
     filename = strcat('I:\makimitsu\',num2str(date),'\Doppler_',num2str(date),num2str(shot,'%03i'),'_',num2str(t),'us');
-    saveas(gcf,strcat(filename,'.png'))
+    saveas(gcf,strcat(filename,'_all','.png'))
     close
 end
 

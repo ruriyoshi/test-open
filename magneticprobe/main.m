@@ -1,10 +1,10 @@
 clear all
-folder_path='';%ts-3uまでのパス
-date=211230;
-TF_shot = 15 ;
+folder_path=getenv('ts3u_path');%ts-3uまでのパス
+date=211217;
+TF_shot = 2 ;
 offset_TF = true;
-shot = 17 ;
-
+shot = 4 ;
+i_EF=150;
 % ********* ALWAYS RUN THIS FUNCTION FIRST ***********
 % parameters:(date,TF_shot,shot,offset_TF,offset_EF)
 %[B_z,r_probe,z_probe,ch_dist,data] = get_B_z(200130,4,12,true,150);

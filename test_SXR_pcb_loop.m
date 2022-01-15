@@ -21,7 +21,7 @@ shotlist=[2692:2950];
 subT=T(shotlist,:);
 IDXlist=shotlist(isfinite(subT.Period_StartTime_)&isfinite(subT.d_tacq));
 %IDX=IDXlist(1,88);
-for IDX=IDXlist(1,48:end)
+for IDX=IDXlist(1,6:end)
 date=T.date(IDX);
 shot=T.shot(IDX);
 d_tacq=T.d_tacq(IDX);
@@ -91,6 +91,7 @@ pathname.NIFS=getenv('NIFS_path');%resultsまでのpath
 filepath.SXR=strcat(pathname.NIFS,'\X-ray\',string(date),'\shots\',string(date),num2str(shot,'%03i'),'.tif');
 
 if isfile(filepath.SXR)
+    %plot_pcb_SXR_multi(data2D.psi,grid2D.rq,grid2D.zq,date,shot,true,false,T.Period_StartTime_(IDX),5,true,filepath.SXR)
     plot_pcb_SXR_multi(data2D.psi,grid2D.rq,grid2D.zq,date,shot,true,false,T.Period_StartTime_(IDX),5,true,filepath.SXR)
 end
 

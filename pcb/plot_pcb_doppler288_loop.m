@@ -33,7 +33,7 @@ else  %NaNなら150をとりあえず代入、記入されているときはそ�
 end
 trange=460:490;
 t=T.DopplerDelay(IDX);
-n=50;
+n=30;
 [grid2D, data2D] = pcbdata(date, d_tacq,d_tacqTF,trange, [], n,i_EF);
 if isstruct(grid2D)==0 %もしdtacqデータがない場合次のloopへ(データがない場合NaNを返しているため)
     continue
@@ -109,7 +109,7 @@ if isfile( fullfile(filepath.D288.folder,filepath.D288.name))
     pos2 = [0.58,0.2,0.35,0.6];
 
     subplot('Position',pos1);
-    contourf(doppler.z,doppler.yy,doppler.emission,10,'LineStyle','none')
+    contourf(doppler.z,doppler.yy,doppler.emission,30,'LineStyle','none')
     colormap(jet)
     axis image
     axis tight manual
@@ -123,7 +123,7 @@ if isfile( fullfile(filepath.D288.folder,filepath.D288.name))
     title(string(t)+'us,emiision')
     xlabel('z')
     ylabel('r')
-    caxis([-2e5,2e5])
+    caxis([-3e5,3e5])
 
     subplot('Position',pos2);
     contourf(doppler.z,doppler.yy,doppler.ti_2d,30,'LineStyle','none')

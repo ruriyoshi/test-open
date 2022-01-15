@@ -55,3 +55,5 @@ for t = times
     plot_pcb_SXR_at_t(psi,rq,zq,date,shot,t,layer,area,start,interval,save,SXRfilename)
 end
 end
+
+
