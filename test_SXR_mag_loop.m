@@ -17,7 +17,7 @@ addpath(f);
 DOCID='1wG5fBaiQ7-jOzOI-2pkPAeV6SDiHc_LrOdcbWlvhHBw';
 T=getTS6log(DOCID);% ログのテーブルを取得
 
-shotlist=[2692:2950];
+shotlist=2942;%[2692:2950];
 subT=T(shotlist,:);
 IDXlist=shotlist(isfinite(subT.Period_StartTime_)&isfinite(subT.d_tacq));
 %IDX=IDXlist(1,88);
@@ -48,7 +48,7 @@ filepath.rgw=strcat(pathname.ts3u, '\', string(date),'\' ...
 %filepath.Dhighspeed=dir(strcat(pathname.NIFS,'\Doppler\Photron\',string(date),'\**\*shot',num2str(shot),'*.tif'));
 %filepath.SXR=strcat(pathname.NIFS,'\X-ray\',string(date),'\shots\',string(date),num2str(shot,'%03i'),'.tif');
 times = start:5:(start+5*7);
-cd 'I:\makimitsu\211223';
+cd J:\makimitsu\211223;
 for t = times
         
         filename = strcat('SXR_',num2str(date),num2str(shot,'%03i'),'_',num2str(t),'us');

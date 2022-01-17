@@ -1,4 +1,4 @@
-function [ok, bz, rpos, zpos, ng] = getpcbbz(rawdata, coeff,date)
+function [ok, bz, rpos, zpos, p_ch] = getpcbbz(rawdata, coeff,date)
 % データの並べ替え（積分器のチャンネルとデジタイザの対応）
 d=reshape([1:32],2,16);%デジタイザの順番
 c=[d;d+32];%積分器の順番

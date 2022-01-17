@@ -17,7 +17,7 @@ addpath(genpath(f));
 DOCID='1wG5fBaiQ7-jOzOI-2pkPAeV6SDiHc_LrOdcbWlvhHBw';
 T=getTS6log(DOCID);% ログのテーブルを取得
  
-shotlist=[2692:2950];
+shotlist=[2946];
 subT=T(shotlist,:);
 IDXlist=shotlist(isfinite(subT.DopplerDelay)&isfinite(subT.d_tacq));
 %IDX=IDXlist(1,88);
@@ -79,7 +79,7 @@ end
 %%ファイルへのパスを作る
 %それぞれのPCから共有フォルダまでのパスはそれぞれ異なるので各自で設定
 %pathname.ts3u=getenv('ts3u_path');%old-koalaのts-3uまでのパス
-pathname.fourier='I:';%md0までのpath
+pathname.fourier='J:';%md0までのpath
 pathname.NIFS=getenv('NIFS_path');%resultsまでのpath
 
 %共有フォルダ以下から目的ショットのファイルを探す
@@ -141,7 +141,7 @@ if isfile( fullfile(filepath.D288.folder,filepath.D288.name))
     title(string(t)+'us,ti')
     xlabel('z')
     ylabel('r')
-    filename = strcat('I:\makimitsu\',num2str(date),'\Doppler_',num2str(date),num2str(shot,'%03i'),'_',num2str(t),'us');
+    filename = strcat('J:\makimitsu\',num2str(date),'\Doppler_',num2str(date),num2str(shot,'%03i'),'_',num2str(t),'us');
     saveas(gcf,strcat(filename,'.png'))
     close
 end
