@@ -1,27 +1,37 @@
 clear
 %%%%%%%%%%%%%%%%%%%%%%%%
 %  288chDopplerとmrdの磁気面を重ねてプロットして保存するコード
-%　288chDopplerはIDLで作ったsavのデータをあらかじめI:\makimitsu\yyddmmに保存してあるものを読み込む
+%　288chDopplerはIDLで作ったsavのデータをあらかじめfourier\md0\makimitsu\date(yyddmm)に保存してあるものを読み込む
 %
 %%%%%%%%%%%%%%%%%%%%%%%%
 
+%%%%ファイルへのパスを作る
+%それぞれのPCから共有フォルダまでのパスはそれぞれ異なるので各自で設定
+pathname.ts3u=getenv('ts3u_path');%old-koalaのts-3uまでのパス
+pathname.fourier='I:';%md0までのpath
+pathname.NIFS=getenv('NIFS_path');%resultsまでのpath
+
+
+setenv('a038_path','I:\a038'); %fourier/md0/a038までのパスをa038_pathとして環境変数設定して、内部ネットで実行できる
 yourname = 'C:\Users\Moe Akimitsu\';
 f = fullfile(yourname,'Documents','GitHub','test-open');
 addpath(genpath(f));
 %addpath(fullfile(yourname,'Documents','GitHub','test-open','pcb'));
 %f = fullfile(yourname,'Documents','GitHub','SXR_test');
 %addpath(f);
+
 %%%適宜変更
 
 
 DOCID='1wG5fBaiQ7-jOzOI-2pkPAeV6SDiHc_LrOdcbWlvhHBw';
 T=getTS6log(DOCID);% ログのテーブルを取得
  
-shotlist=[2692:2950];
+%shotlist=[2692:2950];%IDX（ログの通し番号を入れる）
+shotlist=[2911];
 subT=T(shotlist,:);
 IDXlist=shotlist(isfinite(subT.DopplerDelay)&isfinite(subT.d_tacq));
 %IDX=IDXlist(1,88);
-for IDX=IDXlist(1,114:end)  %
+for IDX=IDXlist(1,1:end)  %
 date=T.date(IDX);
 shot=T.shot(IDX);
 TF_shot=T.TFoffset(IDX);
@@ -34,11 +44,7 @@ t=T.DopplerDelay(IDX);
 n=50;
 
 
-%%ファイルへのパスを作る
-%それぞれのPCから共有フォルダまでのパスはそれぞれ異なるので各自で設定
-pathname.ts3u=getenv('ts3u_path');%old-koalaのts-3uまでのパス
-pathname.fourier='I:';%md0までのpath
-pathname.NIFS=getenv('NIFS_path');%resultsまでのpath
+%%%DopplerはIDLのファイル
 
 %共有フォルダ以下から目的ショットのファイルを探す
 %filepath.rgw=strcat(pathname.ts3u, '\', string(date),'\' ...
@@ -50,7 +56,7 @@ else
     filepath.D288=dir(strcat(pathname.fourier,'\makimitsu\',string(date),'\doppler2D_shot',num2str(shot),'.sav'));
 end    
     %filepath.Dhighspeed=dir(strcat(pathname.NIFS,'\Doppler\Photron\',string(date),'\**\*shot',num2str(shot),'*.tif'));
-    %filepath.SXR=strcat(pathname.NIFS,'\X-ray\',string(date),'\shots\',string(date),num2str(shot,'%03i'),'.tif');
+    filepath.SXR=strcat(pathname.NIFS,'\X-ray\',string(date),'\shots\',string(date),num2str(shot,'%03i'),'.tif');
 if numel(filepath.D288)==0
     continue
 end
@@ -95,10 +101,11 @@ if isfile( fullfile(filepath.D288.folder,filepath.D288.name))
     title(string(t)+'us,emiision')
     xlabel('z')
     ylabel('r')
+    ylim([0.075 0.25])
     caxis([-3e5,3e5])
 
     subplot('Position',pos2);
-    contourf(doppler.z,doppler.yy,doppler.ti_2d,30,'LineStyle','none')
+    contourf(doppler.z,doppler.yy,doppler.ti_2d,[0:0.05:1]*60,'LineStyle','none')
     colormap(jet)
     colorbar('Location','eastoutside')
     hold on
@@ -106,12 +113,14 @@ if isfile( fullfile(filepath.D288.folder,filepath.D288.name))
     hold off
     axis image
     axis tight manual
-    caxis([-300,300])
+    caxis([0,100])
+     ylim([0.075 0.25])
     title(string(t)+'us,ti')
     xlabel('z')
     ylabel('r')
     filename = strcat('I:\makimitsu\',num2str(date),'\Doppler_',num2str(date),num2str(shot,'%03i'),'_',num2str(t),'us');
-    saveas(gcf,strcat(filename,'_all','.png'))
+% plot_psi_SXR_at_t(B_z,r_probe,z_probe,date,shot,473,false,false,T.Period_StartTime_(IDX),5,false,filepath.SXR);
+     saveas(gcf,strcat(filename,'_all','.png'))
     close
 end
 

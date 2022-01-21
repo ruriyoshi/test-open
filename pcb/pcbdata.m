@@ -1,5 +1,5 @@
-function [grid2D, data2D] = pcbdata(date, shot,tfshot,trange, coeff, n,EF)
-[rawdata]=getvalue(shot,tfshot); % rawdata
+function [grid2D, data2D] = pcbdata(date, d_tacq,d_tacqTF,trange, coeff, n,EF)
+[rawdata]=getvalue(d_tacq,d_tacqTF); % rawdata
 if numel(rawdata)< 500
     grid2D=NaN;
     data2D=NaN;

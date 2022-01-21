@@ -17,7 +17,8 @@ addpath(genpath(f));
 DOCID='1wG5fBaiQ7-jOzOI-2pkPAeV6SDiHc_LrOdcbWlvhHBw';
 T=getTS6log(DOCID);% ログのテーブルを取得
  
-shotlist=[2946];
+shotlist=[2875:2946];
+%shotlist=2911;
 subT=T(shotlist,:);
 IDXlist=shotlist(isfinite(subT.DopplerDelay)&isfinite(subT.d_tacq));
 %IDX=IDXlist(1,88);
@@ -79,7 +80,7 @@ end
 %%ファイルへのパスを作る
 %それぞれのPCから共有フォルダまでのパスはそれぞれ異なるので各自で設定
 %pathname.ts3u=getenv('ts3u_path');%old-koalaのts-3uまでのパス
-pathname.fourier='J:';%md0までのpath
+pathname.fourier='I:';%md0までのpath
 pathname.NIFS=getenv('NIFS_path');%resultsまでのpath
 
 %共有フォルダ以下から目的ショットのファイルを探す
@@ -123,10 +124,12 @@ if isfile( fullfile(filepath.D288.folder,filepath.D288.name))
     title(string(t)+'us,emiision')
     xlabel('z')
     ylabel('r')
+     xlim([-0.05 0.05])
+    ylim([0.07 0.25])
     caxis([-3e5,3e5])
 
     subplot('Position',pos2);
-    contourf(doppler.z,doppler.yy,doppler.ti_2d,30,'LineStyle','none')
+    contourf(doppler.z,doppler.yy,doppler.ti_2d,[0:10:150],'LineStyle','none')
     colormap(jet)
     axis image
     axis tight manual
@@ -137,11 +140,16 @@ if isfile( fullfile(filepath.D288.folder,filepath.D288.name))
     plot(grid2D.zq(1,squeeze(mid(opoint(:,:,i),:,i))),grid2D.rq(opoint(:,:,i),1),"ro")
     plot(grid2D.zq(1,squeeze(mid(xpoint(:,:,i),:,i))),grid2D.rq(xpoint(:,:,i),1),"rx")
     hold off
-    caxis([-300,300])
+    %caxis([-100,100])
     title(string(t)+'us,ti')
+    xlim([-0.05 0.05])
+    ylim([0.07 0.25])
     xlabel('z')
     ylabel('r')
-    filename = strcat('J:\makimitsu\',num2str(date),'\Doppler_',num2str(date),num2str(shot,'%03i'),'_',num2str(t),'us');
+    cd 'C:\Users\Moe Akimitsu\Desktop\dronkaiseki\'
+    %filename = strcat('J:\makimitsu\',num2str(date),'\Doppler_',num2str(date),num2str(shot,'%03i'),'_',num2str(t),'us');
+    %filename = strcat('C:\Users\Moe Akimitsu\Desktop\dronkaiseki\',num2str(date),'\Doppler_',num2str(date),num2str(shot,'%03i'),'_',num2str(t),'us');
+                  filename=num2str(IDX);
     saveas(gcf,strcat(filename,'.png'))
     close
 end

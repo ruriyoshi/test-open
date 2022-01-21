@@ -17,7 +17,8 @@ addpath(f);
 DOCID='1wG5fBaiQ7-jOzOI-2pkPAeV6SDiHc_LrOdcbWlvhHBw';
 T=getTS6log(DOCID);% ログのテーブルを取得
 
-shotlist=[2692:2950];
+%shotlist=[2692:2950];
+shotlist=[2911:2950];
 subT=T(shotlist,:);
 IDXlist=shotlist(isfinite(subT.Period_StartTime_)&isfinite(subT.d_tacq));
 %IDX=IDXlist(1,88);
@@ -92,7 +93,7 @@ filepath.SXR=strcat(pathname.NIFS,'\X-ray\',string(date),'\shots\',string(date),
 
 if isfile(filepath.SXR)
     %plot_pcb_SXR_multi(data2D.psi,grid2D.rq,grid2D.zq,date,shot,true,false,T.Period_StartTime_(IDX),5,true,filepath.SXR)
-    plot_pcb_SXR_multi(data2D.psi,grid2D.rq,grid2D.zq,date,shot,true,false,T.Period_StartTime_(IDX),5,true,filepath.SXR)
+plot_pcb_SXR_multi(data2D.psi,grid2D.rq,grid2D.zq,date,shot,true,false,T.Period_StartTime_(IDX),5,true,filepath.SXR)
 end
 
 

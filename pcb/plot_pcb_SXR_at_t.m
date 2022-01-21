@@ -168,6 +168,10 @@ function [] = plot_pcb_SXR_at_t(psi_all,rq,zq,date,shot,t,layer,area,start,inter
         hold off
             axis image
             axis tight manual
+            xlim([min(zq,[],'all') max(zq,[],'all')])
+            ylim([min(rq,[],'all') max(rq,[],'all')])
+
+
         % subplot(2,1,2);
         subplot('Position',pos2);
         [SXR_mesh_z2,SXR_mesh_r2] = meshgrid(z_space_SXR2,r_space_SXR);
@@ -188,11 +192,14 @@ function [] = plot_pcb_SXR_at_t(psi_all,rq,zq,date,shot,t,layer,area,start,inter
         ax.FontSize = 18; 
             axis image
             axis tight manual
+            xlim([min(zq,[],'all') max(zq,[],'all')])
+            ylim([min(rq,[],'all') max(rq,[],'all')])
         hold off
     end
 if ifsave
     % pathname = '/Users/shinjirotakeda/Dropbox/ReconstructionResults/';
-    cd 'I:\makimitsu\211223';
+    %cd 'I:\makimitsu\211223';
+    cd 'C:\Users\Moe Akimitsu\Desktop\dronkaiseki'
 %     if area
 %         foldername = strcat(pathname,num2str(date),'/shot',num2str(shot));
 %     else
