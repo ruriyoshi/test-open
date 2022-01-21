@@ -28,6 +28,8 @@ T=getTS6log(DOCID);% ログのテーブルを取得
  
 %shotlist=[2692:2950];%IDX（ログの通し番号を入れる）
 shotlist=[2911];
+
+
 subT=T(shotlist,:);
 IDXlist=shotlist(isfinite(subT.DopplerDelay)&isfinite(subT.d_tacq));
 %IDX=IDXlist(1,88);

@@ -14,5 +14,6 @@ handler = sun.net.www.protocol.https.Handler;
 connection = java.net.URL([],loginURL,handler).openConnection();
 connection.getInputStream();
 
-ts6log = webread(csvURL,'table');
+%ts6log = webread(csvURL,'table');
+ts6log = readtable(csvURL,'NumHeaderLines',0);
 end
