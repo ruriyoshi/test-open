@@ -1,4 +1,5 @@
 clear
+close all
 %%%%%%%%%%%%%%%%%%%%%%%%
 %  288chDopplerとmrdの磁気面を重ねてプロットして保存するコード
 %　288chDopplerはIDLで作ったsavのデータをあらかじめfourier\md0\makimitsu\date(yyddmm)に保存してあるものを読み込む
@@ -26,14 +27,18 @@ addpath(genpath(f));
 DOCID='1wG5fBaiQ7-jOzOI-2pkPAeV6SDiHc_LrOdcbWlvhHBw';
 T=getTS6log(DOCID);% ログのテーブルを取得
  
-%shotlist=[2692:2950];%IDX（ログの通し番号を入れる）
-shotlist=[2911];
+%shotlist=[2946:2950];%IDX（ログの通し番号を入れる）
+shotlist=[2946];
 
-
+%subT=searchlog(T,'date',211224);
+%shotlist=subT.number;
 subT=T(shotlist,:);
-IDXlist=shotlist(isfinite(subT.DopplerDelay)&isfinite(subT.d_tacq));
+IDXlist=subT{:,1};
+IDXlist=IDXlist(isfinite(subT.DopplerDelay)&isfinite(subT.d_tacq))';
 %IDX=IDXlist(1,88);
-for IDX=IDXlist(1,1:end)  %
+
+for IDX=IDXlist 
+
 date=T.date(IDX);
 shot=T.shot(IDX);
 TF_shot=T.TFoffset(IDX);
@@ -82,8 +87,14 @@ if isfile( fullfile(filepath.D288.folder,filepath.D288.name))
     [psi_mesh_z,psi_mesh_r] = meshgrid(z_space,r_space);
     [probe_mesh_z,probe_mesh_r] = meshgrid(z_probe,r_probe);
     psi = griddata(z_probe,r_probe,psi,psi_mesh_z,psi_mesh_r,'cubic');
-    restore_idl( fullfile(filepath.D288.folder,filepath.D288.name),'lowercase','create'); %.savファイルを読み込む
-    
+    %restore_idl( fullfile(filepath.D288.folder,filepath.D288.name),'lowercase','create'); %.savファイルを読み込む
+    filenameasc=dir(strcat('I:\Doppler\288CH\20',num2str(date),'\shot',num2str(shot),'_*.asc'));
+    if numel(filenameasc)==0
+        continue
+    end    
+    doppler=doppler288ch(fullfile(filenameasc.folder,filenameasc.name),date);
+
+
     f = figure;
     % f.WindowState = 'maximized';
     f.Units = 'normalized';
@@ -92,7 +103,7 @@ if isfile( fullfile(filepath.D288.folder,filepath.D288.name))
     pos2 = [0.58,0.2,0.35,0.6];
 
     subplot('Position',pos1);
-    contourf(doppler.z,doppler.yy,doppler.emission,30,'LineStyle','none')
+    contourf(doppler.z,doppler.yy,doppler.emission,[0:0.1:1]*3e5,'LineStyle','none')
     colormap(jet)
     colorbar('Location','eastoutside')
     hold on
@@ -104,10 +115,10 @@ if isfile( fullfile(filepath.D288.folder,filepath.D288.name))
     xlabel('z')
     ylabel('r')
     ylim([0.075 0.25])
-    caxis([-3e5,3e5])
-
+    caxis([0,3e5])
+   % doppler.ti_2d(doppler.ti_2d>100)=NaN;
     subplot('Position',pos2);
-    contourf(doppler.z,doppler.yy,doppler.ti_2d,[0:0.05:1]*60,'LineStyle','none')
+    contourf(doppler.z,doppler.yy,doppler.ti_2d,[0:0.05:1]*100,'LineStyle','none')
     colormap(jet)
     colorbar('Location','eastoutside')
     hold on

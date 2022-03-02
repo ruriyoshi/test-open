@@ -93,7 +93,7 @@ else
     filepath.D288=dir(strcat(pathname.fourier,'\makimitsu\',string(date),'\doppler2D_shot',num2str(shot),'.sav'));
 end    
     %filepath.Dhighspeed=dir(strcat(pathname.NIFS,'\Doppler\Photron\',string(date),'\**\*shot',num2str(shot),'*.tif'));
-filepath.SXR=strcat(pathname.NIFS,'\X-ray\',string(date),'\shots\',string(date),num2str(shot,'%03i'),'.tif');
+%filepath.SXR=strcat(pathname.NIFS,'\X-ray\',string(date),'\shots\',string(date),num2str(shot,'%03i'),'.tif');
 if numel(filepath.D288)==0
     continue
 end
