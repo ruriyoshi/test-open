@@ -52,7 +52,7 @@ end
 times = start:interval:(start+interval*7);
 
 for t = times
-    plot_pcb_SXR_at_t(psi,rq,zq,date,shot,t,layer,area,start,interval,save,SXRfilename)
+    plot_pcb_SXR_at_t(psi,rq,zq,date,shot,t,layer,area,start,interval,save,SXRfilename)%%ここは更新必要
 end
 end
 

@@ -41,7 +41,7 @@ if isstruct(grid2D)==0 %もしdtacqデータがない場合次のloopへ(デー�
 end
     maxrange=max(abs(data2D.Jt),[],'all');
 
-%%%midplaneとかO点、X点を探す
+%%%midplaneとか
 [psimid,mid]=min(data2D.psi,[],2);
 [opoint,p]=islocalmin(psimid,1);
 [xpoint,~]=islocalmax(psimid,1);
