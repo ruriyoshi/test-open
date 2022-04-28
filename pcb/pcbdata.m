@@ -1,3 +1,6 @@
+%%%%%%%%%%%pcb計測の二次元データdata2D（Bz,Br，Et，Jt）とグリッドgrid2D（zq,rq）が出てくる。
+%%%% input （日付、データックのショット番号、差し引きショット、見たい時間、nはグリッドの個数、EFの電流）
+%%%%%%↑　これはtestの中にある。psisave.mlx内のfunction [date, shot, TF_shot, offset_TF,i_EF,start,Doppler_t] = getinput(T,IDX)を関数化して呼び出すのが楽
 function [grid2D, data2D] = pcbdata(date, d_tacq,d_tacqTF,trange, coeff, n,EF)
 [rawdata]=getvalue(d_tacq,d_tacqTF); % rawdata
 if numel(rawdata)< 500

@@ -10,9 +10,9 @@ clear EF r_EF n_EF i_EF z_EF
 % psi計算用 (Bzの二次元補間→PSI計算)
 
 %trange=(468:1:477);
-data2D=struct('psi',zeros(n,n,size(trange,2)),'Bz',zeros(n,n,size(trange,2)),'Br',zeros(n,n,size(trange,2)),'Jt',zeros(n,n,size(trange,2)),'Et',zeros(n,n,size(trange,2)),'trange',trange);
-minpsi=zeros(n,size(trange,2));
-minind=zeros(n,size(trange,2));
+data2D=struct('psi',zeros(size(grid2D.rq,1),size(grid2D.rq,2),size(trange,2)),'Bz',zeros(size(grid2D.rq,1),size(grid2D.rq,2),size(trange,2)),'Br',zeros(size(grid2D.rq,1),size(grid2D.rq,2),size(trange,2)),'Jt',zeros(size(grid2D.rq,1),size(grid2D.rq,2),size(trange,2)),'Et',zeros(size(grid2D.rq,1),size(grid2D.rq,2),size(trange,2)),'trange',trange);
+minpsi=zeros(size(grid2D.rq,1),size(trange,2));
+minind=zeros(size(grid2D.rq,1),size(trange,2));
 for i=1:size(trange,2)
     t=trange(i);
     %%Bzの二次元補間（rbfinterp）
