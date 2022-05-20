@@ -13,9 +13,9 @@ T=getTS6log(DOCID);
 %%%%%ここが各PCのパス
 %環境変数を設定していない場合はパスを''内に全て記入する（使用しないパスは空白''で良い）
 pathname.ts3u='ts3u_path';%old-koalaのts-3uまでのパス（mrdなど）
-pathname.fourier='/Users/mgar/data/';%fourierのmd0（データックのショットが入ってる）までのpath
-pathname.NIFS='';%resultsまでのpath（ドップラー、SXR）
-pathname.save='/Users/mgar/pcb_save'; %保存先
+pathname.fourier='fourier_path';%fourierのmd0（データックのショットが入ってる）までのpath
+pathname.NIFS='NIFS_path';%resultsまでのpath（ドップラー、SXR）
+pathname.save='save_path'; %保存先
 
 %%%%(2)ログから解析したいデータを検索
 %Github/test-open/searchlog.mを使用
@@ -27,7 +27,7 @@ searchlog(T,node,pat); % ログのテーブルから当てはまるものを抽�
 
 %%%%(3)指定したshotの解析
 IDXlist=2870:2921; %【input】テーブルから解析したいshot番号を抽出して入力
-for IDX=IDXlist(1,22)
+for IDX=IDXlist(1,37)
 plot_psi(T, pathname,IDX); %通常の時系列プロット
 %plot_position(T, pathname, IDX); %計測位置、各位置での生信号も含めた確認用プロット
 end
@@ -75,9 +75,9 @@ end
     maxrange=max(abs(data2D.Jt),[],'all');
 
 %%%midplaneとかO点、X点を探す
-[psimid,mid]=min(data2D.psi,[],2); %各r,tでのpsiの最小値,時間
-[opoint,p]=islocalmin(psimid,1); %全rでのpsiの極小値
-[xpoint,~]=islocalmax(psimid,1); %全rでのpsiの極大値
+[psimid,mid]=min(data2D.psi,[],2);
+[opoint,p]=islocalmin(psimid,1);
+[xpoint,~]=islocalmax(psimid,1);
 [xp_psi,maxxp]=max(squeeze(psimid),[],1);
 % onum=squeeze(sum(opoint,1));
 % trange(onum~=0)
@@ -117,8 +117,7 @@ f.WindowState = 'maximized';
     ylabel('r')
  end
  
- %sgtitle(strcat('IDX=',num2str(IDX),': shot=',num2str(date),num2str(shot,'%03i'),': dtacq=',num2str(T.d_tacq(IDX))))
- sgtitle(strcat('IDX=',num2str(IDX),': shot=',num2str(date),num2str(shot,'%03i'),': dtacq=',num2str(T.d_tacq(IDX)), ': TF=',num2str(T.TF_kV_(IDX)), ' kV')))
+ sgtitle(strcat('IDX=',num2str(IDX),': shot=',num2str(date),num2str(shot,'%03i'),': dtacq=',num2str(T.d_tacq(IDX))))
 
 %figureの保存
 %saveas(gcf,strcat(pathname.save,'\IDX',num2str(IDX),'_shot',num2str(date),num2str(shot,'%03i'),'_dtacq',num2str(T.d_tacq(IDX)),'_time',num2str(t_start),'.png'))
@@ -177,7 +176,7 @@ figure
     %colormap(bone)
     hold on
     plot(grid2D.zq(1,squeeze(mid(:,:,i))),grid2D.rq(:,1))
-    contour(grid2D.zq(1,:),grid2D.rq(:,1),squeeze(data2D.psi(:,:,i)),45,'black','LineWidth',0.6)
+    contour(grid2D.zq(1,:),grid2D.rq(:,1),squeeze(data2D.psi(:,:,i)),50,'black','LineWidth',0.6)
     plot(grid2D.zq(1,squeeze(mid(opoint(:,:,i),:,i))),grid2D.rq(opoint(:,:,i),1),"ro")
     plot(grid2D.zq(1,squeeze(mid(xpoint(:,:,i),:,i))),grid2D.rq(xpoint(:,:,i),1),"rx")
     plot(x,y,"k.",'MarkerSize', 10)
