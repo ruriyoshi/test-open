@@ -14,16 +14,16 @@ end
 [ok, bz, rpos, zpos,p_ch] = getpcbbz(rawdata, coeff,date);
 
 % チャンネルごとの生信号のプロット
-% bz_s=smoothdata(bz,1);
+bz=smoothdata(bz,1);
 % r = 5;
 % col1 = 12;
 % col2 = 13;
 % y_upper_lim = 0.1;
 % y_lower_lim = -0.1;
-% t_start=300;
-% t_end=600;
+% t_start=455;
+% t_end=520;
 % r_ch=col1+col2;
-% plotbzsignal(y_upper_lim, col2, col1, t_end, p_ch, y_lower_lim, t_start, bz_s, ok, r_ch, r);
+% plotbzsignal(y_upper_lim, col2, col1, t_end, p_ch, y_lower_lim, t_start, bz, ok, r_ch, r);
 % clear r col1 col2 y_upper_lim y_lower_lim t t_start t_end
 
 [zq,rq]=meshgrid(linspace(min(zpos),max(zpos),n),linspace(min(rpos),max(rpos),n));
