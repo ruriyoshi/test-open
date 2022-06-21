@@ -12,25 +12,27 @@ T=getTS6log(DOCID);
 
 %%%%%ここが各PCのパス
 %環境変数を設定していない場合はパスを''内に全て記入する（使用しないパスは空白''で良い）
-pathname.ts3u='ts3u_path';%old-koalaのts-3uまでのパス（mrdなど）
-pathname.fourier='fourier_path';%fourierのmd0（データックのショットが入ってる）までのpath
-pathname.NIFS='NIFS_path';%resultsまでのpath（ドップラー、SXR）
-pathname.save='save_path'; %保存先
+pathname.ts3u=getenv('ts3u_path');%old-koalaのts-3uまでのパス（mrdなど）
+pathname.fourier=getenv('fourier_path');%fourierのmd0（データックのショットが入ってる）までのpath
+pathname.NIFS=getenv('NIFS_path');%resultsまでのpath（ドップラー、SXR）
+pathname.save=getenv('save_path'); %保存先
 
 %%%%(2)ログから解析したいデータを検索
 %Github/test-open/searchlog.mを使用
 
-node='date';  % 【input】検索する列の名前. T.Properties.VariableNamesで一覧表示できる
- pat=211223;   % 【input】検索パターン（数値なら一致検索、文字なら含む検索）　
-
-searchlog(T,node,pat); % ログのテーブルから当てはまるものを抽出した新しいテーブルを作成
+% node='date';  % 【input】検索する列の名前. T.Properties.VariableNamesで一覧表示できる
+%  pat=211223;   % 【input】検索パターン（数値なら一致検索、文字なら含む検索）　
+% 
+% searchlog(T,node,pat); % ログのテーブルから当てはまるものを抽出した新しいテーブルを作成
 
 %%%%(3)指定したshotの解析
-IDXlist=2870:2921; %【input】テーブルから解析したいshot番号を抽出して入力
-for IDX=IDXlist(1,37)
+% IDXlist=[2897 2906 2907 2912 2913] ; %2870:2921; %【input】テーブルから解析したいshot番号を抽出して入力
+IDXlist=[2911:2913 2925 2926 2927 2931 2933 2947:2950 2942 2943 2946];
+for IDX=IDXlist(1,7:8) %42
 plot_psi(T, pathname,IDX); %通常の時系列プロット
 %plot_position(T, pathname, IDX); %計測位置、各位置での生信号も含めた確認用プロット
 end
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%
 %以下、local関数(getinput, plot_psi, plot_posision)
@@ -56,7 +58,7 @@ Doppler_t=T.DopplerDelay(IDX);
 d_tacq=T.d_tacq(IDX);
 d_tacqTF=T.TFdtacq(IDX);
 
-trange=460:490;
+trange=470:510;
 t=T.DopplerDelay(IDX);
 n=50; %rz方向のメッシュ数
 end
@@ -82,23 +84,24 @@ end
 % onum=squeeze(sum(opoint,1));
 % trange(onum~=0)
     %maxrange=2e6;
-
+    
 %%磁気面時間発展プロット
-f=figure;
-f.WindowState = 'maximized';
- start=6; %460+?
- t_start=460+start;
+% f=figure;
+% f.WindowState = 'maximized';
+figure('Position', [0 0 1500 1500],'visible','on');
+ start=11; %470+?
+ t_start=470+start;
  for m=1:10 %図示する時間
      i=start+m; %end
      t=trange(i);
      subplot(2,5,m)
-    contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.Jt(:,:,i),10,'LineStyle','none')
+    contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.Jt(:,:,i),15,'LineStyle','none')
     colormap(jet)
     axis image
     axis tight manual
     %     xlim([-0.02 0.02])
     %     ylim([0.12 0.27])
-    caxis([-3*1e+6,3*1e+6]) %カラーバーの軸の範囲
+    caxis([-1.2*1e+6,1.2*1e+6]) %カラーバーの軸の範囲
     %caxis([-maxrange,maxrange])
     colorbar('Location','eastoutside')
     %zlim([-1 1])
@@ -120,12 +123,13 @@ f.WindowState = 'maximized';
  sgtitle(strcat('IDX=',num2str(IDX),': shot=',num2str(date),num2str(shot,'%03i'),': dtacq=',num2str(T.d_tacq(IDX))))
 
 %figureの保存
+saveas(gcf,strcat(pathname.save,'\IDX',num2str(IDX),'pcb_1.png'))
 %saveas(gcf,strcat(pathname.save,'\IDX',num2str(IDX),'_shot',num2str(date),num2str(shot,'%03i'),'_dtacq',num2str(T.d_tacq(IDX)),'_time',num2str(t_start),'.png'))
 %saveas(gcf,strcat(pathname.save,'\IDX',num2str(IDX),'_shot',num2str(date),num2str(shot,'%03i'),'_dtacq',num2str(T.d_tacq(IDX)),'_cr',num2str(cr_time),'us.png'))
 %saveas(gcf,strcat(pathname.save,'\IDX',num2str(IDX),'_shot',num2str(date),num2str(shot,'%03i'),'_dtacq',num2str(T.d_tacq(IDX)),'.png'))
 %save(strcat(pathname.save,'\IDX',num2str(IDX),'_shot',num2str(date),num2str(shot,'%03i'),'_dtacq',num2str(T.d_tacq(IDX)),'_cr',num2str(cr_time),'us.mat'))
 %save(strcat(pathname.save,'\IDX',num2str(IDX),'_shot',num2str(date),num2str(shot,'%03i'),'_dtacq',num2str(T.d_tacq(IDX)),'.mat'))
-%close
+close
 end
 
 %%%plot_psi:pcbプローブの磁気面・電流密度・X点・O点の時系列プロット+測定プローブ位置の表示
@@ -158,7 +162,7 @@ end
 
 %%磁気面時間発展プロット+計測位置プロット
 figure
- start=6; %460+?
+ start=19; %460+?
  for m=1:10 %図示する時間
      i=start+m; %end
      t=trange(i);
@@ -169,7 +173,7 @@ figure
     axis tight manual
     %     xlim([-0.02 0.02])
     %     ylim([0.12 0.27])
-    caxis([-3*1e+6,3*1e+6])
+    caxis([-2.7*1e+6,3*1e+6])
     %caxis([-maxrange,maxrange])
     colorbar('Location','eastoutside')
     %zlim([-1 1])
@@ -184,7 +188,7 @@ figure
     title(string(t)+'us')
     xlabel('z')
     ylabel('r')
-end
+ end
 
 sgtitle(strcat('IDX=',num2str(IDX),': shot=',num2str(date),num2str(shot,'%03i'),': dtacq=',num2str(T.d_tacq(IDX))))
 

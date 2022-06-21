@@ -4,6 +4,7 @@ ch_num=128;
 
 import MDSplus.*
 %ツリーのdatafileがあるフォルダのパスをtreename_pathという形で環境変数に設定
+%setenv('a038_path','/Users/mgar/koala/mnt/fourier/a038');
 %setenv('a038_path','F:\a038');
 %mdsipのポートに接続してa038のツリーを開く。
 mdsconnect('192.168.1.140');

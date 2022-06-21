@@ -1,9 +1,9 @@
 clear all
 folder_path=getenv('ts3u_path');%ts-3uまでのパス
-date=211217;
-TF_shot = 2 ;
+date=211224;
+TF_shot = 1 ;
 offset_TF = true;
-shot = 4 ;
+shot = 6;
 i_EF=150;
 % ********* ALWAYS RUN THIS FUNCTION FIRST ***********
 % parameters:(date,TF_shot,shot,offset_TF,offset_EF)
@@ -43,15 +43,19 @@ r_probe = r_probe([2,3,4,6,7,8]);
 
 % ************* PLOTTING FUNCTIONS *******************
 % parameters:(B_z,ch_dist,start_time,end_time)
-%plot_B_z_in_time(B_z,ch_dist,350,600);
+% plot_B_z_in_time(B_z,ch_dist,350,600);
 
-plot_psi_multi(B_z,r_probe,z_probe,461:1:480,true,true,true,false,shot);
+plot_psi_multi(B_z,r_probe,z_probe,461:1:475,true,true,true,false);
+% plot_psi_multi(B_z,r_probe,z_probe,476:1:491,true,true,true,false);
+% plot_psi_multi(B_z,r_probe,z_probe,492:1:507,true,true,true,false);
+% plot_psi_multi(B_z,r_probe,z_probe,508:1:523,true,true,true,false);
+%plot_psi_multi(B_z,r_probe,z_probe,461:1:480,true,true,true,false,shot);
 
 % parameters:(B_z,r_probe,z_probe,t,fitting,fill,fixed_Clayer,show_probe)
-% plot_psi_at_t(B_z,r_probe,z_probe,440,true,true,true,true);
+% plot_psi_at_t(B_z,r_probe,z_probe,476,true,true,true,true);
 
 %parameters:(B_z,r_probe)
-%plot_fitrate(B_z,r_probe,shot);
+% plot_fitrate(B_z,r_probe,shot);
 
 
 
