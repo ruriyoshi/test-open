@@ -28,7 +28,7 @@ pathname.save=getenv('save_path'); %保存先
 %%%%(3)指定したshotの解析
 % IDXlist=[2897 2906 2907 2912 2913] ; %2870:2921; %【input】テーブルから解析したいshot番号を抽出して入力
 IDXlist=[2911:2913 2925 2926 2927 2931 2933 2947:2950 2942 2943 2946];
-for IDX=IDXlist(1,7:8) %42
+for IDX=IDXlist(1,1) %42
 plot_psi(T, pathname,IDX); %通常の時系列プロット
 %plot_position(T, pathname, IDX); %計測位置、各位置での生信号も含めた確認用プロット
 end
@@ -58,7 +58,7 @@ Doppler_t=T.DopplerDelay(IDX);
 d_tacq=T.d_tacq(IDX);
 d_tacqTF=T.TFdtacq(IDX);
 
-trange=470:510;
+trange=460:490;
 t=T.DopplerDelay(IDX);
 n=50; %rz方向のメッシュ数
 end
@@ -89,47 +89,52 @@ end
 % f=figure;
 % f.WindowState = 'maximized';
 figure('Position', [0 0 1500 1500],'visible','on');
- start=11; %470+?
- t_start=470+start;
+ start=7; %460+?
+%  t_start=470+start;
  for m=1:10 %図示する時間
      i=start+m; %end
      t=trange(i);
      subplot(2,5,m)
-    contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.Jt(:,:,i),15,'LineStyle','none')
+    contourf(grid2D.zq(1,:),grid2D.rq(:,1),-1.*data2D.Jt(:,:,i),10,'LineStyle','none')
     colormap(jet)
     axis image
     axis tight manual
     %     xlim([-0.02 0.02])
     %     ylim([0.12 0.27])
-    caxis([-1.2*1e+6,1.2*1e+6]) %カラーバーの軸の範囲
+    caxis([-2.5*1e+6,2.5*1e+6]) %カラーバーの軸の範囲
+    %caxis([-1*1e+6,1*1e+6])
     %caxis([-maxrange,maxrange])
     colorbar('Location','eastoutside')
     %zlim([-1 1])
     %colormap(bone)
-    %%カラーバーのラベル付け
-    %c = colorbar;
-    %c.Label.String = 'Jt';
+    %カラーバーのラベル付け
+%     c = colorbar;
+%     c.Label.String = 'Jt [A/m^{2}]';
     hold on
     plot(grid2D.zq(1,squeeze(mid(:,:,i))),grid2D.rq(:,1))
     contour(grid2D.zq(1,:),grid2D.rq(:,1),squeeze(data2D.psi(:,:,i)),50,'black')
-    plot(grid2D.zq(1,squeeze(mid(opoint(:,:,i),:,i))),grid2D.rq(opoint(:,:,i),1),"ro")
-    plot(grid2D.zq(1,squeeze(mid(xpoint(:,:,i),:,i))),grid2D.rq(xpoint(:,:,i),1),"rx")
+    plot(grid2D.zq(1,squeeze(mid(opoint(:,:,i),:,i))),grid2D.rq(opoint(:,:,i),1),"bo")
+    plot(grid2D.zq(1,squeeze(mid(xpoint(:,:,i),:,i))),grid2D.rq(xpoint(:,:,i),1),"bx")
     hold off
-    title(string(t)+'us')
-    xlabel('z')
-    ylabel('r')
+    title(string(t)+' us')
+    xlabel('z [m]')
+    %ylabel('r [m]')
+%     ylim([0.1 grid2D.rq(end,1)])
+%     xlim([-0.04 0.04])
+%     ax = gca; %y軸を消す
+%     ax.YTickLabel = cell(size(ax.YTickLabel)); 
  end
  
  sgtitle(strcat('IDX=',num2str(IDX),': shot=',num2str(date),num2str(shot,'%03i'),': dtacq=',num2str(T.d_tacq(IDX))))
 
 %figureの保存
-saveas(gcf,strcat(pathname.save,'\IDX',num2str(IDX),'pcb_1.png'))
+% saveas(gcf,strcat(pathname.save,'\IDX',num2str(IDX),'pcb_1.png'))
 %saveas(gcf,strcat(pathname.save,'\IDX',num2str(IDX),'_shot',num2str(date),num2str(shot,'%03i'),'_dtacq',num2str(T.d_tacq(IDX)),'_time',num2str(t_start),'.png'))
 %saveas(gcf,strcat(pathname.save,'\IDX',num2str(IDX),'_shot',num2str(date),num2str(shot,'%03i'),'_dtacq',num2str(T.d_tacq(IDX)),'_cr',num2str(cr_time),'us.png'))
 %saveas(gcf,strcat(pathname.save,'\IDX',num2str(IDX),'_shot',num2str(date),num2str(shot,'%03i'),'_dtacq',num2str(T.d_tacq(IDX)),'.png'))
 %save(strcat(pathname.save,'\IDX',num2str(IDX),'_shot',num2str(date),num2str(shot,'%03i'),'_dtacq',num2str(T.d_tacq(IDX)),'_cr',num2str(cr_time),'us.mat'))
 %save(strcat(pathname.save,'\IDX',num2str(IDX),'_shot',num2str(date),num2str(shot,'%03i'),'_dtacq',num2str(T.d_tacq(IDX)),'.mat'))
-close
+% close
 end
 
 %%%plot_psi:pcbプローブの磁気面・電流密度・X点・O点の時系列プロット+測定プローブ位置の表示
