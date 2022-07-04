@@ -16,6 +16,7 @@ pathname.ts3u=getenv('ts3u_path');%old-koalaのts-3uまでのパス（mrdなど�
 pathname.fourier=getenv('fourier_path');%fourierのmd0（データックのショットが入ってる）までのpath
 pathname.NIFS=getenv('NIFS_path');%resultsまでのpath（ドップラー、SXR）
 pathname.save=getenv('save_path'); %保存先
+pathname.rawdata='/Users/mgar/rawdata_a038/'; %rawdataの保管場所
 
 %%%%(2)ログから解析したいデータを検索
 %Github/test-open/searchlog.mを使用
