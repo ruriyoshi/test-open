@@ -201,7 +201,7 @@ for i = time
     end
     
     hold off
-    
+%     xlim([-0.1 0.1])
     title(strcat(num2str(i),' us'),'FontSize',12);
     ax = gca;
     
