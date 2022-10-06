@@ -15,7 +15,7 @@ T=getTS6log(DOCID);
 pathname.ts3u='ts3u_path';%old-koalaのts-3uまでのパス（mrdなど）
 pathname.fourier='fourier_path';%fourierのmd0（データックのショットが入ってる）までのpath
 pathname.NIFS='NIFS_path';%resultsまでのpath（ドップラー、SXR）
-pathname.save='save_path'; %保存先
+pathname.save='C:\Users\uswk0\OneDrive\デスクトップ\data\a038_out\'; %保存先
 
 %%%%(2)ログから解析したいデータを検索
 %Github/test-open/searchlog.mを使用
@@ -27,11 +27,12 @@ searchlog(T,node,pat); % ログのテーブルから当てはまるものを抽�
 
 %%%%(3)指定したshotの解析
 IDXlist=2870:2921; %【input】テーブルから解析したいshot番号を抽出して入力
-for IDX=IDXlist(1,37)
-plot_psi(T, pathname,IDX); %通常の時系列プロット
+%for IDX=IDXlist(1,37)
+%plot_psi(T, pathname,IDX); %通常の時系列プロット
 %plot_position(T, pathname, IDX); %計測位置、各位置での生信号も含めた確認用プロット
-end
-
+%end
+IDX = 2911;
+plot_psi(T, pathname,IDX);
 %%%%%%%%%%%%%%%%%%%%%%%%
 %以下、local関数(getinput, plot_psi, plot_posision)
 %%%%%%%%%%%%%%%%%%%%%%%%
@@ -86,10 +87,10 @@ end
 %%磁気面時間発展プロット
 f=figure;
 f.WindowState = 'maximized';
- start=6; %460+?
+ start=13; %460+?
  t_start=460+start;
  for m=1:10 %図示する時間
-     i=start+m; %end
+     i=start+m*2; %end
      t=trange(i);
      subplot(2,5,m)
     contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.Jt(:,:,i),10,'LineStyle','none')
@@ -109,18 +110,18 @@ f.WindowState = 'maximized';
     hold on
     plot(grid2D.zq(1,squeeze(mid(:,:,i))),grid2D.rq(:,1))
     contour(grid2D.zq(1,:),grid2D.rq(:,1),squeeze(data2D.psi(:,:,i)),50,'black')
-    plot(grid2D.zq(1,squeeze(mid(opoint(:,:,i),:,i))),grid2D.rq(opoint(:,:,i),1),"ro")
+    %plot(grid2D.zq(1,squeeze(mid(opoint(:,:,i),:,i))),grid2D.rq(opoint(:,:,i),1),"ro")
     plot(grid2D.zq(1,squeeze(mid(xpoint(:,:,i),:,i))),grid2D.rq(xpoint(:,:,i),1),"rx")
     hold off
-    title(string(t)+'us')
-    xlabel('z')
-    ylabel('r')
+    title(string(t)+'us','Fontsize', 12)
+    xlabel('z [m]','FontSize',12)
+    ylabel('r [m]','FontSize',12)
  end
  
- sgtitle(strcat('IDX=',num2str(IDX),': shot=',num2str(date),num2str(shot,'%03i'),': dtacq=',num2str(T.d_tacq(IDX))))
+ %sgtitle(strcat('IDX=',num2str(IDX),': shot=',num2str(date),num2str(shot,'%03i'),': dtacq=',num2str(T.d_tacq(IDX))))
 
 %figureの保存
-%saveas(gcf,strcat(pathname.save,'\IDX',num2str(IDX),'_shot',num2str(date),num2str(shot,'%03i'),'_dtacq',num2str(T.d_tacq(IDX)),'_time',num2str(t_start),'.png'))
+saveas(gcf,strcat(pathname.save,'\IDX',num2str(IDX),'_shot',num2str(date),num2str(shot,'%03i'),'_dtacq',num2str(T.d_tacq(IDX)),'_time',num2str(t_start),'.png'))
 %saveas(gcf,strcat(pathname.save,'\IDX',num2str(IDX),'_shot',num2str(date),num2str(shot,'%03i'),'_dtacq',num2str(T.d_tacq(IDX)),'_cr',num2str(cr_time),'us.png'))
 %saveas(gcf,strcat(pathname.save,'\IDX',num2str(IDX),'_shot',num2str(date),num2str(shot,'%03i'),'_dtacq',num2str(T.d_tacq(IDX)),'.png'))
 %save(strcat(pathname.save,'\IDX',num2str(IDX),'_shot',num2str(date),num2str(shot,'%03i'),'_dtacq',num2str(T.d_tacq(IDX)),'_cr',num2str(cr_time),'us.mat'))
@@ -158,9 +159,9 @@ end
 
 %%磁気面時間発展プロット+計測位置プロット
 figure
- start=6; %460+?
+ start=9; %460+?
  for m=1:10 %図示する時間
-     i=start+m; %end
+     i=start+(m*2+1); %end
      t=trange(i);
      subplot(2,5,m)
     contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.Jt(:,:,i),10,'LineStyle','none')
@@ -182,13 +183,13 @@ figure
     plot(x,y,"k.",'MarkerSize', 10)
     hold off
     title(string(t)+'us')
-    xlabel('z')
-    ylabel('r')
+    xlabel('z [m]','FontSize',12)
+    ylabel('r [m]','FontSize',12)
 end
 
 sgtitle(strcat('IDX=',num2str(IDX),': shot=',num2str(date),num2str(shot,'%03i'),': dtacq=',num2str(T.d_tacq(IDX))))
 
-%saveas(gcf,strcat(pathname.save,'\IDX',num2str(IDX),'_shot',num2str(date),num2str(shot,'%03i'),'_dtacq',num2str(T.d_tacq(IDX)),'_cr',num2str(cr_time),'us.png'))
+saveas(gcf,strcat(pathname.save,'\IDX',num2str(IDX),'_shot',num2str(date),num2str(shot,'%03i'),'_dtacq',num2str(T.d_tacq(IDX)),'_cr',num2str(cr_time),'us.png'))
 %save(strcat(pathname.save,'\IDX',num2str(IDX),'_shot',num2str(date),num2str(shot,'%03i'),'_dtacq',num2str(T.d_tacq(IDX)),'_cr',num2str(cr_time),'us.mat')
 %close
 end

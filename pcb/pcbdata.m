@@ -2,7 +2,11 @@
 %%%% input （日付、データックのショット番号、差し引きショット、見たい時間、nはグリッドの個数、EFの電流）
 %%%%%%↑　これはtestの中にある。psisave.mlx内のfunction [date, shot, TF_shot, offset_TF,i_EF,start,Doppler_t] = getinput(T,IDX)を関数化して呼び出すのが楽
 function [grid2D, data2D] = pcbdata(date, d_tacq,d_tacqTF,trange, coeff, n,EF)
-[rawdata]=getvalue(d_tacq,d_tacqTF); % rawdata
+%[rawdata]=getvalue(d_tacq,d_tacqTF); % rawdata
+pathname.rawdata='C:\Users\uswk0\OneDrive\デスクトップ\data\rawdata_a038\'; %rawdataの保管場所（各自変更）
+filename=strcat(pathname.rawdata,'rawdata_dtacq',num2str(d_tacq),'.mat');
+load(filename,'rawdata');
+
 if numel(rawdata)< 500
     grid2D=NaN;
     data2D=NaN;
