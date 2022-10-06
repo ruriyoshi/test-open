@@ -13,8 +13,8 @@ function [B_z,r_probe,z_probe,ch_dist,B_z_return,data_return,shot_num] = get_B_z
 
 %************** Folder directory *****************
 %folder_directory = 'C:/Users/take_/OneDrive/デスクトップ/program/fluctuation/data/';
-folder_directory_Bz = strcat(folder_path,'/');
-
+%folder_directory_Bz = strcat(folder_path,'/');
+folder_directory_Bz = 'C:/Users/uswk0/OneDrive/デスクトップ/data/';
 %************** Physical Constants ***************
 mu0   = 4*pi*10^(-7);   % vacuum permeability (H/m)
 

@@ -1,9 +1,9 @@
 clear all
 folder_path=getenv('ts3u_path');%ts-3uまでのパス
-date=211217;
+date=211223;
 TF_shot = 2 ;
 offset_TF = true;
-shot = 4 ;
+shot = 30 ;
 i_EF=150;
 % ********* ALWAYS RUN THIS FUNCTION FIRST ***********
 % parameters:(date,TF_shot,shot,offset_TF,offset_EF)
