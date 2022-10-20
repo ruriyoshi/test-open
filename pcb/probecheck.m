@@ -1,47 +1,72 @@
 %%%%%%%%%%%%%%%%%%%%%%%%
-%pcbプローブと装置の極性チェック
+%pcbプローブと装置の磁場信号極性チェック
 %dtacqのshot番号を直接指定する場合
 %%%%%%%%%%%%%%%%%%%%%%%%
 
-% %%%%(1)spread sheetから ログのテーブルを取得してTに格納
-% %Github/test-open/getTS6log.mを使用
-% DOCID='1wG5fBaiQ7-jOzOI-2pkPAeV6SDiHc_LrOdcbWlvhHBw';%スプレッドシートのID
-% T=getTS6log(DOCID);
-
 %%%%%ここが各PCのパス
-%環境変数を設定していない場合はパスを''内に全て記入する（使用しないパスは空白''で良い）
+%【※コードを使用する前に】環境変数を設定しておくか、matlab内のコマンドからsetenv('パス名','アドレス')で指定してから動かす
 pathname.ts3u=getenv('ts3u_path');%old-koalaのts-3uまでのパス（mrdなど）
 pathname.fourier=getenv('fourier_path');%fourierのmd0（データックのショットが入ってる）までのpath
 pathname.NIFS=getenv('NIFS_path');%resultsまでのpath（ドップラー、SXR）
-pathname.save='C:\Users\kuru1\OneDrive - g.ecc.u-tokyo.ac.jp\labo\experiment\221017'; %保存先
+pathname.save=getenv('savedata_path');%outputデータ保存先
 
-pathname.rawdata='C:\Users\kuru1\OneDrive - g.ecc.u-tokyo.ac.jp\labo\experiment\rawdata_a038_noTF\'; %rawdataの保管場所
+pathname.rawdata=getenv('rawdata_path');%dtacqのrawdataの保管場所
+pathname.woTFdata=getenv('woTFdata_path');%rawdata（TFoffset引いた）の保管場所
 
-%%%%(3)指定したshotの解析
-dtacqlist=3327;%10002:10004; %【input】テーブルから解析したいshot番号を抽出して入力
+%%%%実験オペレーションの取得
+%直接入力の場合
+dtacqlist=10007;%3327; %【input】dtacqの保存番号
+date = 221021;%211214;%【input】計測日
 
-date = 211214;%221014;
-d_tacqTF = '';
-i_EF = 0;
-trange=460:490;
-n=50; %rz方向のメッシュ数
+%磁気面出す場合は適切な値を入力、磁場信号のみプロットする場合は変更不要
+d_tacqTF = '';%【input】TFoffsetのdtacq保存番号
+i_EF = 0;%【input】EF電流
+trange=460:490;%【input】計算時間範囲
+n=50; %【input】rz方向のメッシュ数
+
+% spread sheetから ログのテーブルを取得してTに格納、参照する場合
+% %Github/test-open/getTS6log.mを使用
+% DOCID='1wG5fBaiQ7-jOzOI-2pkPAeV6SDiHc_LrOdcbWlvhHBw';%スプレッドシートのID
+% T=getTS6log(DOCID);
+%  [date, shot, TF_shot, offset_TF, i_EF, start, Doppler_t, d_tacq, d_tacqTF, trange, t, n] = getinput(T,IDX)
 
 for d_tacq=dtacqlist(1,1)
-plot_psi(date, d_tacq, d_tacqTF,trange, n, i_EF, pathname); %通常の時系列プロット
-%plot_position(date, d_tacq, d_tacqTF,trange, n, i_EF, pathname); %計測位置、各位置での生信号も含めた確認用プロット
+check_signal(date, d_tacq, d_tacqTF,trange, n, i_EF, pathname); %通常の時系列プロット
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%
-%以下、local関数(getinput, plot_psi, plot_posision)
+%以下、local関数(getinput, plot_psi)
 %%%%%%%%%%%%%%%%%%%%%%%%
 
-%%%plot_psi:pcbプローブの磁気面・電流密度・X点・O点の時系列プロット
-%Github/test-open/pcbdata.mを使用->[チャンネルごとの生信号のプロット]の項目をコメントアウトしなければ、別figureで確認用にプロットされる
-function plot_psi(date, d_tacq, d_tacqTF,trange, n, i_EF, pathname)
+function [date, shot, TF_shot, offset_TF, i_EF, start, Doppler_t, d_tacq, d_tacqTF, trange, t, n] = getinput(T,IDX)
+date=T.date(IDX);
+shot=T.shot(IDX);
+TF_shot=T.TFoffset(IDX);
+offset_TF=isfinite(TF_shot);
 
+if isnan(T.EF_A_(IDX))%%NaNでないことを確認（ログが空白だとNaNになる）
+    i_EF=150;
+else  %NaNなら150をとりあえず代入、記入されているときはその値を使う
+    i_EF=T.EF_A_(IDX);
+end
+
+start=T.Period_StartTime_(IDX);
+Doppler_t=T.DopplerDelay(IDX);
+
+d_tacq=T.d_tacq(IDX);
+d_tacqTF=T.TFdtacq(IDX);
+
+trange=460:490;
+t=T.DopplerDelay(IDX);
+n=50; %rz方向のメッシュ数
+end
+
+
+function check_signal(date, d_tacq, d_tacqTF,trange, n, i_EF, pathname)
 filename=strcat(pathname.rawdata,'rawdata_noTF_dtacq',num2str(d_tacq),'.mat');
 load(filename,'rawdata');
 
+%正しくデータ取得できていない場合はreturn
 if numel(rawdata)< 500
     grid2D=NaN;
     data2D=NaN;
@@ -64,7 +89,6 @@ y_lower_lim = -inf;%-0.1;%縦軸プロット領域（b_z下限）
 t_start=430;%455;%横軸プロット領域（開始時間）
 t_end=520;%横軸プロット領域（終了時間）
 r_ch=col1+col2;%r方向から挿入した各プローブのチャンネル数
-
 
 f=figure;
 f.WindowState = 'maximized';
