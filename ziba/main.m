@@ -4,6 +4,7 @@ date=211223;
 TF_shot = 30 ;
 offset_TF = true;
 
+
 shot = 42  ;
 
 % ********* ALWAYS RUN THIS FUNCTION FIRST ***********
@@ -15,7 +16,7 @@ shot = 42  ;
 
 %########## Raed oscilloscope (DL716) file ##########
 % parameters:(date,shot,TF_shot,offset_TF)
-%[low_n_data] = low_n_mode(date,shot,TF_shot,offset_TF);
+[low_n_data] = low_n_mode(date,shot,TF_shot,offset_TF);
 
 % run this as well
 % (ignore a column of broken probes)
@@ -33,20 +34,26 @@ r_probe = r_probe([2,3,4,6,7,8]);
 % z_probe = z_probe(2:end);
 % ch_dist = ch_dist(:,2:end);
 
-% ***** toroidal mode *****
-%toroidal_mode_offset_new(low_n_data,shot_num,offset,smoothing,movemean,standarization);
-%[low_n_signal] = toroidal_mode_offset_new(low_n_data,shot,true,false,true,false);
+% ***** toroidal mode 計算*****
+offset = true;
+smoothing = false;
+movemean = true;
+standarization = true;
+toroidal_mode_offset_new(low_n_data,shot_num,offset,smoothing,movemean,standarization);
+[low_n_signal] = toroidal_mode_offset_new(low_n_data,shot,true,false,true,false);
 
 % ### plot contour figure ###
-%parameters(low_n_signal,t_start,t_end)
-%contour_low_n(low_n_signal,460,550);
+
+%parameters: (low_n_signal,t_start,t_end)
+contour_low_n(low_n_signal,460,550);
 
 
 % ************* PLOTTING FUNCTIONS *******************
 % parameters:(B_z,ch_dist,start_time,end_time)
 %plot_B_z_in_time(B_z,ch_dist,350,600);
 
-plot_psi_multi(B_z,r_probe,z_probe,471:1:488,true,true,false,shot);
+%磁気面表示
+%plot_psi_multi(B_z,r_probe,z_probe,471:1:488,true,true,false,shot);
 
 % parameters:(B_z,r_probe,z_probe,t,fitting,fill,fixed_Clayer,show_probe)
 % plot_psi_at_t(B_z,r_probe,z_probe,440,true,true,true,true);

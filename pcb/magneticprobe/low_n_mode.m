@@ -2,8 +2,8 @@ function [low_n_data] = low_n_mode(date,shot,TF_shot,TF_offset)
 
 %## prepare folder directory ##
 %folder_directory_Bz = 'C:/Users/take_/OneDrive/デスクトップ/program/モード計測/data/Bz/';
-%folder_directory_Bz= 'D:\pub\mnt\old-koala\experiment\results\ts-3u/';
-folder_directory_Bz = 'E:/experiment/results/ts-3u/';
+folder_directory_Bz= 'D:\pub\mnt\old-koala\experiment\results\ts-3u/';
+%folder_directory_Bz = 'E:/experiment/results/ts-3u/';
 
 %## make directory generation ##
 [data_dir_oscilloscope,TF_dir_oscilloscope] = directory_generation_rgw(date,shot,TF_shot);
