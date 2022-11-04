@@ -8,6 +8,7 @@ offset_TF = true;
 shot = 42  ;
 
 % ********* ALWAYS RUN THIS FUNCTION FIRST ***********
+%camacのデータからBzを算出するコード
 % parameters:(date,TF_shot,shot,offset_TF,offset_EF)
 %[B_z,r_probe,z_probe,ch_dist,data] = get_B_z(200130,4,12,true,150);
 %[B_z,r_probe,z_probe,ch_dist,data] = get_B_z(200202,7,6,true,0);
@@ -50,14 +51,17 @@ contour_low_n(low_n_signal,460,550);
 
 % ************* PLOTTING FUNCTIONS *******************
 % parameters:(B_z,ch_dist,start_time,end_time)
+% get_Bz で取得した全チャンネルの磁場波形をプロットする関数。磁気面がおかしい時はこれを動かすと解決できることが多い。
 %plot_B_z_in_time(B_z,ch_dist,350,600);
 
-%磁気面表示
+%磁気面を指定した時間の分だけ 描く関数
 %plot_psi_multi(B_z,r_probe,z_probe,471:1:488,true,true,false,shot);
 
+%ある時刻の 磁気面を 1 つだけ描くコード
 % parameters:(B_z,r_probe,z_probe,t,fitting,fill,fixed_Clayer,show_probe)
 % plot_psi_at_t(B_z,r_probe,z_probe,440,true,true,true,true);
 
+% 合体率を計算するコード。
 %parameters:(B_z,r_probe)
 %plot_fitrate(B_z,r_probe,shot);
 

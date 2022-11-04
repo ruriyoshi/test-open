@@ -1,4 +1,7 @@
 function [B_z,r_probe,z_probe,ch_dist,B_z_return,data_return,shot_num] = get_B_z(date,TF_shot,shot,offset_TF,i_EF,folder_path)
+
+%camacのデータからBzを算出するコード
+
 % input:
 %   integer: date of experiment. Example:(2019 Aug. 01->190801)
 %   integer: TF shot number. Example:(2)

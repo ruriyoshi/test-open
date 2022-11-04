@@ -1,4 +1,6 @@
 function [] = plot_psi_multi(B_z,r_probe,z_probe,time,fitting,fill,fixed_Clayer,show_probe)
+
+%磁気面を指定した時間の分だけ 描く関数
 % plot psi in rz plane at multiple times
 % input:
 %   3d array of double: B_z (r,z,t), offsetted at zero and smoothed
