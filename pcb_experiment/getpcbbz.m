@@ -57,6 +57,9 @@ clear rind
 % 
 % 
 % 無視するチャンネル(プローブ)
+Probe=readmatrix('probe_version.xlsx');
+Probe(63,:)=[];
+
 if date<211212 
 ng_ch=[1,13,16,22,47,50,53,64-1];%~1213
 %ng_ch=[1,13,16,22,47,50,53];%1214~
@@ -81,13 +84,16 @@ elseif date<221104%date>=211212
         ok(63)=true;
     end
 else%新規システム後
-    load('ok211212.mat');
-    if  date>=211214
-        ok(63)=true;
-        ok(48)=false;
-        ok(27)=false;
-        ok(35)=false;
-    end
+    ok=Probe(1:125,4);
+    ok=logical(ok);
+%     load('ok211212.mat');
+%     if  date>=211214
+%         ok(63)=true;
+%         ok(48)=false;
+%         ok(27)=false;
+%         ok(35)=false;
+%         ok(71)=false;%信号大きすぎ
+%     end
 %     P=readmatrix('probe_polarity.csv');%TFonlyから読み取った極性
 %     ng=~P;
 %     ok= ng==false;
@@ -98,10 +104,17 @@ bz=bz(:,d2c);
 bz=bz(:,ch(ch_p));
 clear d2c ch_p okp c2p d2c d_ch p2c 
 %% 
-% Bzの極性をそろえる（TF only）
+% Bzの極性をそろえる（TF only）:Bz(time1000×ch125)
+% P=Probe(1:126,5);%125*1の±1の極性
+% for i=1:125
+%     bz(:,i)=P(i).*bz(:,i);
+% end
+
 %440usの時点でのプラスマイナスで判定
-bz(:,bz(460,:)<=0)=-bz(:,bz(460,:)<=0);
-if date==221104
-    bz(:,99)=-bz(:,99);
-end
+bz(:,bz(490,:)<=0)=-bz(:,bz(490,:)<=0);
+% if date>221104
+%     bz(:,99)=-bz(:,99);
+%     reverse=[16 20 42 43 51 54 68 71 79 85 100 103 104 110 119];
+%     bz(:,reverse)=-bz(:,reverse);
+% end
 end

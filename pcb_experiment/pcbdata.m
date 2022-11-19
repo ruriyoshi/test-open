@@ -26,15 +26,15 @@ end
 [ok, bz, rpos, zpos,p_ch] = getpcbbz(rawdata, coeff,date);
 
 % チャンネルごとの生信号のプロット
-bz=smoothdata(bz,1);
+bz=smoothdata(bz,1);%各ch内のデータを時間に関してsmoothing
 
 r = 5;%プローブ本数＝グラフ出力時の縦に並べる個数
 col1 = 12;%1枚目のグラフ出力時の横に並べる個数
 col2 = 13;%2枚目のグラフ出力時の横に並べる個数
-y_upper_lim = inf;%0.1;%縦軸プロット領域（b_z上限）
-y_lower_lim = -inf;%-0.1;%縦軸プロット領域（b_z下限）
-t_start=455;%455;%横軸プロット領域（開始時間）
-t_end=520;%横軸プロット領域（終了時間）
+y_upper_lim = 0.03;%2.5e-3;%0.1;%縦軸プロット領域（b_z上限）
+y_lower_lim = -0.03;%2e-3;%-0.1;%縦軸プロット領域（b_z下限）
+t_start=330;%455;%横軸プロット領域（開始時間）
+t_end=600;%横軸プロット領域（終了時間）
 r_ch=col1+col2;%r方向から挿入した各プローブのチャンネル数
 plotbzsignal(y_upper_lim, col2, col1, t_end, p_ch, y_lower_lim, t_start, bz, ok, r_ch, r);
 clear r col1 col2 y_upper_lim y_lower_lim t t_start t_end
