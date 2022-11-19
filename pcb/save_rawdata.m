@@ -10,6 +10,13 @@ for dtacq=dtacqlist(1,:)
     save(strcat(pathname.rawdata,'rawdata_noTF_dtacq',num2str(dtacq),'.mat'),'rawdata');
 end
 
+% for dtacq=dtacqlist(1,:)
+%     clear x
+%     [rawdata]=getvalue(dtacq,10125);
+%     save(strcat(pathname.rawdata,'\rawdata_dtacq',num2str(dtacq),'.mat'),'rawdata');
+% end
+
+
 %TFoffsetの対応がある場合に、オフセットを引いて保存する場合
 % %%%%(1)spread sheetから ログのテーブルを取得してTに格納
 % %Github/test-open/getTS6log.mを使用
