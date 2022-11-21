@@ -15,6 +15,10 @@ function [] = plot_psi_multi(B_z,r_probe,z_probe,time,fitting,fill,fixed_Clayer,
 % Number of plots in a row and in a column
 % It is required that row * column = length(time)
 
+%data画像保存先
+pathname.save='C:\Users\uswk0\OneDrive\デスクトップ\data\movie_out\'; %保存先
+
+
 figure('Position', [0 0 1500 1500],'visible','on');
 
 column = ceil(sqrt(numel(time))); 
@@ -122,8 +126,12 @@ min_color = min(color_store(:));
 max_color = max(color_store(:));
 contour_layer_color =  min_color:(max_color-min_color)/50:max_color;
 for i = time
+    
     subplot(row,column,n);
     hold on
+
+    
+   
     
     if fill
         contourf(psi_mesh_z,psi_mesh_r,psi_store(:,:,i),contour_layer,'Fill','on');
@@ -150,6 +158,11 @@ for i = time
     set(gca,'YTickLabel',[]);
     set(gca,'XTickLabel',[]);
     end
+
+
+    %movieの作成
+    %saveas(gcf,strcat(pathname.save,'\time',num2str(i),'_shot',num2str(date),'.jpg'))
+    %close
     
     %k = 0.04;
     %ax.TickLength = [k, k]; % Make tick marks longer.

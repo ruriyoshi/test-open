@@ -46,7 +46,7 @@ toroidal_mode_offset_new(low_n_data,shot_num,offset,smoothing,movemean,standariz
 % ### plot contour figure ###
 
 %parameters: (low_n_signal,t_start,t_end)
-contour_low_n(low_n_signal,460,550);
+%contour_low_n(low_n_signal,460,550);
 
 
 % ************* PLOTTING FUNCTIONS *******************
@@ -56,6 +56,9 @@ contour_low_n(low_n_signal,460,550);
 
 %磁気面を指定した時間の分だけ 描く関数
 %plot_psi_multi(B_z,r_probe,z_probe,471:1:488,true,true,false,shot);
+
+%ある時刻の 磁気面を 1枚ずつ描いてmovie作る用
+plot_psi_at_t_movie(B_z,r_probe,z_probe,471:1:490,true,true,false,shot);
 
 %ある時刻の 磁気面を 1 つだけ描くコード
 % parameters:(B_z,r_probe,z_probe,t,fitting,fill,fixed_Clayer,show_probe)
