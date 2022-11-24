@@ -12,6 +12,7 @@ imageNames = dir(fullfile(workingDir,'*.jpg'));
 imageNames = {imageNames.name}';
 
 outputVideo = VideoWriter(fullfile(workingDir,video_name),"MPEG-4");
+
 %再生速度の変更(defaultの30は早すぎ)
 outputVideo.FrameRate = 5;
 

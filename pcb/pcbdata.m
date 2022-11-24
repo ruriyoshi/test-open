@@ -30,9 +30,11 @@ end
 % plotbzsignal(y_upper_lim, col2, col1, t_end, p_ch, y_lower_lim, t_start, bz_s, ok, r_ch, r);
 % clear r col1 col2 y_upper_lim y_lower_lim t t_start t_end
 
+%zq*rqの座標を生成
 [zq,rq]=meshgrid(linspace(min(zpos),max(zpos),n),linspace(min(rpos),max(rpos),n));
+%構造体にして情報を入れ込む
 grid2D=struct('zq',zq,'rq',rq);
 clear zq rq
-
+%data2D（Bz,Br，Et，Jt）を計算してる
 data2D = data2Dcalc(EF, grid2D, n, trange, rpos, zpos, bz, ok);
 end

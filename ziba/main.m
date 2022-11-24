@@ -16,13 +16,14 @@ shot = 42  ;
 [B_z,r_probe,z_probe,ch_dist,data,data_raw,shot_num] = get_B_z(date,TF_shot,shot,true,true);
 
 %########## Raed oscilloscope (DL716) file ##########
-% parameters:(date,shot,TF_shot,offset_TF)
+% parameters:(date,shot,TF_shot,offset_TF) 
+% oscilloでとったcoalaのデータをよみ込む関数
 [low_n_data] = low_n_mode(date,shot,TF_shot,offset_TF);
 
 % run this as well
 % (ignore a column of broken probes)
 
-B_z = B_z([2,3,4,6,7,8],2:end,:);
+B_z = B_z([2,3,4,6,7,8],2:end,:); % 8*29*1024 → 6*28*1024
 data = data([2,3,4,6,7,8],2:end,:);
 z_probe = z_probe(2:end);
 ch_dist = ch_dist([2,3,4,6,7,8],2:end);
@@ -40,7 +41,9 @@ offset = true;
 smoothing = false;
 movemean = true;
 standarization = true;
-toroidal_mode_offset_new(low_n_data,shot_num,offset,smoothing,movemean,standarization);
+
+%toroidal_mode_offset_new(low_n_data,shot_num,offset,smoothing,movemean,standarization);
+% low_n_dataからトロイダルモードを計算してプロットする関数
 [low_n_signal] = toroidal_mode_offset_new(low_n_data,shot,true,false,true,false);
 
 % ### plot contour figure ###
@@ -52,13 +55,13 @@ toroidal_mode_offset_new(low_n_data,shot_num,offset,smoothing,movemean,standariz
 % ************* PLOTTING FUNCTIONS *******************
 % parameters:(B_z,ch_dist,start_time,end_time)
 % get_Bz で取得した全チャンネルの磁場波形をプロットする関数。磁気面がおかしい時はこれを動かすと解決できることが多い。
-%plot_B_z_in_time(B_z,ch_dist,350,600);
+plot_B_z_in_time(B_z,ch_dist,471,488);
 
 %磁気面を指定した時間の分だけ 描く関数
 %plot_psi_multi(B_z,r_probe,z_probe,471:1:488,true,true,false,shot);
 
 %ある時刻の 磁気面を 1枚ずつ描いてmovie作る用
-plot_psi_at_t_movie(B_z,r_probe,z_probe,471:1:490,true,true,false,shot);
+%plot_psi_at_t_movie(B_z,r_probe,z_probe,471:1:490,true,true,false,shot);
 
 %ある時刻の 磁気面を 1 つだけ描くコード
 % parameters:(B_z,r_probe,z_probe,t,fitting,fill,fixed_Clayer,show_probe)

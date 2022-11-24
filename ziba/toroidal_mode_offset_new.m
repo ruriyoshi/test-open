@@ -4,6 +4,7 @@ t = linspace(0,1000,10001);
 t_start = 200;
 t_end = 800;
 porality = [-1, 1, 1, -1, -1, 1, 1, 1];
+%probeの挿入角度
 not_rad_x = [8.6, 68, 113, 143, 188, 233, 263, 323];
 x = not_rad_x*2*pi/360;
 ch_num = length(x);
@@ -13,9 +14,10 @@ S = pi*d*d; % area
 R = 100e3;
 C = 100e-9; 
 
+%時間(s)*チャンネル数(8ch)
 low_n_signal = zeros(length(t),ch_num);
 
-%read data from rgw file
+%read data from rgw file → low_n_data, low_n_signalにBzの値が入っている
 for i=11:18
     low_n_signal(:,i-10) = low_n_data(:,i);
 end
@@ -71,7 +73,7 @@ y_shift = zeros(length(t),length(x));
 for i = 1:length(t)
   y_fft = fft(low_n_signal(i,:));
   %fshift = (-n/2:n/2-1);
-  y_shift(i,:) = fftshift(y_fft);
+  y_shift(i,:) = fftshift(y_fft); %周期を0中心にする
 end
 
 
