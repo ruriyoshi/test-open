@@ -1,4 +1,4 @@
-function [] = plot_SXR_multi(B_z,r_probe,z_probe,date,shot,layer,area,start,interval,save,SXRfilename)
+function [] = plot_SXR_multi(B_z,r_probe,z_probe,date,shot,show_xpoint,show_localmax,start,interval,save,SXRfilename)
 % plot SXR emission on psi in rz plane
 % input:
 %   3d array of double: B_z (r,z,t), offsetted at zero and smoothed
@@ -6,25 +6,40 @@ function [] = plot_SXR_multi(B_z,r_probe,z_probe,date,shot,layer,area,start,inte
 %   1d array of double: z_probe, locations of probes along z
 %   integer: date, date of experiment
 %   integer: shot, number of shot
-%   boolean: area, option for narrowing the reconstruction area
-%   boolean: layer, option for changing the contour property
+%   boolean: show_xpoint, option for showing the x-point
+%   boolean: show_localmax, option for showing the local maximum point
 %   integer: start, start time (us)
 %   integer: interval, interval time of the framing camera (us)
 %   boolean: save, option for saving the reconstruction result
 %   string: SXRfilename, name of the SXR image file
 
+% 実行結果（行列）を保存するフォルダの確認
+% なければ作成＆計算、あれば読み込みsave
+savefolder = strcat('/Users/shinjirotakeda/OneDrive - The University of Tokyo/Documents/result_matrix/',num2str(date),'/shot',num2str(shot));
+if exist(savefolder,'dir') == 0
+    clc_flag = true;
+    mkdir(savefolder);
+else
+    clc_flag = false;
+end
+
+% 再構成計算に必要なパラメータを計算するなら読み込む
 filepath = '/Users/shinjirotakeda/Documents/GitHub/SXR_diagnostics/parameters.mat';
-N_projection_new = 80;
-N_grid_new = 100;
-if isfile(filepath)
-    load(filepath, 'U1','U2','s1','s2','v1','v2','M','K','range','N_projection','N_grid');
-    if N_projection_new ~= N_projection || N_grid_new ~= N_grid
-        disp('Different parameters - Start calculation!');
-        [U1,U2,s1,s2,v1,v2,M,K,range] = clc_parameters(N_projection_new,N_grid_new);
+if clc_flag
+    N_projection_new = 80;
+    N_grid_new = 100;
+    if isfile(filepath)
+        load(filepath, 'U1', 'U2', 's1', 's2', 'v1', 'v2', 'M', 'K', 'range','N_projection', 'N_grid');
+        if N_projection_new ~= N_projection || N_grid_new ~= N_grid
+            disp('Different parameters - Start calculation!');
+            [U1,U2,s1,s2,v1,v2,M,K] = clc_parameters(N_projection_new,N_grid_new);
+        end
+    else
+        disp('No parameter - Start calculation!');
+        [U1,U2,s1,s2,v1,v2,M,K] = clc_parameters(N_projection_new,N_grid_new);
     end
 else
-    disp('No parameter - Start calculation!');
-    [U1,U2,s1,s2,v1,v2,M,K,range] = clc_parameters(N_projection_new,N_grid_new);
+    load(filepath,'range');
 end
 
 times = start:interval:(start+interval*7);
@@ -32,17 +47,33 @@ plot_flag = false;
 
 for t = times
     number = (t-start)/interval+1;
-
-    if date <= 210924
-        [VectorImage1,VectorImage2] = get_SXRImage(date,number,SXRfilename);
+    
+    if clc_flag
+%         ベクトル形式の画像データの読み込み
+        if date <= 210924
+            [VectorImage1,VectorImage2] = get_SXRImage(date,number,SXRfilename);
+        else
+            [VectorImage2,VectorImage1] = get_SXRImage(date,number,SXRfilename);
+        end
+        
+%         再構成計算
+        EE_high = clc_distribution(M,K,U1,s1,v1,VectorImage1,plot_flag);
+        EE_low = clc_distribution(M,K,U2,s2,v2,VectorImage2,plot_flag);
+        
+%         再構成結果を保存するファイルを作成、保存
+        savepath_high = strcat(savefolder,'/',num2str(number),'_high.txt');
+        writematrix(EE_high,savepath_high);
+        savepath_low = strcat(savefolder,'/',num2str(number),'_low.txt');
+        writematrix(EE_low,savepath_low);
     else
-        [VectorImage2,VectorImage1] = get_SXRImage(date,number,SXRfilename);
+        loadpath_high = strcat(savefolder,'/',num2str(number),'_high.txt');
+        loadpath_low = strcat(savefolder,'/',num2str(number),'_low.txt');
+        EE_high = readmatrix(loadpath_high);
+        EE_low = readmatrix(loadpath_low);
     end
+    
+    plot_save_SXR(B_z,r_probe,z_probe,range,date,shot,t,EE_high,EE_low,show_localmax,show_xpoint,save);
 
-    EE1 = clc_distribution(M,K,U1,s1,v1,VectorImage1,plot_flag);
-    EE2 = clc_distribution(M,K,U2,s2,v2,VectorImage2,plot_flag);
-
-    plot_save_SXR(B_z,r_probe,z_probe,range,date,shot,t,EE1,EE2,area,layer,save);
 end
 
 end
