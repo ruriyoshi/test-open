@@ -1,4 +1,4 @@
-function [] = plot_SXR_multi(B_z,r_probe,z_probe,date,shot,show_xpoint,show_localmax,start,interval,save,SXRfilename)
+function [] = plot_SXR_multi(B_z,r_probe,z_probe,date,shot,show_xpoint,show_localmax,start,interval,save,SXRfilename,filter)
 % plot SXR emission on psi in rz plane
 % input:
 %   3d array of double: B_z (r,z,t), offsetted at zero and smoothed
@@ -12,6 +12,7 @@ function [] = plot_SXR_multi(B_z,r_probe,z_probe,date,shot,show_xpoint,show_loca
 %   integer: interval, interval time of the framing camera (us)
 %   boolean: save, option for saving the reconstruction result
 %   string: SXRfilename, name of the SXR image file
+%   boolean: filter, option for applying non-linear mean (NLM) filter
 
 % 実行結果（行列）を保存するフォルダの確認
 % なければ作成＆計算、あれば読み込みsave
@@ -51,9 +52,9 @@ for t = times
     if clc_flag
 %         ベクトル形式の画像データの読み込み
         if date <= 210924
-            [VectorImage1,VectorImage2] = get_SXRImage(date,number,SXRfilename);
+            [VectorImage1,VectorImage2] = get_SXRImage(date,number,SXRfilename,filter);
         else
-            [VectorImage2,VectorImage1] = get_SXRImage(date,number,SXRfilename);
+            [VectorImage2,VectorImage1] = get_SXRImage(date,number,SXRfilename,filter);
         end
         
 %         再構成計算
