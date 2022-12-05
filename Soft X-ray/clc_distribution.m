@@ -45,8 +45,11 @@ if NL
     H = gm2d;
     G = VectorImage;
     W = eye(size(C, 1));
+    diag_idx = find(W);
     %figure('Name', 'Weight matrix');
-    for j = 1:10
+    for j = 1:2
+%         tic
+%         disp(j);
         % 二次Fisher情報量
 %         whos H
 %         whos M
@@ -54,24 +57,33 @@ if NL
 %         whos C
 %         whos W
 %         whos G
-        EE = (H' * H + (M * gamma) .* (C'* W * C))^(-1) * H' * G';        
+%         20回呼び出されて3340秒消費（特にmpower?）mpower
+        EE = (H' * H + (M * gamma) .* (C'* W * C))^(-1) * H' * G'; 
+%         disp('finished');
 %         diag_W = diag(W);
 %         index = 1:size(diag(W));
         %plot(index, diag_W);hold on;
-        for i = 1:size(C, 1)
-            if EE(i) > 0
-                W(i, i) = 1/EE(i);
-            else
-                W(i, i) = -100;
-            end
-        end
-        for i = 1:size(C, 1)
-            if W(i, i) == -100
-                W(i, i) = max(W, [], 'all');
-            end
-        end
+%         行列形式でのパラメータ更新（合計710秒）
+        W(diag_idx) = 1./EE;
+        W(W==Inf) = -1;
+        W(W<0) = max(W, [], 'all');
+% %         従来方式（合計1755秒）
+%         for i = 1:size(C, 1)
+%             if EE(i) > 0
+%                 W(i, i) = 1/EE(i);
+%             else
+%                 W(i, i) = -100;
+%             end
+%         end
+%         for i = 1:size(C, 1)
+%             if W(i, i) == -100
+% %                 10000回呼び出されて1000秒消費
+%                 W(i, i) = max(W, [], 'all');
+%             end
+%         end
+%         toc
     end
-    EE = reshape(EE, sqrt(k), sqrt(k));
+    EE = reshape(EE, sqrt(K), sqrt(K));
 else
     for i=1:K
         if M>K
