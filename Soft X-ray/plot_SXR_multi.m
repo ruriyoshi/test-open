@@ -17,7 +17,27 @@ function [] = plot_SXR_multi(B_z,r_probe,z_probe,date,shot,show_xpoint,show_loca
 
 % 実行結果（行列）を保存するフォルダの確認
 % なければ作成＆計算、あれば読み込みsave
-savefolder = strcat('/Users/shinjirotakeda/OneDrive - The University of Tokyo/Documents/result_matrix/',num2str(date),'/shot',num2str(shot));
+% if filter & NL
+%     savefolder = strcat('/Users/shinjirotakeda/OneDrive - The University of Tokyo/Documents/result_matrix/NLF_NLR/',num2str(date),'/shot',num2str(shot));
+% elseif ~filter & NL
+%     savefolder = strcat('/Users/shinjirotakeda/OneDrive - The University of Tokyo/Documents/result_matrix/LF_NLR/',num2str(date),'/shot',num2str(shot));
+% elseif filter & ~NL
+%     savefolder = strcat('/Users/shinjirotakeda/OneDrive - The University of Tokyo/Documents/result_matrix/NLF_LR/',num2str(date),'/shot',num2str(shot));
+% else
+%     savefolder = strcat('/Users/shinjirotakeda/OneDrive - The University of Tokyo/Documents/result_matrix/LF_LR/',num2str(date),'/shot',num2str(shot));
+% end
+% savefolder = strcat('/Users/shinjirotakeda/OneDrive - The University of Tokyo/Documents/result_matrix/',num2str(date),'/shot',num2str(shot));
+
+if filter & NL
+    options = 'NLF_NLR';
+elseif ~filter & NL
+    options = 'LF_NLR';
+elseif filter & ~NL
+    options = 'NLF_LR';
+else
+    options = 'LF_LR';
+end
+savefolder = strcat('/Users/shinjirotakeda/OneDrive - The University of Tokyo/Documents/result_matrix/',options,'/',num2str(date),'/shot',num2str(shot));
 if exist(savefolder,'dir') == 0
     clc_flag = true;
     mkdir(savefolder);
@@ -76,7 +96,7 @@ for t = times
         EE_low = readmatrix(loadpath_low);
     end
     
-    plot_save_SXR(B_z,r_probe,z_probe,range,date,shot,t,EE_high,EE_low,show_localmax,show_xpoint,save);
+    plot_save_SXR(B_z,r_probe,z_probe,range,date,shot,t,EE_high,EE_low,show_localmax,show_xpoint,save,filter,NL);
 
 end
 

@@ -1,4 +1,4 @@
-function plot_save_SXR(B_z,r_probe,z_probe,range,date,shot,t,EE1,EE2,show_localmax,show_xpoint,save)
+function plot_save_SXR(B_z,r_probe,z_probe,range,date,shot,t,EE1,EE2,show_localmax,show_xpoint,save,filter,NL)
 % plot SXR emission and psi in rz plane and save the result
 % input:
 %   3d array of double: B_z (r,z,t), offsetted at zero and smoothed
@@ -12,6 +12,8 @@ function plot_save_SXR(B_z,r_probe,z_probe,range,date,shot,t,EE1,EE2,show_localm
 %   boolean: show_xpoint, option for showing the x-point
 %   boolean: show_localmax, option for showing the local maximum point
 %   boolean: save, option for saving the reconstruction result
+%   boolean: filter, option for applying non-linear mean (NLM) filter
+%   boolean: NL, option for using non-linear reconstruction
 
 % 表示範囲の設定に使うパラメータを取得
 range = range./1000;
@@ -135,7 +137,16 @@ hold off
 
 if save
     pathname = '/Users/shinjirotakeda/OneDrive - The University of Tokyo/Documents/ReconstructionResults/';
-    foldername = strcat(pathname,num2str(date),'/shot',num2str(shot),'_wide');
+    if filter & NL
+        directory = '/NLF_NLR/';
+    elseif ~filter & NL
+        directory = '/LF_NLR/';
+    elseif filter & ~NL
+        directory = '/NLF_LR/';
+    else
+        directory = '/LF_LR/';
+    end
+    foldername = strcat(pathname,directory,num2str(date),'/shot',num2str(shot),'_wide');
     if exist(foldername,'dir') == 0
         mkdir(foldername);
     end

@@ -37,9 +37,9 @@ function VectorImages = CutImage(date,resolution,check_flag,SXRfilename,filter)
 RawImage = imread(SXRfilename);
 
 if filter
-%     figure;imagesc(RawImage);
+    figure;imagesc(RawImage);
     [RawImage,~] = imnlmfilt(RawImage,'SearchWindowSize',91,'ComparisonWindowSize',15);
-%     figure;imagesc(RawImage);
+    figure;imagesc(RawImage);
 % else
 %     RawImage = RawImage;
 end
