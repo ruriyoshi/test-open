@@ -18,6 +18,8 @@ fg_ch=128;
 x=getMDSdata(dtacq_num,shot,0);
 int=x(:,int_ch);
 fg=x(:,fg_ch);
+int=int-mean(int);
+fg=fg-mean(fg);
 RC=rms(int)./rms(fg);
 
 t=1:1000;
