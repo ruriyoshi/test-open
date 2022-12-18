@@ -12,13 +12,13 @@ pathname.woTFdata=getenv('woTFdata_path');%rawdata（TFoffset引いた）の保�
 
 %計測chなど読み込み
 S=readmatrix("221216RC.xlsx");
+fail=S(:,5);
+S(fail==1,:)=[];
+
 dtacq_list=S(:,1);
 shot_list=S(:,2);
 int_list=S(:,3);
 fg_list=S(:,4);
-fail=S(:,5);
-
-S(fail==1,:)=[];
 
 % %手動入力
 % dtacq_list=39;
