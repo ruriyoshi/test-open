@@ -29,9 +29,9 @@ data=zeros(n,3);%較正係数保管
 
 for i=1:n
     dtacq_num=dtacq_list(i);
-    shot=shot(i);
+    shot=shot_list(i);
     int_ch=int_list(i);
-    fg_ch=fg(i);
+    fg_ch=fg_list(i);
     if fail(i)==1
         return
     end
