@@ -10,23 +10,52 @@ pathname.save=getenv('savedata_path');%outputデータ保存先
 pathname.rawdata=getenv('rawdata_path');%dtacqのrawdataの保管場所
 pathname.woTFdata=getenv('woTFdata_path');%rawdata（TFoffset引いた）の保管場所
 
-dtacq_num=39;
-shot=9;
-int_ch=1;
-fg_ch=128;
+%計測chなど読み込み
+S=readmatrix("221216RC.xlsx");
+dtacq_list=S(:,1);
+shot_list=S(:,2);
+int_list=S(:,3);
+fg_list=S(:,4);
+fail=S(:,5);
 
-x=getMDSdata(dtacq_num,shot,0);
-int=x(:,int_ch);
-fg=x(:,fg_ch);
-int=int-mean(int);
-fg=fg-mean(fg);
-RC=rms(int)./rms(fg);
+% %手動入力
+% dtacq_list=39;
+% shot_list=9;
+% int_list=1;
+% fg_list=128;
 
-t=1:1000;
-figure
-plot(t,int,'r')
-hold on
-plot(t,fg,'b')
-legend('integrator','FG')
-ylim([-1 1])
+n=numel(shot_list);%計測データ数
+data=zeros(n,3);%較正係数保管
+
+for i=1:n
+    dtacq_num=dtacq_list(i);
+    shot=shot(i);
+    int_ch=int_list(i);
+    fg_ch=fg(i);
+    if fail(i)==1
+        return
+    end
+    x=getMDSdata(dtacq_num,shot,0);
+    int=x(:,int_ch);
+    fg=x(:,fg_ch);
+    int=int-mean(int);%offsetを0に揃える
+    fg=fg-mean(fg);
+    RC=rms(int)./rms(fg);
+
+    data(i,1)=dtacq_num;
+    data(i,2)=int_ch;
+    data(i,3)=RC;
+
+%     %信号図示
+%     t=1:1000;
+%     figure
+%     plot(t,int,'r')
+%     hold on
+%     plot(t,fg,'b')
+%     legend('integrator','FG')
+%     ylim([-1 1])
+
+end
+
+save('221216RC.mat','data')
 
