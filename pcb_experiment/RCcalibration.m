@@ -18,6 +18,8 @@ int_list=S(:,3);
 fg_list=S(:,4);
 fail=S(:,5);
 
+S(fail==1,:)=[];
+
 % %手動入力
 % dtacq_list=39;
 % shot_list=9;
@@ -32,9 +34,7 @@ for i=1:n
     shot=shot_list(i);
     int_ch=int_list(i);
     fg_ch=fg_list(i);
-    if fail(i)==1
-        return
-    end
+    
     x=getMDSdata(dtacq_num,shot,0);
     int=x(:,int_ch);
     fg=x(:,fg_ch);
@@ -57,5 +57,5 @@ for i=1:n
 
 end
 
-save('221216RC.mat','data')
+save(strcat(pathname.save,'\','221216RC.mat'),'data')
 
