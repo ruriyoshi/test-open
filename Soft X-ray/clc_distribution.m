@@ -46,43 +46,58 @@ if NL
     G = VectorImage;
     W = eye(size(C, 1));
     diag_idx = find(W);
-    %figure('Name', 'Weight matrix');
-    for j = 1:2
-%         tic
-%         disp(j);
-        % 二次Fisher情報量
-%         whos H
-%         whos M
-%         whos gamma
-%         whos C
-%         whos W
-%         whos G
-%         20回呼び出されて3340秒消費（特にmpower?）mpower
-        EE = (H' * H + (M * gamma) .* (C'* W * C))^(-1) * H' * G'; 
-%         disp('finished');
-%         diag_W = diag(W);
-%         index = 1:size(diag(W));
-        %plot(index, diag_W);hold on;
-%         行列形式でのパラメータ更新（合計710秒）
-        W(diag_idx) = 1./EE;
-        W(W==Inf) = -1;
-        W(W<0) = max(W, [], 'all');
-% %         従来方式（合計1755秒）
-%         for i = 1:size(C, 1)
-%             if EE(i) > 0
-%                 W(i, i) = 1/EE(i);
-%             else
-%                 W(i, i) = -100;
-%             end
-%         end
-%         for i = 1:size(C, 1)
-%             if W(i, i) == -100
-% %                 10000回呼び出されて1000秒消費
-%                 W(i, i) = max(W, [], 'all');
-%             end
-%         end
-%         toc
+    for i=1:K
+        if M>K
+            v_1 = [v(i,:) zeros(1,M-K)];
+        else
+            v_1 = v(i,:);
+        end
+        E1 = (s./(s.^2+M*10^(lg_gamma(gamma_index)))).*v_1.*(Z.');
+        E(i)=sum(E1);
     end
+    EE = E;
+    W(diag_idx) = 1./EE;
+    W(W==Inf) = -1;
+    W(W<0) = max(W, [], 'all');
+    EE = (H' * H + (M * gamma) .* (C'* W * C))^(-1) * H' * G'; 
+    
+%     for j = 1:2
+% %         tic
+% %         disp(j);
+%         % 二次Fisher情報量
+% %         whos H
+% %         whos M
+% %         whos gamma
+% %         whos C
+% %         whos W
+% %         whos G
+% %         20回呼び出されて3340秒消費（特にmpower?）mpower
+%         EE = (H' * H + (M * gamma) .* (C'* W * C))^(-1) * H' * G'; 
+% %         最初の計算だけは特異値分解でどうにかならんか
+% %         disp('finished');
+% %         diag_W = diag(W);
+% %         index = 1:size(diag(W));
+%         %plot(index, diag_W);hold on;
+% %         行列形式でのパラメータ更新（合計710秒）
+%         W(diag_idx) = 1./EE;
+%         W(W==Inf) = -1;
+%         W(W<0) = max(W, [], 'all');
+% % % %         従来方式（合計1755秒）
+% % %         for i = 1:size(C, 1)
+% % %             if EE(i) > 0
+% % %                 W(i, i) = 1/EE(i);
+% % %             else
+% % %                 W(i, i) = -100;
+% % %             end
+% % %         end
+% % %         for i = 1:size(C, 1)
+% % %             if W(i, i) == -100
+% % % %                 10000回呼び出されて1000秒消費
+% % %                 W(i, i) = max(W, [], 'all');
+% % %             end
+% % %         end
+% % %         toc
+%     end
     EE = reshape(EE, sqrt(K), sqrt(K));
 else
     for i=1:K
