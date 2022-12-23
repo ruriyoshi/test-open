@@ -12,7 +12,7 @@ n=numel(shotlist);%計測データ数
 %RC係数読み込み
 
 for i=1:n
-    dtacq_num=dtacqlist;
+    dtacq_num=dtacqlist(i);
     shot=shotlist(i);
     tfshot=tfshotlist(i);
     [rawdata]=getMDSdata(dtacq_num,shot,tfshot);%測定した生信号

@@ -3,7 +3,11 @@ function [x]=getMDSdata(dtacq_num,shot,tfshot)
 %%%【input】dtacq:38/39/40,
 %%%shot:dtacqのshot番号,tfshot:TFoffsetに対応するdtacqのshot番号、ない場合は0
 clear x y
-ch_num=192;
+if dtacq_num==38
+    ch_num=128;
+else
+    ch_num=192;
+end
 post=1000;%t=0からの計測時間[us]
 dtacq=strcat('a',num2str(dtacq_num,'%03i'));%a038などの形式の文字列へ変換
 x=zeros(post,ch_num);
