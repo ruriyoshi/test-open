@@ -10,7 +10,7 @@ pathname.fourier=getenv('fourier_path');%fourierのmd0（データックのシ�
 pathname.NIFS=getenv('NIFS_path');%resultsまでのpath（ドップラー、SXR）
 pathname.save=getenv('savedata_path');%outputデータ保存先
 
-pathname.rawdata38=getenv('rawdata38_path');%dtacq a038のrawdataの保管場所
+pathname.rawdata38=getenv('rawdata038_path');%dtacq a038のrawdataの保管場所
 pathname.woTFdata=getenv('woTFdata_path');%rawdata（TFoffset引いた）の保管場所
 
 pathname.rawdata=getenv('rawdata_path');%dtacqのrawdataの保管場所
