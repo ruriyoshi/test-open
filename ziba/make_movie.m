@@ -20,14 +20,14 @@ open(outputVideo)
 %writeAnimation(outputVideo)
 
 %イメージ シーケンス内で繰り返し、各イメージを読み取り、それをビデオに書き込みます。
-
 for ii = 1:length(imageNames)
    img = imread(fullfile(workingDir,imageNames{ii}));
    writeVideo(outputVideo,img)
 end
-%ビデオ ファイルを完成します。
 
+%ビデオ ファイルを完成します。
 close(outputVideo)
+
 %最終的なビデオの表示
 %リーダー オブジェクトを作成します。
 shuttleMp4 = VideoReader(fullfile(workingDir,strcat(video_name,'.mp4')));
