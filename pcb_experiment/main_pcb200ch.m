@@ -18,13 +18,13 @@ pathname.rawdata=getenv('rawdata_path');%dtacqのrawdataの保管場所
 %%%%実験オペレーションの取得
 %直接入力の場合
 dtacqlist=39;
-shotlist=228;%【input】dtacqの保存番号
-tfshotlist=0;
-date = 221220;%【input】計測日
+shotlist=240;%241;%【input】dtacqの保存番号
+tfshotlist=0;%237;
+date = 221223;%【input】計測日
 n_data=numel(shotlist);%計測データ数
 
-i_EF = 150;%【input】EF電流
-trange=460:500;%【input】計算時間範囲
+i_EF = 0;%150;%【input】EF電流
+trange=440:500;%【input】計算時間範囲
 n=50; %【input】rz方向のメッシュ数
 
 for i=1:n_data
@@ -92,6 +92,11 @@ for i=1:192
         rpos_bt(ceil(ch(i)/2))=rpos(i);
     end
 end
+
+Pcheck=[1	-1	1	1	-1	-1	-1	1	1	1	1	1	1	-1	-1	0	-1	-1	1	-1	1	0	1	-1	-1	1	-1	-1	1	-1	-1	1	-1	1	-1	1	-1	-1	-1	1	-1	-1	1	1	-1	-1	-1	-1	-1	-1	1	-1	-1	-1	-1	-1	-1	-1	-1	-1	1	1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	1	-1	1	-1	-1	-1	-1	1	-1	-1	1	-1	-1	1	-1	-1	1	1	1	-1	1	-1	-1	1	1	1	-1];
+bz=bz.*Pcheck;
+ok_bz([5 6 11 16 20 22 31 33 39 49 63 66 71 72 79 80 95 100])=false;
+
 
 [zq,rq]=meshgrid(linspace(min(zpos),max(zpos),n),linspace(min(rpos),max(rpos),n));
 grid2D=struct('zq',zq,'rq',rq);

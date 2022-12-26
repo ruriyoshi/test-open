@@ -18,9 +18,9 @@ pathname.rawdata=getenv('rawdata_path');%dtacqのrawdataの保管場所
 %%%%実験オペレーションの取得
 %直接入力の場合
 dtacqlist=39;
-shotlist=228;%【input】dtacqの保存番号
-tfshotlist=0;
-date = 221220;%【input】計測日
+shotlist=240;%241;%【input】dtacqの保存番号
+tfshotlist=0;%237;
+date = 221223;%【input】計測日
 n=numel(shotlist);%計測データ数
 
 % %磁気面出す場合は適切な値を入力、磁場信号のみプロットする場合は変更不要
@@ -88,6 +88,10 @@ for i=1:192
     end
 end
 
+Pcheck=[1	-1	1	1	-1	-1	-1	1	1	1	1	1	1	-1	-1	0	-1	-1	1	-1	1	0	1	-1	-1	1	-1	-1	1	-1	-1	1	-1	1	-1	1	-1	-1	-1	1	-1	-1	1	1	-1	-1	-1	-1	-1	-1	1	-1	-1	-1	-1	-1	-1	-1	-1	-1	1	1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	1	-1	1	-1	-1	-1	-1	1	-1	-1	1	-1	-1	1	-1	-1	1	1	1	-1	1	-1	-1	1	1	1	-1];
+bz=bz.*Pcheck;
+ok_bz([5 6 11 16 20 22 31 33 39 49 63 66 71 72 79 80 95 100])=false;
+
 % log_d2bz=~isnan(d2bz);
 % ok_bz=ok(log_d2bz);
 % d2bz=d2bz(log_d2bz);
@@ -149,39 +153,39 @@ for i=1:r
 end
 sgtitle('Bz signal probe6-10')
 
-f3=figure;
-f3.WindowState = 'maximized';
-for i=1:r
-    for j=1:col
-        subplot(r,col,(i-1)*col+j)
-        if ok_bt(col*(i-1)+j)==1 %okなチャンネルはそのままプロット
-            plot(t_start:t_end,bt(t_start:t_end,col*(i-1)+j))
-        else %NGなチャンネルは赤色点線でプロット
-            plot(t_start:t_end,bt(t_start:t_end,col*(i-1)+j),'r:')
-        end   
-        title(num2str(2.*(col*(i-1)+j)));
-        xticks([t_start t_end]);
-        ylim([y_lower_lim y_upper_lim]);
-    end
-end
-sgtitle('Bt signal probe1-5')
-
-f4=figure;
-f4.WindowState = 'maximized';
-for i=1:r
-    for j=1:col
-        subplot(r,col,(i-1)*col+j)
-        if ok_bt(col*(i+r-1)+j)==1 %okなチャンネルはそのままプロット
-            plot(t_start:t_end,bt(t_start:t_end,col*(i+r-1)+j))
-        else %NGなチャンネルは赤色点線でプロット
-            plot(t_start:t_end,bt(t_start:t_end,col*(i+r-1)+j),'r:')
-        end   
-        title(num2str(2.*(col*(i+r-1)+j)));
-        xticks([t_start t_end]);
-        ylim([y_lower_lim y_upper_lim]);
-    end
-end
-sgtitle('Bt signal probe6-10')
+% f3=figure;
+% f3.WindowState = 'maximized';
+% for i=1:r
+%     for j=1:col
+%         subplot(r,col,(i-1)*col+j)
+%         if ok_bt(col*(i-1)+j)==1 %okなチャンネルはそのままプロット
+%             plot(t_start:t_end,bt(t_start:t_end,col*(i-1)+j))
+%         else %NGなチャンネルは赤色点線でプロット
+%             plot(t_start:t_end,bt(t_start:t_end,col*(i-1)+j),'r:')
+%         end   
+%         title(num2str(2.*(col*(i-1)+j)));
+%         xticks([t_start t_end]);
+%         ylim([y_lower_lim y_upper_lim]);
+%     end
+% end
+% sgtitle('Bt signal probe1-5')
+% 
+% f4=figure;
+% f4.WindowState = 'maximized';
+% for i=1:r
+%     for j=1:col
+%         subplot(r,col,(i-1)*col+j)
+%         if ok_bt(col*(i+r-1)+j)==1 %okなチャンネルはそのままプロット
+%             plot(t_start:t_end,bt(t_start:t_end,col*(i+r-1)+j))
+%         else %NGなチャンネルは赤色点線でプロット
+%             plot(t_start:t_end,bt(t_start:t_end,col*(i+r-1)+j),'r:')
+%         end   
+%         title(num2str(2.*(col*(i+r-1)+j)));
+%         xticks([t_start t_end]);
+%         ylim([y_lower_lim y_upper_lim]);
+%     end
+% end
+% sgtitle('Bt signal probe6-10')
 
 % saveas(gcf,strcat(pathname.save,'\date',num2str(date),'_dtacq',num2str(d_tacq),'_02','.png'))
 % close
