@@ -1,14 +1,21 @@
 function rms_mat = low_n_calib(direction)
-% rms_mat = [rms_func_gene rms_amp rms_coil_raw rms_coil_smoothed; :];
-%direction = 'T' or 'R' or 'Z'
-%C:\Users\uswk0\OneDrive\デスクトップ\道家\卒論\data\low_n_calib
-rms_mat = zeros(8,4);
+
+% rms_mat:(probe本数) × 4　(rms_func_gene, rms_amp, rms_coil_raw, rms_coil_smoothed)の行列を計算する関数
+% direction = 'T' or 'R' or 'Z'
+
+
+probe_num = 8;
+rms_mat = zeros(probe_num,4);
+
 for i = 1:8
-    disp(i);
+    disp(strcat('進行確認 i = ', num2str(i)));
+    
+    %終端抵抗無しファイル → '--', 終端抵抗ありファイル → '&-'
     filename = strcat('B',direction,'--','0',num2str(i),'00');
-    %filename = 'BT&-0100.CSV';
+    %filename = strcat('B',direction,'&-','0',num2str(i),'00');
+
     M = readmatrix(strcat("C:\Users\uswk0\OneDrive\デスクトップ\道家\卒論\data\low_n_calib\", filename, '.CSV'));
-    %データの最初の30行無視
+    %オシロデータの最初の30行無視
     M = M(31:10031,:);
 
     %%%%%%%%% 各パラメータ定義　%%%%%%%%
