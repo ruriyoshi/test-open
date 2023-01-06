@@ -11,6 +11,7 @@ probe_num = 8;
 
 direction_num = total_channel_num/probe_num; 
 
+
 test_Bt_raw = zeros(length(t), probe_num); % 200*8
 test_Bz_raw = zeros(length(t), probe_num);
 

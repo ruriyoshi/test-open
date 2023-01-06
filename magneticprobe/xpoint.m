@@ -29,10 +29,11 @@ pathname.save='C:\Users\uswk0\OneDrive\デスクトップ\data\a038_out\'; %保�
 %%%%(3)指定したshotの解析
 % IDXlist=[2897 2906 2907 2912 2913] ; %2870:2921; %【input】テーブルから解析したいshot番号を抽出して入力
 IDXlist=[2911:2913 2925 2926 2927 2931 2933 2947:2950 2942 2943 2946];
-for IDX=IDXlist%(1,1)
+%for IDX=IDXlist%(1,1)
+%[xr,xz]=plot_xpoint(T, pathname,IDX);
+%end
+IDX = 2911;
 [xr,xz]=plot_xpoint(T, pathname,IDX);
-end
-
 %%%%%%%%%%%%%%%%%%%%%%%%
 %以下、local関数
 %%%%%%%%%%%%%%%%%%%%%%%%
@@ -105,10 +106,10 @@ end
 
 %X点r座標プロット
 figure
-plot(trange,xr,'b*','MarkerSize',8)
-ylabel('r [m]','Fontsize',12)
-xlabel('Time [us]','Fontsize', 12)
-% xlim([460 482])
+plot(trange,xr,'b*','MarkerSize',20)
+ylabel('r [m]','Fontsize', 20)
+xlabel('Time [us]','Fontsize', 20)
+xlim([470 482])
 title(strcat('IDX=',num2str(IDX)))
 ha1 = gca;
 ha1.LineWidth = 1;
