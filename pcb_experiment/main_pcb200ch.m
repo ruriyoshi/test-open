@@ -18,12 +18,12 @@ pathname.rawdata=getenv('rawdata_path');%dtacqのrawdataの保管場所
 %%%%実験オペレーションの取得
 %直接入力の場合
 dtacqlist=39;
-shotlist=240;%241;%【input】dtacqの保存番号
-tfshotlist=0;%237;
-date = 221223;%【input】計測日
+shotlist=257;%240;%【input】dtacqの保存番号
+tfshotlist=253;%0;
+date = 230103;%【input】計測日
 n_data=numel(shotlist);%計測データ数
 
-i_EF = 0;%150;%【input】EF電流
+i_EF = 150;%150;%【input】EF電流
 trange=440:500;%【input】計算時間範囲
 n=50; %【input】rz方向のメッシュ数
 
@@ -67,7 +67,7 @@ d2bt=C(:,17);
 
 b=rawdata.*coeff';%較正係数RC/NS
 b=b.*P';%極性揃え
-b=smoothdata(b,1);
+b=smoothdata(b,1,'lowess',3);
 
 %デジタイザchからプローブ通し番号順への変換
 bz=zeros(1000,100);
@@ -92,11 +92,10 @@ for i=1:192
         rpos_bt(ceil(ch(i)/2))=rpos(i);
     end
 end
+% bz(:,[57 67 68 77 87])=-bz(:,[57 67 68 77 87]);
+% ok_bz(28)=false;
 
-Pcheck=[1	-1	1	1	-1	-1	-1	1	1	1	1	1	1	-1	-1	0	-1	-1	1	-1	1	0	1	-1	-1	1	-1	-1	1	-1	-1	1	-1	1	-1	1	-1	-1	-1	1	-1	-1	1	1	-1	-1	-1	-1	-1	-1	1	-1	-1	-1	-1	-1	-1	-1	-1	-1	1	1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	1	-1	1	-1	-1	-1	-1	1	-1	-1	1	-1	-1	1	-1	-1	1	1	1	-1	1	-1	-1	1	1	1	-1];
-bz=bz.*Pcheck;
-ok_bz([5 6 11 16 20 22 31 33 39 49 63 66 71 72 79 80 95 100])=false;
-
+[bz, ok_bz, ok_bz_plot] = ng_replace(bz, ok_bz, sheet_date);
 
 [zq,rq]=meshgrid(linspace(min(zpos),max(zpos),n),linspace(min(rpos),max(rpos),n));
 grid2D=struct('zq',zq,'rq',rq);
@@ -121,11 +120,11 @@ data2D=struct('psi',zeros(size(grid2D.rq,1),size(grid2D.rq,2),size(trange,2)),'B
 
 for i=1:size(trange,2)
     t=trange(i);
-    %%Bzの二次元補間(rbfinterp)
-    vq = bz_rbfinterp(rpos_bz, zpos_bz, grid2D, bz, ok_bz, t);
+    %%Bzの二次元補間(線形fit)
+    vq =b_interp(rpos_bz, zpos_bz, grid2D, bz, ok_bz, t);
     B_z = -Bz_EF+vq;
     %%PSI計算
-    data2D.psi(:,:,i) = cumtrapz(grid2D.rq(:,1),B_z,1);
+    data2D.psi(:,:,i) = cumtrapz(grid2D.rq(:,1),2*pi*B_z.*grid2D.rq(:,1),1);
     %このままだと1/2πrが計算されてないので
     [data2D.Br(:,:,i),data2D.Bz(:,:,i)]=gradient(data2D.psi(:,:,i),grid2D.zq(1,:),grid2D.rq(:,1)) ;
     data2D.Br(:,:,i)=-data2D.Br(:,:,i)./(2.*pi.*grid2D.rq);
@@ -136,38 +135,43 @@ data2D.Et=diff(data2D.psi,1,3).*1e+6;
 %diffは単なる差分なので時間方向のsizeが1小さくなる %ステップサイズは1us
 data2D.Et=data2D.Et./(2.*pi.*grid2D.rq);
 
+ok_z = zpos_bz(ok_bz_plot); %z方向の生きているチャンネル
+ok_r = rpos_bz(ok_bz_plot); %r方向の生きているチャンネル
+
 if isstruct(grid2D)==0 %もしdtacqデータがない場合次のloopへ(データがない場合NaNを返しているため)
     return
 end
 
+
 figure('Position', [0 0 1500 1500],'visible','on');
-start=10;
+start=40;
 %  t_start=470+start;
  for m=1:10 %図示する時間
      i=start+m; %end
      t=trange(i);
      subplot(2,5,m)
     contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.Bz(:,:,i),30,'LineStyle','none')
-%     contourf(grid2D.zq(1,:),grid2D.rq(:,1),-1.*data2D.Jt(:,:,i),10,'LineStyle','none')
+%     contourf(grid2D.zq(1,:),grid2D.rq(:,1),-1.*data2D.Jt(:,:,i),20,'LineStyle','none')
     colormap(jet)
     axis image
     axis tight manual
-%     caxis([-2.5*1e+6,2.5*1e+6]) %カラーバーの軸の範囲
-    caxis([-0.05,0.05])
+%     caxis([-0.8*1e+6,0.8*1e+6]) %カラーバーの軸の範囲
+    caxis([-0.1,0.1])
     colorbar('Location','eastoutside')
     %カラーバーのラベル付け
 %     c = colorbar;
 %     c.Label.String = 'Jt [A/m^{2}]';
     hold on
 %     plot(grid2D.zq(1,squeeze(mid(:,:,i))),grid2D.rq(:,1))
-    contour(grid2D.zq(1,:),grid2D.rq(:,1),squeeze(data2D.psi(:,:,i)),30,'black')
+% contour(grid2D.zq(1,:),grid2D.rq(:,1),squeeze(data2D.psi(:,:,i)),20,'black')
+    contour(grid2D.zq(1,:),grid2D.rq(:,1),squeeze(data2D.psi(:,:,i)),[-20e-3:0.2e-3:40e-3],'black')
 %     plot(grid2D.zq(1,squeeze(mid(opoint(:,:,i),:,i))),grid2D.rq(opoint(:,:,i),1),"bo")
 %     plot(grid2D.zq(1,squeeze(mid(xpoint(:,:,i),:,i))),grid2D.rq(xpoint(:,:,i),1),"bx")
-%     plot(ok_z,ok_r,"k.",'MarkerSize', 7)%測定位置
+    plot(ok_z,ok_r,"k.",'MarkerSize', 6)%測定位置
     hold off
     title(string(t)+' us')
-    xlabel('z [m]')
-    ylabel('r [m]')
+%     xlabel('z [m]')
+%     ylabel('r [m]')
  end
 
 end
