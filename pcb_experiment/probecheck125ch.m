@@ -18,8 +18,8 @@ pathname.rawdata=getenv('rawdata_path');%dtacqのrawdataの保管場所
 %%%%実験オペレーションの取得
 %直接入力の場合
 dtacqlist=38;
-shotlist=10314;%【input】dtacqの保存番号
-tfshotlist=10312;
+shotlist=10299;%【input】dtacqの保存番号
+tfshotlist=0;
 date = 230103;%【input】計測日
 n=numel(shotlist);%計測データ数
 
@@ -68,7 +68,7 @@ d2p=C(:,15);
 d2bz=C(:,16);
 d2bt=C(:,17);
 
-p_ch= readmatrix('C:\Users\kuru1\OneDrive - g.ecc.u-tokyo.ac.jp\labo\experiment\coeff125ch.xlsx','Sheet','p_ch');
+p_ch= readmatrix('coeff125ch.xlsx','Sheet','p_ch');
 
 b=rawdata.*coeff';%較正係数RC/NS
 b=b.*P';%極性揃え
@@ -86,6 +86,11 @@ for i=1:128
 end
 bz(:,63)=[];
 ok_bz(63)=[];
+
+P2=ones(1,125);
+P2([23 47 48 49 50 71 72 73 74 75 98 99 100 122 123 125])=-1;
+bz=bz.*P2;
+ok_bz(51)=false;
 
 % [bz, ok_bz, ok_bz_plot] = ng_replace(bz, ok_bz, sheet_date);
 
@@ -139,53 +144,53 @@ end
 % saveas(gcf,strcat(pathname.save,'\date',num2str(date),'_dtacq',num2str(d_tacq),'_02','.png'))
 % close
 
-% %横軸z, 縦軸Bzのプロット
-% f5=figure;
-% f5.WindowState = 'maximized';
-% t=460;
-% subplot(3,1,1)
-% for i=1:8
-%     zline=(1:25:101)+(i-1);
-%     bz_zline=bz(t,zline);
-%     bz_zline(ok_bz(zline)==false)=NaN;
-%     plot(1:5,bz_zline,'-*')
-%     clear bz_zline
-%     hold on
-% end
-% hold off
-% xlabel('z [m]')
-% ylabel('Bz')
-% yline(0,'k--')
-% legend('r1','r2','r3','r4','r5','r6','r7','r8',Location='eastoutside')
-% 
-% subplot(3,1,2)
-% for i=9:16
-%     zline=(1:25:101)+(i-1);
-%     bz_zline=bz(t,zline);
-%     bz_zline(ok_bz(zline)==false)=NaN;
-%     plot(1:5,bz_zline,'-*')
-%     clear bz_zline
-%     hold on
-% end
-% hold off
-% xlabel('z [m]')
-% ylabel('Bz')
-% yline(0,'k--')
-% legend('r9','r10','r11','r12','r13','r14','r15','r16','r17','r18',Location='eastoutside')
-% 
-% subplot(3,1,3)
-% for i=17:25
-%     zline=(1:25:101)+(i-1);
-%     bz_zline=bz(t,zline);
-%     bz_zline(ok_bz(zline)==false)=NaN;
-%     plot(1:5,bz_zline,'-*')
-%     clear bz_zline
-%     hold on
-% end
-% hold off
-% xlabel('z [m]')
-% ylabel('Bz')
-% yline(0,'k--')
-% legend('r17','r18','r19','r20','r21','r22','r23','r24','r25',Location='eastoutside')
-% sgtitle(strcat('t=',num2str(t),' us'))
+%横軸z, 縦軸Bzのプロット
+f5=figure;
+f5.WindowState = 'maximized';
+t=440;
+subplot(3,1,1)
+for i=1:8
+    zline=(1:25:101)+(i-1);
+    bz_zline=bz(t,zline);
+    bz_zline(ok_bz(zline)==false)=NaN;
+    plot(1:5,bz_zline,'-*')
+    clear bz_zline
+    hold on
+end
+hold off
+xlabel('z [m]')
+ylabel('Bz')
+yline(0,'k--')
+legend('r1','r2','r3','r4','r5','r6','r7','r8',Location='eastoutside')
+
+subplot(3,1,2)
+for i=9:16
+    zline=(1:25:101)+(i-1);
+    bz_zline=bz(t,zline);
+    bz_zline(ok_bz(zline)==false)=NaN;
+    plot(1:5,bz_zline,'-*')
+    clear bz_zline
+    hold on
+end
+hold off
+xlabel('z [m]')
+ylabel('Bz')
+yline(0,'k--')
+legend('r9','r10','r11','r12','r13','r14','r15','r16',Location='eastoutside')
+
+subplot(3,1,3)
+for i=17:25
+    zline=(1:25:101)+(i-1);
+    bz_zline=bz(t,zline);
+    bz_zline(ok_bz(zline)==false)=NaN;
+    plot(1:5,bz_zline,'-*')
+    clear bz_zline
+    hold on
+end
+hold off
+xlabel('z [m]')
+ylabel('Bz')
+yline(0,'k--')
+legend('r17','r18','r19','r20','r21','r22','r23','r24','r25',Location='eastoutside')
+sgtitle(strcat('t=',num2str(t),' us'))
 end
