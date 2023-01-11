@@ -18,9 +18,9 @@ pathname.rawdata=getenv('rawdata_path');%dtacqのrawdataの保管場所
 %%%%実験オペレーションの取得
 %直接入力の場合
 dtacqlist=39;
-shotlist=255;%【input】dtacqの保存番号
-tfshotlist=253;
-date = 230103;%【input】計測日
+shotlist=320;%【input】dtacqの保存番号
+tfshotlist=317;
+date = 230110;%【input】計測日
 n=numel(shotlist);%計測データ数
 
 % %磁気面出す場合は適切な値を入力、磁場信号のみプロットする場合は変更不要
@@ -51,11 +51,11 @@ if numel(rawdata)< 500
 end
 
 %較正係数のバージョンを日付で判別
-sheets = sheetnames('coeff200ch.xlsx');
+sheets = sheetnames('C:\Users\kuru1\OneDrive - g.ecc.u-tokyo.ac.jp\labo\experiment\coeff200ch.xlsx');
 sheets = str2double(sheets);
 sheet_date=max(sheets(sheets<=date));
 
-C = readmatrix('coeff200ch.xlsx','Sheet',num2str(sheet_date));
+C = readmatrix('C:\Users\kuru1\OneDrive - g.ecc.u-tokyo.ac.jp\labo\experiment\coeff200ch.xlsx','Sheet',num2str(sheet_date));
 ok = logical(C(:,14));
 P=C(:,13);
 coeff=C(:,12);
@@ -91,7 +91,8 @@ end
 % bz(:,[57 67 68 77 87])=-bz(:,[57 67 68 77 87]);
 % ok_bz(28)=false;
 
-[bz, ok_bz, ok_bz_plot] = ng_replace(bz, ok_bz, sheet_date);
+% [bz, ok_bz, ok_bz_plot] = ng_replace(bz, ok_bz, sheet_date);
+ok_bz_plot=ok_bz;
 
 % 221219ver
 % Pcheck=[1	-1	1	1	-1	-1	-1	1	1	1	1	1	1	-1	-1	0	-1	-1	1	-1	1	0	1	-1	-1	1	-1	-1	1	-1	-1	1	-1	1	-1	1	-1	-1	-1	1	-1	-1	1	1	-1	-1	-1	-1	-1	-1	1	-1	-1	-1	-1	-1	-1	-1	-1	-1	1	1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	1	-1	1	-1	-1	-1	-1	1	-1	-1	1	-1	-1	1	-1	-1	1	1	1	-1	1	-1	-1	1	1	1	-1];
@@ -110,7 +111,7 @@ r = 5;%プローブ本数＝グラフ出力時の縦に並べる個数
 col = 10;%グラフ出力時の横に並べる個数
 y_upper_lim = 0.05;%3e-3;%0.1;%縦軸プロット領域（b_z上限）
 y_lower_lim = -0.05;%3e-3;%-0.1;%縦軸プロット領域（b_z下限）
-t_start=300;%430;%455;%横軸プロット領域（開始時間）
+t_start=350;%430;%455;%横軸プロット領域（開始時間）
 t_end=600;%550;%横軸プロット領域（終了時間）
 % r_ch=col1+col2;%r方向から挿入した各プローブのチャンネル数
 
@@ -185,24 +186,24 @@ sgtitle('Bt signal probe6-10')
 % saveas(gcf,strcat(pathname.save,'\date',num2str(date),'_dtacq',num2str(d_tacq),'_02','.png'))
 % close
 
-% %横軸z, 縦軸Bzのプロット
-% f5=figure;
-% f5.WindowState = 'maximized';
-% t=465;
-% for i=1:10
-%     zline=(1:10:91)+(i-1);
-%     bz_zline=bz(t,zline);
-%     bz_zline(ok_bz(zline)==false)=NaN;
-%     plot([-0.17 -0.1275 -0.0850 -0.0315 -0.0105 0.0105 0.0315 0.0850 0.1275 0.17],bz_zline,'-*')
-%     clear bz_zline
-%     hold on
-% end
-% hold off
-% xlabel('z [m]')
-% ylabel('Bz')
-% yline(0,'k--')
-% title(strcat('t=',num2str(t),' us'))
-% legend('r1','r2','r3','r4','r5','r6','r7','r8','r9','r10',Location='eastoutside')
+%横軸z, 縦軸Bzのプロット
+f5=figure;
+f5.WindowState = 'maximized';
+t=465;
+for i=1:10
+    zline=(1:10:91)+(i-1);
+    bz_zline=bz(t,zline);
+    bz_zline(ok_bz(zline)==false)=NaN;
+    plot([-0.17 -0.1275 -0.0850 -0.0315 -0.0105 0.0105 0.0315 0.0850 0.1275 0.17],bz_zline,'-*')
+    clear bz_zline
+    hold on
+end
+hold off
+xlabel('z [m]')
+ylabel('Bz')
+yline(0,'k--')
+title(strcat('t=',num2str(t),' us'))
+legend('r1','r2','r3','r4','r5','r6','r7','r8','r9','r10',Location='eastoutside')
 
 % bz1=[bz(t,1) bz(t,11) bz(t,21) bz(t,31) bz(t,41) bz(t,51) bz(t,61) bz(t,71) bz(t,81) bz(t,91)];
 % bz2=[bz(t,2) bz(t,12) bz(t,22) bz(t,32) bz(t,42) bz(t,52) bz(t,62) bz(t,72) bz(t,82) bz(t,92)];

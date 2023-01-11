@@ -18,9 +18,9 @@ pathname.rawdata=getenv('rawdata_path');%dtacqのrawdataの保管場所
 %%%%実験オペレーションの取得
 %直接入力の場合
 dtacqlist=38;
-shotlist=10299;%【input】dtacqの保存番号
+shotlist=10374;%【input】dtacqの保存番号
 tfshotlist=0;
-date = 230103;%【input】計測日
+date = 230110;%【input】計測日
 n=numel(shotlist);%計測データ数
 
 % %磁気面出す場合は適切な値を入力、磁場信号のみプロットする場合は変更不要
@@ -144,53 +144,53 @@ end
 % saveas(gcf,strcat(pathname.save,'\date',num2str(date),'_dtacq',num2str(d_tacq),'_02','.png'))
 % close
 
-%横軸z, 縦軸Bzのプロット
-f5=figure;
-f5.WindowState = 'maximized';
-t=440;
-subplot(3,1,1)
-for i=1:8
-    zline=(1:25:101)+(i-1);
-    bz_zline=bz(t,zline);
-    bz_zline(ok_bz(zline)==false)=NaN;
-    plot(1:5,bz_zline,'-*')
-    clear bz_zline
-    hold on
-end
-hold off
-xlabel('z [m]')
-ylabel('Bz')
-yline(0,'k--')
-legend('r1','r2','r3','r4','r5','r6','r7','r8',Location='eastoutside')
-
-subplot(3,1,2)
-for i=9:16
-    zline=(1:25:101)+(i-1);
-    bz_zline=bz(t,zline);
-    bz_zline(ok_bz(zline)==false)=NaN;
-    plot(1:5,bz_zline,'-*')
-    clear bz_zline
-    hold on
-end
-hold off
-xlabel('z [m]')
-ylabel('Bz')
-yline(0,'k--')
-legend('r9','r10','r11','r12','r13','r14','r15','r16',Location='eastoutside')
-
-subplot(3,1,3)
-for i=17:25
-    zline=(1:25:101)+(i-1);
-    bz_zline=bz(t,zline);
-    bz_zline(ok_bz(zline)==false)=NaN;
-    plot(1:5,bz_zline,'-*')
-    clear bz_zline
-    hold on
-end
-hold off
-xlabel('z [m]')
-ylabel('Bz')
-yline(0,'k--')
-legend('r17','r18','r19','r20','r21','r22','r23','r24','r25',Location='eastoutside')
-sgtitle(strcat('t=',num2str(t),' us'))
+% %横軸z, 縦軸Bzのプロット
+% f5=figure;
+% f5.WindowState = 'maximized';
+% t=440;
+% subplot(3,1,1)
+% for i=1:8
+%     zline=(1:25:101)+(i-1);
+%     bz_zline=bz(t,zline);
+%     bz_zline(ok_bz(zline)==false)=NaN;
+%     plot(1:5,bz_zline,'-*')
+%     clear bz_zline
+%     hold on
+% end
+% hold off
+% xlabel('z [m]')
+% ylabel('Bz')
+% yline(0,'k--')
+% legend('r1','r2','r3','r4','r5','r6','r7','r8',Location='eastoutside')
+% 
+% subplot(3,1,2)
+% for i=9:16
+%     zline=(1:25:101)+(i-1);
+%     bz_zline=bz(t,zline);
+%     bz_zline(ok_bz(zline)==false)=NaN;
+%     plot(1:5,bz_zline,'-*')
+%     clear bz_zline
+%     hold on
+% end
+% hold off
+% xlabel('z [m]')
+% ylabel('Bz')
+% yline(0,'k--')
+% legend('r9','r10','r11','r12','r13','r14','r15','r16',Location='eastoutside')
+% 
+% subplot(3,1,3)
+% for i=17:25
+%     zline=(1:25:101)+(i-1);
+%     bz_zline=bz(t,zline);
+%     bz_zline(ok_bz(zline)==false)=NaN;
+%     plot(1:5,bz_zline,'-*')
+%     clear bz_zline
+%     hold on
+% end
+% hold off
+% xlabel('z [m]')
+% ylabel('Bz')
+% yline(0,'k--')
+% legend('r17','r18','r19','r20','r21','r22','r23','r24','r25',Location='eastoutside')
+% sgtitle(strcat('t=',num2str(t),' us'))
 end
