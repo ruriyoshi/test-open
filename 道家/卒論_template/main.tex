@@ -1,0 +1,89 @@
+\documentclass[report,dvipdfmx,platex,titlepage,a4j,oneside,openany]{jsbook}
+
+\usepackage[left=25mm,right=25mm,top=25mm,bottom=25mm]{geometry}
+\usepackage[utf8]{inputenc}
+
+%% Packages---------------------
+\usepackage{amsmath}
+\usepackage{ascmac}
+\usepackage{bm}
+\usepackage[dvipdfmx]{graphicx, color}
+\usepackage{url}
+\usepackage{here}
+\usepackage{hyperref}
+\usepackage[margin=5pt]{subcaption}
+\usepackage{listings}
+\usepackage{overcite}
+\usepackage{fancyhdr}
+\usepackage{pdfpages}
+%%------------------------------
+
+%% Commands --------------------
+\newcommand{\dsp}{\displaystyle}
+\newcommand{\pfrac}[2]{\frac{\partial {#1}}{\partial {#2}}}
+\newcommand{\expf}[2]{\exp{\frac{#1}{#2}}}
+\newcommand{\sinf}[2]{\sin{\frac{#1}{#2}}}
+\newcommand{\cosf}[2]{\cos{\frac{#1}{#2}}}
+\newcommand{\route}{^{1/2}}
+\renewcommand{\thefigure}{\thechapter.\arabic{figure}}
+\renewcommand{\thesection}{\arabic{section}}
+\renewcommand{\thesubsection}{\thesection.\arabic{subsection}}
+\renewcommand{\thesubsubsection}{\thesection.\thesubsection.\arabic{1}}
+\renewcommand{\frac}{\dfrac}
+\newcommand{\eq}[1]{(\ref{eq:#1})}
+\newcommand{\fig}[1]{Fig.\ \ref{fig:#1}}
+\newcommand{\tab}[1]{Tab.\ \ref{tab:#1}}
+\newcommand{\x}{\times}
+%%------------------------------
+
+%% Table and figure settings----
+\captionsetup[figure]{format=plain, labelformat=simple, labelsep=quad, font=small}
+\captionsetup[subfigure]{format=plain, labelformat=parens, labelsep=space, font=small}
+\captionsetup[table]{format=plain, labelformat=simple, labelsep=quad, font=small}
+\setlength\floatsep{1mm}		
+\setlength\textfloatsep{1mm}
+\setcounter{tocdepth}{2}
+\pagestyle{plain}
+\graphicspath{./fig}
+%%------------------------------
+
+\pagestyle{fancy}
+\lhead{\leftmark} \rhead{\rightmark} \cfoot{-- \thepage\ --}
+\renewcommand{\plainifnotempty}{\relax}
+
+\title{\vspace{1cm}
+	{\large 東京大学 工学部電気電子工学科\\
+  小野靖研究室}\\\vspace{1cm}
+	{\huge 2021年度}\\\vspace{0.5cm}
+	{\huge 卒業論文}\\\vspace{1cm}
+	\textbf{\huge 軟X線を用いた\\
+	高エネルギー電子分布計測の開発}\\\vspace{3cm}
+  }
+
+\date{}
+\author{
+	{\Large 2022年2月9日提出}\\\vspace{1cm}
+	{\Large 指導教員 小野 靖 教授}\\\vspace{1cm}
+	{\Huge 03-200474\hspace{0.8cm}奥西\hspace{0.8cm}衛門}
+  }
+
+\begin{document}
+\includepdf{title.pdf}
+\pagenumbering{Roman}
+\maketitle
+
+% \newpage\thispagestyle{empty}
+% \include{chapter/abstract}
+\newpage\pagenumbering{roman}\setcounter{page}{1}
+\tableofcontents\listoffigures
+
+\newpage\pagenumbering{arabic}\setcounter{page}{1}
+\include{chapter/01}
+\include{chapter/02}
+\include{chapter/03}
+\include{chapter/04}
+\include{chapter/05}
+\include{chapter/06}
+\bibliographystyle{junsrt}
+\bibliography{references}
+\end{document}

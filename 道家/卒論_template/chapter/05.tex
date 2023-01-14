@@ -1,0 +1,32 @@
+\chapter{軟X線発光分布の再構成}
+\section{非線形再構成法およびNLMの評価}
+ここまでに説明した軟X線を観測するカメラシステムと再構成ソフトウェアを用いて，TS6実験を行った。このときポロイダルコイル充電電圧$V_{PF} = 39\mathrm{kV}$, トロイダルコイル充電電圧$V_{TF} = 4\mathrm{kV}$で$\mathrm{Ar}$ガスが使用された。実験で得られた軟X線画像は，再構成に使用する部分を切り出し，図\ref{fig:reconst}中（３）の状態から処理が始まる。カメラが撮影した画像にNLMを適用した結果が図\ref{fig:filter_camera}に，同じ投影画像に対して(i)Tikhonov-Phillips正則化，(ii)最小Fisher情報量法による正則化，(iii)NLMとTikhonov-Phillips正則化，(iv)NLMと最小Fisher情報量法による正則化をそれぞれ施し，磁気面と重ね合わせたものが図\ref{fig:n_nl}である。このときリコネクション期間は$480\mathrm{\mu s} から 485\mathrm{\mu s}$であり，$480\mathrm{\mu s}$の画像はリコネクション初期段階である。(i)と(ii)を比較すると，線形正則化では$z$軸負の領域に広がっていた中程度の発光が右側では抑えられており，ファントムテストで示されたとおりピークの弱い領域における強い正則化が認められる。ピーク領域に関しては大きな違いは見られず，ともにセパラトリクスに沿った加熱が確認できる。(i)や(ii)ではX点から$z-$にかけて一連なりの強い発光が見られる一方で，(iii)や(iv)では加熱箇所の局所性が高まり，X点の加熱と$z-$の二つの加熱が分離している様子まで確認できる。このことから，NLMによるフィルタリングによって複数の小さな加熱群を分離して再構成できることが分かる。NLMの有無による図\ref{fig:filter_camera}ほどの違いが再構成後の画像に見られないのは，ホワイト性の高いノイズが二次元投影画像から空間分布に再分配されるにあたってノイズが平均化されるためと考えられる。
+\begin{figure}[H]
+   \centering
+   \includegraphics[scale=0.6]{fig/ccdcamera_filter.png}
+   \caption{Aluminum, Mylarそれぞれの撮影画像（左側）にNLMを適用したもの（右側）。}
+   \label{fig:filter_camera}
+\end{figure}
+\begin{figure}[H]
+   \centering
+   \includegraphics[scale=0.6]{fig/result_n_nl_f.png}
+   \caption{1$\mathrm{\mu m}$Mylarフィルタを用いて観測したX線強度（色）と磁場（黒線）の$r-z$分布:(上段左)線形正則化，(上段右)非線形正則化，(下段左)NLMと線形正則化，(下段右)NLMと非線形正則化による再構成結果}
+   \label{fig:n_nl_f}
+\end{figure}
+\section{ダウンストリーム加熱とX点加熱の検出}
+$V_{TF}=4\mathrm{kV}, V_{PF}=39\mathrm{kV}$での時間発展が図\ref{fig:xpoint_filter}に示されている。$z$軸正と負の方向から近づく二つのプラズマが，$z = 0$付近で合体し磁気リコネクションが生じていて，放電開始時点を$t = 0\mathrm{\mu s}$として$t = 475\mathrm{\mu s}$でX点から噴出した高速電子によるダウンストリーム加熱が観測された。$480\mathrm{\mu s}$ではX点から内側方向に吹き出した高エネルギー電子が，時間が経過するに伴って磁力線に沿って移動し，$z+, z-$両側に広がる様子がはっきりと見て取れる。さらに$t = 480\mathrm{\mu s}$ににおいてX点付近およびセパラトリクス上に留まる強い局所発光にはダウンストリーム加熱の約二倍の発光量が観測されており，リコネクション初期段階の発光であることや下部にダウンストリームの噴出が認められることからX点加熱である可能性が示唆された。
+\begin{figure}[H]
+   \centering
+   \includegraphics[scale=0.6]{fig/xpointheating_filter_29.png}
+   \caption{1$\mathrm{\mu m}$Mylarフィルタを用いた場合のX線強度（色）と磁場（黒線）の$r-z$分布と，ダウンストリーム加熱の時間発展:$V_{TF} = 4\mathrm{kV}, V_{PF}=39\mathrm{kV}$}
+   \label{fig:xpoint_filter}
+\end{figure}
+
+これが実際の加熱であることを検証するために，非線形再構成が計算した複数の局所加熱をもつ分布と同様のファントムを作成し，改めて従来手法との比較を行った結果が図\ref{fig:newphantom}である。線形再構成では合体してしまう二つの小加熱が，非線形再構成できちんと二つに分離して再現できている。このテストによって非線形再構成とNLMを用いた新手法が小加熱の中心とその幅をより精度の高い状態で再現できることが確かめられ，従来手法に対する優位性が実証された。
+
+\begin{figure}[H]
+   \centering
+   \includegraphics[scale=0.6]{fig/newphantom_good.png}
+   \caption{実験結果を元に作成したファントム（左）と，線形（中央）非線形（右）手法による再構成結果:数字は各小ピーク中心の明度の比を表す}
+   \label{fig:newphantom}
+\end{figure}

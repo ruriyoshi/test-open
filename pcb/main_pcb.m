@@ -15,7 +15,7 @@ T=getTS6log(DOCID);
 pathname.ts3u='ts3u_path';%old-koalaのts-3uまでのパス（mrdなど）
 pathname.fourier='fourier_path';%fourierのmd0（データックのショットが入ってる）までのpath
 pathname.NIFS='NIFS_path';%resultsまでのpath（ドップラー、SXR）
-pathname.save='C:\Users\uswk0\OneDrive\デスクトップ\data\a038_out\'; %保存先
+pathname.save='C:\Users\uswk0\OneDrive\デスクトップ\道家\卒論\data'; %保存先
 
 %%%%(2)ログから解析したいデータを検索
 %Github/test-open/searchlog.mを使用

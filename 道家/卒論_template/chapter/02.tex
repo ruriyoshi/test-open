@@ -1,0 +1,111 @@
+\chapter{実験装置概要}
+今回の研究で用いるプラズマ実験装置TS-6とその基礎計測系，および軟X線計測システムの概要を説明する。
+
+\section{プラズマ合体実験装置TS-6}
+% \begin{figure}[h]\centering\includegraphics[width=0.55\columnwidth]{fig/TS-3.png}
+% 	\caption{TS-6装置図}\label{fig:TS-3}
+% \end{figure}
+
+TS-6は前章にて述べた，ST合体が可能なプラズマ実験装置である。
+真空容器は全長1170mm，内径750mmの円筒容器であり，不純物の混入を防ぐためにステンレス製となっている。この内部にはトカマクプラズマを生成するためのポロイダル磁場コイル，放電電極，外部トロイダル磁場コイル，CSコイル，及びプラズマを安定に保持するための平衡磁界コイルが設置されている。
+
+\begin{description}
+	\item[真空容器および真空排気系]\mbox{}\\TS-6の真空容器は全長1440mm，内径750mmの円筒形でステンレス鋼でできている。真空排気系はロータリーポンプとターボ分子ポンプそれぞれ1基備わっており，最大$\sim$2.0$\times10^{-5}$torrまで排気される。
+	\item[ポロイダル磁場コイル(PFコイル)]\mbox{}\\真空容器両端に設置されており，ポロイダル磁場を生成する。プラズマ点火時には初期プラズマ生成と真空容器中央部にプラズマを押し出すプラズマ合体を促進する働きをもつ。
+	\item[放電電極]\mbox{}\\放電電極によって真空容器内に投入したガスをグロー放電させ予備電離とすることで，PFコイルによる電流立ち上げ時にトーラスプラズマを安定させる働きをもつ。
+	\item[外部トロイダル磁場コイル(TFコイル)]\mbox{}\\真空容器の中心対称軸上に存在する直線状の導線と，真空容器の外部を取り巻く戻り用の導線からなる全12ターンのトロイダル磁場コイルである。PFコイルと比較して動作時間が長く，合体終了時までおよそ一定の磁場が印加される。このTFはリコネクションにおけるガイド磁場に相当する。
+	\item[平衡磁界コイル(EFコイル)]\mbox{}\\軸方向に磁界を印加し，プラズマがトロイダル電流によって受けるフープ力を抑制する働きをもつ。
+	\item[セパレーションコイル]\mbox{}\\3turn$\times$2並列のPFコイルで，中心平面を挟むように2つ設置されている。プラズマのトロイダル電流と逆の電流を流し，合体により生成されたプラズマが真空容器壁に接触しないように抑える。
+	\item[センターソレノイドコイル(CSコイル)]\mbox{}\\真空容器中心軸上に挿入されているソレノイドコイルで，CSに流す電流を立ち上げることによる誘導起電力によりプラズマ中にトロイダル電流を誘起することができる。
+\end{description}
+
+\subsection{TS-6のプラズマ生成方法}
+\begin{itemize}
+	\item ロータリーポンプ，ターボ分子ポンプにより容器に真空を引く。
+ \item EFコイルにより一様磁界を印加し，ガスを注入後左右の電極でグロー放電を生じ，予備電離を開始する。
+ \item TFコイルに電流を流しトロイダル磁場を生成する。
+ \item PFコイルに電流を流し($t=740\mu s$)ポロイダル磁場を生成し，PFコイルに流す電流の立ち上がりによりトロイダル電流を誘起させプラズマを左右に生成する。
+ \item PFコイル電流の極性を反転することで，プラズマとの間に反発力を発生させ，2つのプラズマを容器の中央部に押し出す。
+ \item 2つのプラズマが中央部で合体し，それと同時に磁気リコネクションによって急速に温度が上がり１つの高温プラズマが生成される。
+\end{itemize}
+
+\section{磁気プローブによる磁気計測}
+TS-6内部には磁場測定用の2次元磁気プローブアレイが挿入されており，各プローブは磁場の時間変化による誘導起電力を出力するため，これを積分することで磁場を測定する。以下に原理を記す。\\　コイルの巻き数をN，面積をSとして，磁場$B$における信号は
+\begin{equation}　V_{coil}(t)=-\rm{NS}\frac{dB(t)}{dt}
+\end{equation}
+となる。また，RC積分器で積分することにより
+\begin{equation}
+V_{int}(t)=-\frac{1}{\rm{RC}}\int{V_{coil}}(t)dt=\frac{\rm{NS}}{\rm{RC}}B(t)
+\end{equation}
+として得られる。RC積分により信号が小さくなるため，基本的にはRC積分後，オペアンプを用いた非反転増幅回路を設け，信号を増幅させてデジタイザに入力している。その他に
+\begin{equation}
+B(t)=-\frac{1}{\rm{NS}}\int{V_{coil}}(t)dt
+\end{equation}
+と数値積分によっても誘導起電力$V_{coil}$から磁場B(t)を求めることができる。\\
+軸対称性$\partial /\partial\theta=0$を仮定し，ポロイダル磁場$B_z$を計測することで，
+\begin{equation}
+\varPhi (r,z)=\int{\rm{2\pi} rB_z(r,z)}dr
+\end{equation}
+によりポロイダル磁束を計算できる。ポロイダル磁束から
+\begin{equation}
+　B_r(r,z)=-\frac{1}{\rm{2\pi}r}\frac{\partial\varPhi}{\partial z}
+\end{equation}
+により径方向磁場$B_r$を求められる。さらに，ポロイダル磁場$B_z$，$B_r$の空間微分をとることでトロイダル電流密度$j_t$とトロイダル電場$E_t$を求めることができる。
+\begin{equation}　j_t(R)=\frac{1}{\rm{\mu_0}}\bigg[\frac{dB_r}{dz}-\frac{dB_z}{dR'}\bigg]_{R'=R}
+\end{equation}
+\begin{equation}
+E_t(R)=-\frac{1}{2\pi R}\frac{d\varPhi}{dt}\bigg|_{R'=R}
+\end{equation}
+% \section{ロゴスキーコイル}
+% ロゴスキーコイルは各コイルや電源から導体棒に流れる電流を非接触で計測するために用いている。\fig{coil}のようにロゴスキーコイルはソレノイドコイルを環状にした構造をしている。
+
+% \begin{figure}[H]\centering\includegraphics[width=0.3\columnwidth]{fig/coil.png}
+% 	\caption{ロゴスキーコイルの概要}\label{fig:coil}
+% \end{figure}
+
+% コイル中心を貫く電流が作る磁束変化によって端子間に生じる誘導起電力を計測することで，電流値を求めることができる。以下に計測原理の概要を記す。\\　コイルの巻き数をn，コイルの断面積をAとすると，コイル内を通過する磁束$\varPhi$は
+% \begin{equation}
+% \varPhi=\rm{n}\oint_{l}{}\int_{A}{}{dA\bm{B}・\bm{dl}}
+% \end{equation}
+% と書ける。アンペールの法則を用いて式を書き直すと，以下のように書ける。
+% \begin{equation}
+% \varPhi=\rm{n\mu_0AI}
+% \end{equation}
+% ここで$\mu_0$は真空の透磁率を表す。したがってロゴスキーコイルの誘導起電力$V_{out}$は
+% \begin{equation}
+% V_{out}=\frac{d\varPhi}{dt}=\rm{n\mu_0A}\frac{dI}{dt}
+% \end{equation}
+% と書け，この$V_{out}$を積分することで電流値$I(t)$を求めることができる。
+% \begin{equation}
+% I(t)=\frac{1}{\rm{n\mu_0A}}\int_{0}^{t}{V_{out}(t')}dt'
+% \end{equation}
+
+\section{2次元軟X線測定システム}
+\begin{figure}[H]
+	\begin{tabular}{ccc}
+			\begin{minipage}[t]{0.33\hsize}
+					\centering
+					\includegraphics[keepaspectratio, scale=0.3]{fig/lightline_ts6.png}
+					\caption{TS-6に対するMCP真空容器の配置\cite{RSI}}
+					\label{fig:siya}
+			\end{minipage} &
+			\begin{minipage}[t]{0.33\hsize}
+					\centering
+					\includegraphics[keepaspectratio, scale=0.45]{fig/MCPchamber.png}
+					\caption{MCP真空容器の外観}
+			\end{minipage}
+			\begin{minipage}[t]{0.33\hsize}
+					\centering
+					\includegraphics[keepaspectratio, scale=0.4]{fig/xraysystem.png}
+					\caption{MCP真空容器の内部\cite{RSI}}
+					\label{fig:xraysystem}
+			\end{minipage} 
+	\end{tabular}
+\end{figure}
+軟X線を測定するために，MCP（浜松ホトニクス製）が用いられる。MCPは光電効果によって軟X線を電子線に変換し増倍する管を束ねたもので，電界が逆方向に印加されることで電子を出力するものであり，図\ref{fig:siya}\cite{RSI}と図\ref{fig:xraysystem}\cite{RSI}にシステムの概要を示す。このシステムでは，図\ref{fig:block}に示すとおりに信号が変換される；まずプラズマ中で生じた様々な波長の光がピンホールを通じてシステムに入射したあと，MCP前部のフィルターが軟X線の波長を選択する。次にMCPがこれを電子線に変換，MCP後部に設置された蛍光板が出力電子線を可視光に変換する。そして光はファイバーバンドルによってカメラまで伝送され，適切な大きさにレンズで拡大されたあとこれをカメラが撮影する。その結果，軟X線発光が可視光画像として計測される。波長選択フィルタは本研究では厚さ$1\mathrm{\mu m}$のMylarが用いられ，これは100$\mathrm{eV}$以上の光を主に透過する。カメラは露光時間$2\mathrm{\mu s}$, シャッター間隔$5\mathrm{\mu s}$で動作し，$200\times400$pixelの視野を持つ。ただし，$6000$本のファイバーから成るファイバーバンドル二束を視野に入れるため，得られる軟X線画像はこの値に支配される。
+\begin{figure}[H]
+	 \centering
+	 \includegraphics[scale=0.5]{fig/blocksystem.png}
+	 \caption{X線計測システムにおいて発光画像が撮影されるまでの信号の変換過程}
+	 \label{fig:block}
+\end{figure}
