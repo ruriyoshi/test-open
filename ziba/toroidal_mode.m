@@ -1,8 +1,6 @@
 function [n_Amp,n_Ph] = toroidal_mode(t,x,signal)
-t_start = t(1);
-t_end = t(end);
+
 len_freq = length(x);
-signal = signal(t_start:t_end,:);
 x_interp = 0:1/8:7/8;
 
 % ********** main calculation **********
@@ -10,6 +8,7 @@ x_interp = 0:1/8:7/8;
 yshift_store = zeros(length(t),length(x));
 for i = 1:length(t)
     sig = interp1(x,signal(i,:),x_interp,'makima','extrap' ); %補完関数
+    %sig = signal(i,:);
     y_fft = fft(sig);
     yshift_store(i,:) = fftshift(y_fft);
     %fshift = (-len_freq/2:len_freq/2)*((1/(abs(x(1)-x(2))))/len_freq);

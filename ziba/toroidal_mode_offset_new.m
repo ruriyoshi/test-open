@@ -1,16 +1,21 @@
 function [low_n_signal] = toroidal_mode_offset_new(low_n_data,shot,offset,smoothing,movemean,standarization)
 
 t = linspace(0,1000,10001);
-t_start = 200;
-t_end = 800;
+
+
+%プロット表示する時間範囲
+t_start = 400;
+t_end = 600;
+
 porality = [-1, 1, 1, -1, -1, 1, 1, 1];
 %probeの挿入角度
 not_rad_x = [8.6, 68, 113, 143, 188, 233, 263, 323];
 x = not_rad_x*2*pi/360;
 ch_num = length(x);
-N = 200; % turn
-d = 1e-3; % outer diameter
-S = pi*d*d; % area
+NS_z = 31.8e-3;
+NS_t = 35.3e-3;
+NS_r = 107e-3;
+
 R = 100e3;
 C = 100e-9; 
 
@@ -18,6 +23,8 @@ C = 100e-9;
 low_n_signal = zeros(length(t),ch_num);
 
 %read data from rgw file → low_n_data, low_n_signalにBzの値が入っている
+%low_n_dataに全てのチャンネルの
+
 for i=11:18
     low_n_signal(:,i-10) = low_n_data(:,i);
 end
@@ -32,7 +39,7 @@ end
 low_n_signal = low_n_signal.*porality;
 
 % calibration
-low_n_signal = (R*C)/(N*S)*low_n_signal;
+low_n_signal = (R*C)/(NS_z)*low_n_signal;
 
 
 
@@ -66,9 +73,20 @@ if standarization
     low_n_signal = low_n_signal.*(max_coefficient./max_array);
 end
 
-
-
 % execute fourie transform
+[n_Amp, n_Ph] = toroidal_mode(t,x, low_n_signal);
+
+n0_Am = n_Amp(1,:);
+n1_Am = n_Amp(2,:);
+n2_Am = n_Amp(3,:);
+n3_Am = n_Amp(4,:);
+
+n1_Omega = calculate_omega(smooth(cumulative_phase(n_Ph(1,:)),0.1,'loess'));
+n2_Omega = calculate_omega(smooth(cumulative_phase(n_Ph(2,:)),0.1,'loess'));
+n3_Omega = calculate_omega(smooth(cumulative_phase(n_Ph(3,:)),0.1,'loess'));
+
+%{
+%%%%%% older mode analyze code %%%%%%
 y_shift = zeros(length(t),length(x));
 for i = 1:length(t)
   y_fft = fft(low_n_signal(i,:));
@@ -90,29 +108,30 @@ ph3 = angle(rot90(y_shift(:,8)));
 omega1 = calculate_omega(ph1);
 omega2 = calculate_omega(ph2);
 omega3 = calculate_omega(ph3);
+%}
 
 
 % plotting function
 
-% mode 
+% mode amplitudeのプロット 
 figure
 ax = gca;
 ax.FontSize = 12;
-plot(t,Am0,'k');
+plot(t,n0_Am,'k');
 xlim([420 580])
 ylim([0 1]);
 xlabel('time[μs]','FontSize',11,'FontWeight','bold');
 ylabel('Amplitude','FontSize',11,'FontWeight','bold');
 hold on
-plot(t,Am1);
-plot(t,Am2);
-plot(t,Am3);
+plot(t,n1_Am);
+plot(t,n2_Am);
+plot(t,n3_Am);
 legend('n=0','n=1','n=2','n=3');
 %title('amplitude')
 hold off
 
 
-
+%ch1~ch8までの磁場信号の時間変化を2×4で個々に表示
 f = figure('name',['shot', num2str(shot)]);
 f.Position(3) = 800;
 for i = 1:8
@@ -172,6 +191,7 @@ end
 %     title(num2str(i),'T');
 % end
 
+%ch1~ch8までの磁場信号の時間変化重ねて表示
 figure('name',['shot', num2str(shot)]);
 for i=1:8
     plot(t,low_n_signal(:,i));
@@ -188,21 +208,58 @@ end
 legend('CH1','CH2','CH3','CH4','CH5','CH6','CH7','CH8');
 hold off
 
+
 function Omega = calculate_omega(Ph)
-        Omega = zeros(size(Ph));
-        for j = 1:length(Ph)-1
-            if abs(Ph(j+1)-Ph(j)) < pi/2
-                Omega(j) = Ph(j+1)-Ph(j);
-            else
-                delta = 2*pi + min(Ph(j+1),Ph(j)) - max(Ph(j+1),Ph(j));
-                if Ph(j+1) > Ph(j)
-                    delta = -delta;
-                end
-                Omega(j) = delta;
-            end
-        end
-        Omega(end) = Omega(end-1);
+    Omega = zeros(size(Ph));
+    for j = 1:length(Ph)-1
+        Omega(j) = Ph(j+1)-Ph(j);
     end
+    Omega(end) = Omega(end-1);
 end
 
 
+
+
+function phase = total_phase(freq)
+% get phase from frequency
+    phase = zeros(size(freq));
+    for k = 1:length(phase)
+        phase(k) = sum(freq(1:k))*2*pi;
+    end
+end
+
+function phase = cumulative_phase(Ph)
+% get cumulative phase from phase
+    phase = zeros(size(Ph));
+    phase_reference = 0;
+    phase(1) = phase_reference + Ph(1);
+    for k = 2:length(phase)
+        if Ph(k)-Ph(k-1) > pi
+            phase_reference = phase_reference - 2*pi;
+        elseif Ph(k)-Ph(k-1) < -pi
+            phase_reference = phase_reference + 2*pi;
+        end
+        phase(k) = phase_reference + Ph(k);
+    end
+end
+
+%function [] = Animate_toroidal_mode(t,n_Amp,n_Ph)
+%     figure
+%     xx = linspace(0,1,30)*2*pi;
+%     for j = t
+%         jj = j - (t(1)-1);
+%         subplot(3,1,1)
+%         polarplot(xx,n_Amp(2,jj)/n_Amp(1,jj)*sin(1*xx+n_Ph(1,jj))+1);
+%         rlim([0 1.5]);
+%         subplot(3,1,2)
+%         polarplot(xx,n_Amp(3,jj)/n_Amp(1,jj)*sin(2*xx+n_Ph(2,jj))+1);
+%         rlim([0 1.5]);
+%         subplot(3,1,3)
+%         polarplot(xx,n_Amp(4,jj)/n_Amp(1,jj)*sin(3*xx+n_Ph(3,jj))+1);
+%         rlim([0 1.5]);
+%         
+%         pause(0.02);
+%     end
+% end
+
+end
