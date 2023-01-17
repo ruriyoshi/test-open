@@ -45,7 +45,7 @@ for i = 1:length(t)
     %alpha(i,:) = test_Bt_raw(i,:)/test_Bz_raw(i,:);% 1*channnel_num
     %theta = arctan(1/alpha)
 
-    theta(i,:) = atan(test_Bz_raw(i,:)/test_Bt_raw(i,:)); % 1*channel_num
+    theta(i,:) = atan2(test_Bz_raw(i,:),test_Bt_raw(i,:)); % 1*channel_num
   
 
     for j = 1:probe_num
