@@ -20,9 +20,13 @@ MyFolderName = {MyFolderInfo.name};
 FolderInfo = strcat(MyFolderDir,'/',MyFolderName);
 
 for i = 1:numel(FolderInfo)
+    if MyFolderInfo(i).isdir
+        continue
+    end
     figure(1);
     IM = imread(string(FolderInfo(i)));
-    imagesc(IM,[50,65]);
+    imagesc(IM,[50,80]);
+    imagesc(IM);
     saveas(gcf,strcat(path2,'/',string(MyFolderName(i))));
 end
 end

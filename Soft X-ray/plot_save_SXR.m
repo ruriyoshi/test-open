@@ -1,4 +1,4 @@
-function plot_save_SXR(B_z,r_probe,z_probe,range,date,shot,t,EE1,EE2,show_localmax,show_xpoint,save)
+function plot_save_SXR(B_z,r_probe,z_probe,range,date,shot,t,EE1,EE2,show_localmax,show_xpoint,save,filter,NL)
 % plot SXR emission and psi in rz plane and save the result
 % input:
 %   3d array of double: B_z (r,z,t), offsetted at zero and smoothed
@@ -12,6 +12,8 @@ function plot_save_SXR(B_z,r_probe,z_probe,range,date,shot,t,EE1,EE2,show_localm
 %   boolean: show_xpoint, option for showing the x-point
 %   boolean: show_localmax, option for showing the local maximum point
 %   boolean: save, option for saving the reconstruction result
+%   boolean: filter, option for applying non-linear mean (NLM) filter
+%   boolean: NL, option for using non-linear reconstruction
 
 % 表示範囲の設定に使うパラメータを取得
 range = range./1000;
@@ -27,8 +29,10 @@ z_space_SXR1 = linspace(zmin1,zmax1,size(EE1,2));
 z_space_SXR2 = linspace(zmin2,zmax2,size(EE2,2));
 
 r_range1 = find(0.060<=r_space_SXR1 & r_space_SXR1<=0.300);
+% r_range1 = find(0.060<=r_space_SXR1 & r_space_SXR1<=0.330);
 r_space_SXR1 = r_space_SXR1(r_range1);
 r_range2 = find(0.060<=r_space_SXR2 & r_space_SXR2<=0.300);
+% r_range2 = find(0.060<=r_space_SXR2 & r_space_SXR2<=0.330);
 r_space_SXR2 = r_space_SXR2(r_range2);
 z_range1 = find(-0.20<=z_space_SXR1 & z_space_SXR1<=0.20);
 z_range2 = find(-0.20<=z_space_SXR2 & z_space_SXR2<=0.20);
@@ -70,7 +74,7 @@ subplot('Position',pos1);
 [~,h1] = contourf(SXR_mesh_z1,SXR_mesh_r1,EE1,20);
 h1.LineStyle = 'none';
 caxis([0,0.2]);
-% caxis([0,0.15]);
+% caxis([0,1]);
 c=colorbar;c.Label.String='Intensity [a.u.]';c.FontSize=18;
 hold on
 
@@ -84,7 +88,7 @@ if show_localmax
 %     localmax_pos_r = SXR_mesh_r1(localmax_idx);
 %     localmax_pos_z = SXR_mesh_z1(localmax_idx);
     EE_localmax = EE1.*localmax_idx;
-    [~, localmax_idx] = maxk(EE_localmax(:),10);
+    [~, localmax_idx] = maxk(EE_localmax(:),2);
     localmax_pos_r = SXR_mesh_r1(localmax_idx);
     localmax_pos_z = SXR_mesh_z1(localmax_idx);
     plot(localmax_pos_z,localmax_pos_r,'r*');
@@ -111,8 +115,8 @@ subplot('Position',pos2);
 [SXR_mesh_z2,SXR_mesh_r2] = meshgrid(z_space_SXR2,r_space_SXR2);
 [~,h2] = contourf(SXR_mesh_z2,SXR_mesh_r2,EE2,20);
 h2.LineStyle = 'none';
-% caxis([0,0.15]);
-caxis([0,0.2]);
+caxis([0,0.1]);
+% % caxis([0,1]);
 c=colorbar;c.Label.String='Intensity [a.u.]';c.FontSize=18;
 hold on
 
@@ -135,7 +139,16 @@ hold off
 
 if save
     pathname = '/Users/shinjirotakeda/OneDrive - The University of Tokyo/Documents/ReconstructionResults/';
-    foldername = strcat(pathname,num2str(date),'/shot',num2str(shot),'_wide');
+    if filter & NL
+        directory = '/NLF_NLR/';
+    elseif ~filter & NL
+        directory = '/LF_NLR/';
+    elseif filter & ~NL
+        directory = '/NLF_LR/';
+    else
+        directory = '/LF_LR/';
+    end
+    foldername = strcat(pathname,directory,num2str(date),'/shot',num2str(shot),'_wide');
     if exist(foldername,'dir') == 0
         mkdir(foldername);
     end

@@ -1,9 +1,6 @@
-function [U1,U2,s1,s2,v1,v2,M,K,range] = clc_parameters(N_projection,N_grid)
-% % 投影数、グリッド数の定義（要る？）
-% N_projection = 80;
-% N_grid = 80;
+function [] = clc_parameters(N_projection,N_grid)
 
-filepath = '/Users/shinjirotakeda/Documents/GitHub/SXR_diagnostics/parameters.mat';
+filepath = '/Users/shinjirotakeda/Documents/GitHub/test-open/Soft X-ray/parameters.mat';
 
 % 視線の分布、重み行列の作成
 zhole1=40;zhole2=-40;
@@ -34,7 +31,7 @@ if M>K
     s2 = [s2 zeros(1,M-K)];
 end
 
-save(filepath,'U1','U2','s1','s2','v1','v2','M','K','range','N_projection','N_grid');
+save(filepath,'gm2d1','gm2d2','U1','U2','s1','s2','v1','v2','M','K','range','N_projection','N_grid');
 
 end
 

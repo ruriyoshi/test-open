@@ -1,16 +1,16 @@
-function [VectorImage1,VectorImage2] = get_SXRImage(date,number,SXRfilename)
+function [VectorImage1,VectorImage2] = get_SXRImage(date,number,SXRfilename,filter)
 % % 画像を切り取る
 N_projection = 80;
 % VectorImages = CutImage(date,shot,N_projection/230,false);
 CheckFlag = false;
-VectorImages = CutImage(date,N_projection/240,CheckFlag,SXRfilename);
+VectorImages = CutImage(date,N_projection/240,CheckFlag,SXRfilename,filter);
 VectorImages1 = squeeze(VectorImages(1,:,:));
 VectorImages2 = squeeze(VectorImages(2,:,:));
 VectorImage1 = VectorImages1(number,:);
 VectorImage2 = VectorImages2(number,:);
 end
 
-function VectorImages = CutImage(date,resolution,check_flag,SXRfilename)
+function VectorImages = CutImage(date,resolution,check_flag,SXRfilename,filter)
 
 
 % pathname = '/Users/shinjirotakeda/OneDrive - The University of Tokyo/Documents/SXR_Images/';
@@ -35,6 +35,14 @@ function VectorImages = CutImage(date,resolution,check_flag,SXRfilename)
 % filename = strcat(foldername,shotname);
 
 RawImage = imread(SXRfilename);
+
+if filter
+    figure;imagesc(RawImage);
+    [RawImage,~] = imnlmfilt(RawImage,'SearchWindowSize',91,'ComparisonWindowSize',15);
+    figure;imagesc(RawImage);
+% else
+%     RawImage = RawImage;
+end
 % whos RawImage
 
 % IW = 115; %Image Width
