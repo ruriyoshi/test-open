@@ -6,14 +6,14 @@ function vq = bz_rbfinterp(rpos, zpos, grid2D, bz, ok, t)
 
 %%スムージングと関数の選択
 smoothval=0.05;
-func='Linear';%Gaussian, Linear, Cubic,multiquadric Thinplate から選べる
-%const=0.015;
+func='multiquadric';%Gaussian, Linear, Cubic,multiquadric, Thinplate から選べる
+const=0.015;
 %%無視するチャンネルを除いたbzの散布データ（okのチャンネルのみ残す）
 x=zpos(ok);
 y=rpos(ok);
 z=double(bz(t,ok))';
 
 %%補間
-vq= rbfinterp([grid2D.zq(:)'; grid2D.rq(:)'], rbfcreate([x' ; y'], z','RBFFunction',func )%,'RBFSmooth', smoothval,'RBFConstant',const));
+vq= rbfinterp([grid2D.zq(:)'; grid2D.rq(:)'], rbfcreate([x' ; y'], z','RBFFunction',func,'RBFConstant',const,'RBFSmooth', smoothval ));%,'RBFSmooth', smoothval,'RBFConstant',const));
 vq = reshape(vq, size(grid2D.zq));
 end
