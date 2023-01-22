@@ -9,22 +9,22 @@ pathname.save=getenv('savedata_path');%outputデータ保存先
 
 pathname.rawdata=getenv('rawdata_path');%dtacqのrawdataの保管場所
 pathname.woTFdata=getenv('woTFdata_path');%rawdata（TFoffset引いた）の保管場所
+% 
+% %計測chなど読み込み
+% S=readmatrix("221216RC.xlsx");
+% fail=S(:,5);
+% S(fail==1,:)=[];
+% 
+% dtacq_list=S(:,1);
+% shot_list=S(:,2);
+% int_list=S(:,3);
+% fg_list=S(:,4);
 
-%計測chなど読み込み
-S=readmatrix("221216RC.xlsx");
-fail=S(:,5);
-S(fail==1,:)=[];
-
-dtacq_list=S(:,1);
-shot_list=S(:,2);
-int_list=S(:,3);
-fg_list=S(:,4);
-
-% %手動入力
-% dtacq_list=39;
-% shot_list=9;
-% int_list=1;
-% fg_list=128;
+%手動入力
+dtacq_list=39;
+shot_list=9;
+int_list=1;
+fg_list=128;
 
 n=numel(shot_list);%計測データ数
 data=zeros(n,3);%較正係数保管
@@ -46,16 +46,21 @@ for i=1:n
     data(i,2)=int_ch;
     data(i,3)=RC;
 
-%     %信号図示
-%     t=1:1000;
-%     figure
-%     plot(t,int,'r')
-%     hold on
-%     plot(t,fg,'b')
-%     legend('integrator','FG')
-%     ylim([-1 1])
+    %信号図示
+    t=1:1000;
+    figure
+    plot(t,int,'r')
+    hold on
+    plot(t,fg,'b')
+    legend('Integrator','Function Generator')
+    ylim([-1 1])
+    xlabel('t [us]')
+    ylabel('V [V]')
+    ha1 = gca;
+    ha1.LineWidth = 1;
+    ha1.FontSize=13;
 
 end
 
-save(strcat(pathname.save,'\','221216RC.mat'),'data')
+% save(strcat(pathname.save,'\','221216RC.mat'),'data')
 
