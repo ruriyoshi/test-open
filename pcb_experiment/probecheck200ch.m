@@ -18,9 +18,9 @@ pathname.rawdata=getenv('rawdata_path');%dtacqのrawdataの保管場所
 %%%%実験オペレーションの取得
 %直接入力の場合
 dtacqlist=39;
-shotlist=320;%【input】dtacqの保存番号
-tfshotlist=317;
-date = 230110;%【input】計測日
+shotlist=418;%【input】dtacqの保存番号
+tfshotlist=411;
+date = 230119;%【input】計測日
 n=numel(shotlist);%計測データ数
 
 % %磁気面出す場合は適切な値を入力、磁場信号のみプロットする場合は変更不要
@@ -87,10 +87,9 @@ for i=1:192
         ok_bt(ceil(ch(i)/2))=ok(i);
     end
 end
-
+ok_bz([9 10 96 17])=false;
+ok_bz([49 57])=true;
 % bz(:,[57 67 68 77 87])=-bz(:,[57 67 68 77 87]);
-% ok_bz(28)=false;
-
 % [bz, ok_bz, ok_bz_plot] = ng_replace(bz, ok_bz, sheet_date);
 ok_bz_plot=ok_bz;
 
