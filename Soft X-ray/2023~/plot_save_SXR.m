@@ -1,4 +1,4 @@
-function plot_save_SXR(B_z,r_probe,z_probe,range,date,shot,t,EE1,EE2,show_localmax,show_xpoint,save,filter,NL)
+function plot_save_SXR(grid2D,data2D,range,date,shot,t,EE1,EE2,show_localmax,show_xpoint,save,filter,NL)
 % plot SXR emission and psi in rz plane and save the result
 % input:
 %   3d array of double: B_z (r,z,t), offsetted at zero and smoothed
@@ -28,14 +28,14 @@ r_space_SXR2 = linspace(rmin,rmax,size(EE1,1));
 z_space_SXR1 = linspace(zmin1,zmax1,size(EE1,2));
 z_space_SXR2 = linspace(zmin2,zmax2,size(EE2,2));
 
-r_range1 = find(0.060<=r_space_SXR1 & r_space_SXR1<=0.300);
-% r_range1 = find(0.060<=r_space_SXR1 & r_space_SXR1<=0.330);
+% r_range1 = find(0.060<=r_space_SXR1 & r_space_SXR1<=0.300);
+r_range1 = find(0.060<=r_space_SXR1 & r_space_SXR1<=0.330);
 r_space_SXR1 = r_space_SXR1(r_range1);
-r_range2 = find(0.060<=r_space_SXR2 & r_space_SXR2<=0.300);
-% r_range2 = find(0.060<=r_space_SXR2 & r_space_SXR2<=0.330);
+% r_range2 = find(0.060<=r_space_SXR2 & r_space_SXR2<=0.300);
+r_range2 = find(0.060<=r_space_SXR2 & r_space_SXR2<=0.330);
 r_space_SXR2 = r_space_SXR2(r_range2);
-z_range1 = find(-0.20<=z_space_SXR1 & z_space_SXR1<=0.20);
-z_range2 = find(-0.20<=z_space_SXR2 & z_space_SXR2<=0.20);
+z_range1 = find(-0.17<=z_space_SXR1 & z_space_SXR1<=0.17);
+z_range2 = find(-0.17<=z_space_SXR2 & z_space_SXR2<=0.17);
 
 z_space_SXR1 = z_space_SXR1(z_range1);
 z_space_SXR2 = z_space_SXR2(z_range2);
@@ -43,13 +43,17 @@ z_space_SXR2 = z_space_SXR2(z_range2);
 EE1 = EE1(r_range1,z_range1);
 EE2 = EE2(r_range2,z_range2);
 
-z_space = linspace(z_probe(1),z_probe(end),50);
-r_space = linspace(r_probe(1),r_probe(end),50);
-[psi_mesh_z,psi_mesh_r] = meshgrid(z_space,r_space);
+% z_space = linspace(z_probe(1),z_probe(end),50);
+% r_space = linspace(r_probe(1),r_probe(end),50);
+% [psi_mesh_z,psi_mesh_r] = meshgrid(z_space,r_space);
+psi_mesh_z = grid2D.zq;
+psi_mesh_r = grid2D.rq;
 
-% psi = get_psi(B_z,r_probe,t+2);
-psi = get_psi(B_z,r_probe,t);
-psi = griddata(z_probe,r_probe,psi,psi_mesh_z,psi_mesh_r,'cubic');
+% % psi = get_psi(B_z,r_probe,t+2);
+% psi = get_psi(B_z,r_probe,t);
+% psi = griddata(z_probe,r_probe,psi,psi_mesh_z,psi_mesh_r,'cubic');
+t_idx = find(data2D.trange==t);
+psi = data2D.psi(:,:,t_idx);
 
 psi_min = min(min(psi));
 psi_max = max(max(psi));
@@ -73,7 +77,7 @@ subplot('Position',pos1);
 [SXR_mesh_z1,SXR_mesh_r1] = meshgrid(z_space_SXR1,r_space_SXR1);
 [~,h1] = contourf(SXR_mesh_z1,SXR_mesh_r1,EE1,20);
 h1.LineStyle = 'none';
-caxis([0,0.2]);
+% caxis([0,0.2]);
 % caxis([0,1]);
 c=colorbar;c.Label.String='Intensity [a.u.]';c.FontSize=18;
 hold on
@@ -115,7 +119,7 @@ subplot('Position',pos2);
 [SXR_mesh_z2,SXR_mesh_r2] = meshgrid(z_space_SXR2,r_space_SXR2);
 [~,h2] = contourf(SXR_mesh_z2,SXR_mesh_r2,EE2,20);
 h2.LineStyle = 'none';
-caxis([0,0.1]);
+% caxis([0,0.1]);
 % % caxis([0,1]);
 c=colorbar;c.Label.String='Intensity [a.u.]';c.FontSize=18;
 hold on

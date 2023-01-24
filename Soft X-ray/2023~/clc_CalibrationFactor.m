@@ -59,7 +59,7 @@ end
 MeanIntensity = mean(VectorImages,'all');
 CalibrationFactor = MeanIntensity./VectorImages;
 CalibrationSavePath = strcat(CalibrationPath,'/CalibrationFactor.mat');
-save(CalibrationSavePath,CalibrationFactor);
+save(CalibrationSavePath,'CalibrationFactor');
 
 end
 

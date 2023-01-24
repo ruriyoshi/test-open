@@ -1,4 +1,4 @@
-function [EE_high,EE_low] = plot_SXR_at_t(B_z,r_probe,z_probe,date,shot,t,show_xpoint,show_localmax,start,interval,save,SXRfilename,filter,NL)
+function [EE_high,EE_low] = plot_SXR_at_t(grid2D,data2D,date,shot,t,show_xpoint,show_localmax,start,interval,save,SXRfilename,filter,NL)
 % plot SXR emission on psi in rz plane
 % input:
 %   3d array of double: B_z (r,z,t), offsetted at zero and smoothed
@@ -56,7 +56,7 @@ else
 end
 
 % 再構成計算に必要なパラメータを計算するなら読み込む、しない場合も範囲に関しては読み込む
-filepath = '/Users/shinjirotakeda/Documents/GitHub/test-open/Soft X-ray/parameters.mat';
+filepath = '/Users/shinjirotakeda/Documents/GitHub/test-open/Soft X-ray/2023~/parameters.mat';
 if clc_flag
     N_projection_new = 80;
     N_grid_new = 100;
@@ -65,12 +65,12 @@ if clc_flag
 %         load(filepath);
         if N_projection_new ~= N_projection || N_grid_new ~= N_grid
             disp('Different parameters - Start calculation!');
-            clc_parameters(N_projection_new,N_grid_new);
+            clc_parameters(N_projection_new,N_grid_new,filepath);
             load(filepath, 'gm2d1', 'gm2d2', 'U1', 'U2', 's1', 's2', 'v1', 'v2', 'M', 'K', 'range');
         end
     else
         disp('No parameter - Start calculation!');
-        clc_parameters(N_projection_new,N_grid_new);
+        clc_parameters(N_projection_new,N_grid_new,filepath);
         load(filepath, 'gm2d1', 'gm2d2', 'U1', 'U2', 's1', 's2', 'v1', 'v2', 'M', 'K', 'range');
     end
 else
@@ -82,12 +82,13 @@ plot_flag = false;
 
 if clc_flag
 %         ベクトル形式の画像データの読み込み
-    if date <= 210924
-        [VectorImage1,VectorImage2] = get_SXRImage(date,number,SXRfilename,filter);
-%         return
-    else
-        [VectorImage2,VectorImage1] = get_SXRImage(date,number,SXRfilename,filter);
-    end
+%     if date <= 210924
+%         [VectorImage1,VectorImage2] = get_SXRImage(date,number,SXRfilename,filter);
+% %         return
+%     else
+%         [VectorImage2,VectorImage1] = get_SXRImage(date,number,SXRfilename,filter);
+%     end
+[VectorImage1,VectorImage2] = get_SXRImage(date,number,SXRfilename,filter);
 
 %         再構成計算
     EE_high = clc_distribution(M,K,gm2d1,U1,s1,v1,VectorImage1,plot_flag,NL);
@@ -99,6 +100,6 @@ else
     EE_low = readmatrix(loadpath_low);
 end
 
-plot_save_SXR(B_z,r_probe,z_probe,range,date,shot,t,EE_high,EE_low,show_localmax,show_xpoint,save,filter,NL);
+plot_save_SXR(grid2D,data2D,range,date,shot,t,EE_high,EE_low,show_localmax,show_xpoint,save,filter,NL);
 
 end

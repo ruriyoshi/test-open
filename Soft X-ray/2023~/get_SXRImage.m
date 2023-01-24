@@ -1,7 +1,13 @@
 function [VectorImage1,VectorImage2] = get_SXRImage(date,number,SXRfilename,filter)
+% date = 230119;
+% number = 5;
+% SXRfilename = '/Users/shinjirotakeda/Library/CloudStorage/OneDrive-TheUniversityofTokyo/Documents/SXR_Images/230119/shot024.tif';
+% filter = false;
+
 % % 画像を切り取る
 N_projection = 80;
 % VectorImages = CutImage(date,shot,N_projection/230,false);
+% CheckFlag = true;
 CheckFlag = false;
 VectorImages = CutImage(date,N_projection,CheckFlag,SXRfilename,filter);
 VectorImages1 = squeeze(VectorImages(1,:,:));
@@ -25,11 +31,12 @@ end
 % IW = 115; %Image Width
 % IW = 120; %Image Width
 
-CalibrationPath = strcat('/Users/shinjirotakeda/OneDrive - The University of Tokyo/Documents/SXR_Images/',num2str(date),'/PositionCheck.tif');
-CalibrationImage = imread(CalibrationPath);
+PositionPath = strcat('/Users/shinjirotakeda/OneDrive - The University of Tokyo/Documents/SXR_Images/',num2str(date),'/PositionCheck.tif');
+CalibrationImage = imread(PositionPath);
 [centers,radii]=FindFibers(CalibrationImage);
 IW = round(mean(radii));
 centers = round(centers);
+IW = 80;
 
 Center = zeros(2,8,2);
 TimeRapsImage = zeros(2,8,2*IW,2*IW);
@@ -37,9 +44,20 @@ TimeRapsImage = zeros(2,8,2*IW,2*IW);
 Center(1,:,:) = centers([1,3,6,8,9,11,14,16],:);
 Center(2,:,:) = centers([2,4,5,7,10,12,13,15],:);
 
+Center(2,1,:) = [530,1520];
+Center(2,2,:) = [1060,1530];
+Center(2,3,:) = [1070,1160];
+Center(2,4,:) = [530,1150];
+Center(2,5,:) = [530,770];
+Center(2,6,:) = [1070,780];
+Center(2,7,:) = [1070,410];
+Center(2,8,:) = [530,380];
+Center(1,:,1) = Center(2,:,1) - 190;
+Center(1,:,2) = Center(2,:,2) + 5;
+
 % disp(Center);
-whos RawImage
-whos TimeRapsImage
+% whos RawImage
+% whos TimeRapsImage
 
 for i = 1:8
     UpRangeV = Center(1,i,1)-IW+1:Center(1,i,1)+IW;
@@ -59,14 +77,17 @@ k = FindCircle(N_projection/2);
 VectorImages = zeros(2,8,numel(k));
 
 if check_flag
-    f=figure;
+    f1=figure;
 %     f.WindowState = 'maximized';
-    f.Position = [900,200,500,500];
+    f1.Position = [900,200,500,500];
+    f2=figure;
+%     f.WindowState = 'maximized';
+    f2.Position = [900,200,500,500];
 end
 
 CalibrationPath = strcat('/Users/shinjirotakeda/OneDrive - The University of Tokyo/Documents/SXR_Images/',num2str(date),'/CalibrationFactor.mat');
-if exist(CalbrationPath,'file')
-    load(CalibrationPath,CalibrationFactor);
+if exist(CalibrationPath,'file')
+    load(CalibrationPath,'CalibrationFactor');
 else
     CalibrationFactor = clc_CalibrationFactor(date,N_projection);
 end
@@ -92,23 +113,34 @@ for i=1:8
 %     RoughImage2 = RoughImage2./fliplr(SD./100);
     
     if check_flag
-        figure(f);
+        figure(f1);
         i_str = num2str(i);
         title1 = strcat('1,',i_str);
         title2 = strcat('2,',i_str);
         subplot(4,4,2*(i-1)+1);imagesc(RoughImage1);title(title1);
-        caxis([50,60]);
+%         caxis([50,60]);
         subplot(4,4,2*(i-1)+2);imagesc(RoughImage2);title(title2);
-        caxis([50,60]);
+%         caxis([50,60]);
 %         if i == 8
 %             colorbar;
 %         end
+        figure(f2);
+        RoughCalibrated1 = RoughImage1;
+        RoughCalibrated1(k) = RoughCalibrated1(k).*squeeze(CalibrationFactor(1,i,:));
+        subplot(4,4,2*(i-1)+1);imagesc(RoughCalibrated1);title(title1);
+        RoughCalibrated2 = RoughImage2;
+        RoughCalibrated2(k) = RoughCalibrated2(k).*squeeze(CalibrationFactor(1,i,:));
+        subplot(4,4,2*(i-1)+2);imagesc(RoughCalibrated2);title(title2);
     end
+    
+%     figure;imagesc(RoughImage1);
+%     RoughImage1(k) = RoughImage1(k).*squeeze(CalibrationFactor(1,i,:));
+%     figure;imagesc(RoughImage1);
 
-%     VectorImages(1,i,:) = RoughImage1(k);
-%     VectorImages(2,i,:) = RoughImage2(k);
-    VectorImages(1,i,:) = RoughImage1(k).*squeeze(CalibrationFactor(1,i,:));
-    VectorImages(2,i,:) = RoughImage2(k).*squeeze(CalibrationFactor(2,i,:));
+    VectorImages(1,i,:) = RoughImage1(k);
+    VectorImages(2,i,:) = RoughImage2(k);
+%     VectorImages(1,i,:) = RoughImage1(k).*squeeze(CalibrationFactor(1,i,:));
+%     VectorImages(2,i,:) = RoughImage2(k).*squeeze(CalibrationFactor(2,i,:));
 end
 
 end

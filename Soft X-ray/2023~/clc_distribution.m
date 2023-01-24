@@ -114,6 +114,7 @@ end
 
 % contourfで単調増加する軸から生成されたmeshgridを使ってプロットすると上下が反転する
 EE = flipud(EE);
+% figure;imagesc(EE);
 
 end
 
