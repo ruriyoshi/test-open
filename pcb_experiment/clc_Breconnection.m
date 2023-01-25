@@ -16,7 +16,7 @@ for i=1:frame
     for j = 1:numel(r_ind)
         max_r(j) = r_space(r_ind(j));
     end
-%     max_psi_ind=find(islocalmax(smooth(max_psi(:,i)),'MaxNumExtrema', 2));
+    max_psi_ind=find(islocalmax(smooth(max_psi(:,i)),'MaxNumExtrema', 2));
 %     max_psi_ind_left=find(max(smooth(max_psi(1:n/2,i))));
 %     max_psi_ind_right=find(max(smooth(max_psi(n/2:n,i))));
 
@@ -28,18 +28,21 @@ for i=1:frame
         if xr==1 || xr==n %r両端の場合は検知しない
             continue
         else
-%             figure;plot(z_space,max_psi(:,i));
-            pp = spline(z_space,max_psi(:,i));
+            if numel(max_psi_ind) < 2 %磁気軸が両側で見つからなければ全体探索
+                z_range = z_space;
+                r_range = max_r;
+                pp = spline(z_range,max_psi(:,i));
+            else
+                z_range = z_space(min(max_psi_ind):max(max_psi_ind)); %磁気軸の間でのみ検索
+                r_range = max_r(min(max_psi_ind):max(max_psi_ind));
+                pp = spline(z_range,max_psi(min(max_psi_ind):max(max_psi_ind),i));
+            end
             p_der = fnder(pp,1);
-%             A = (-1./(2*pi*max_r));
-%             whos A
-%             B = ppval(p_der,z_space);
-%             whos B
-            B_r = (-1./(2*pi*max_r)).'.*ppval(p_der,z_space);
-%             whos B_r
-%             figure;plot(z_space,B_r);
-%             B_rec
-%             break
+            B_r = (-1./(2*pi*r_range)).'.*ppval(p_der,z_range);
+%             if mod(i,4)==0
+%                 figure;plot(z_space,max_psi(:,i));
+%                 figure;plot(z_range,B_r);
+%             end
             B_recconection(i) = (abs(min(B_r))+max(B_r))/2;
         end
     end

@@ -10,28 +10,28 @@ pathname.rawdata=getenv('rawdata_path');%dtacqのrawdataの保管場所
 
 addpath(genpath('/Users/shinjirotakeda/Documents/GitHub/test-open'));
 
-%%%%実験オペレーションの取得
-DOCID='1wG5fBaiQ7-jOzOI-2pkPAeV6SDiHc_LrOdcbWlvhHBw';%スプレッドシートのID
-T=getTS6log(DOCID);
-node='date';
-pat = 230119;
-date = pat;
-T=searchlog(T,node,pat);
-IDXlist=28;%[4:6 8:11 13 15:19 21:23 24:30 33:37 39:40 42:51 53:59 61:63 65:69 71:74];
-n_data=numel(IDXlist);%計測データ数
-shotlist=T.a039(IDXlist);
-tfshotlist=T.a039_TF(IDXlist);
-EFlist=T.EF_A_(IDXlist);
-TFlist=T.TF_kV_(IDXlist);
-dtacqlist=39.*ones(n_data,1);
+% %%%%実験オペレーションの取得
+% DOCID='1wG5fBaiQ7-jOzOI-2pkPAeV6SDiHc_LrOdcbWlvhHBw';%スプレッドシートのID
+% T=getTS6log(DOCID);
+% node='date';
+% pat = 230119;
+% date = pat;
+% T=searchlog(T,node,pat);
+% IDXlist=28;%[4:6 8:11 13 15:19 21:23 24:30 33:37 39:40 42:51 53:59 61:63 65:69 71:74];
+% n_data=numel(IDXlist);%計測データ数
+% shotlist=T.a039(IDXlist);
+% tfshotlist=T.a039_TF(IDXlist);
+% EFlist=T.EF_A_(IDXlist);
+% TFlist=T.TF_kV_(IDXlist);
+% dtacqlist=39.*ones(n_data,1);
 
-% % %直接入力の場合【注意】全て同じサイズの行列になるように記入
-% dtacqlist=39;
-% shotlist=395;%【input】実験ログのa039の番号
-% tfshotlist=391;%【input】実験ログのa039_TFの番号
-% date = 230118;%【input】計測日
-% n_data=numel(shotlist);%計測データ数
-% EFlist = 150;%【input】EF電流
+% %直接入力の場合【注意】全て同じサイズの行列になるように記入
+dtacqlist=39;
+shotlist=396;%【input】実験ログのa039の番号
+tfshotlist=391;%【input】実験ログのa039_TFの番号
+date = 230118;%【input】計測日
+n_data=numel(shotlist);%計測データ数
+EFlist = 150;%【input】EF電流
 
 trange=450:510;%【input】計算時間範囲
 n=50; %【input】rz方向のメッシュ数
