@@ -6,7 +6,8 @@ function [grid2D, data2D] = pcbdata(date, d_tacq,d_tacqTF,trange, coeff, n,EF)
 % [rawdata]=getvalue(d_tacq,d_tacqTF);
 
 %localに保管したrawdataから読み込み
-pathname.rawdata='C:\Users\kuru1\OneDrive - g.ecc.u-tokyo.ac.jp\labo\experiment\rawdata_a038\'; %rawdataの保管場所
+
+pathname.rawdata='C:\Users\uswk0\OneDrive\ドキュメント\GitHub\test-open\道家\卒論\data\230119\'; %rawdataの保管場所
 filename=strcat(pathname.rawdata,'rawdata_dtacq',num2str(d_tacq),'.mat');
 
 % %noTF

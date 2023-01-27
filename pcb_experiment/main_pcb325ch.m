@@ -13,14 +13,15 @@ pathname.save=getenv('savedata_path');%outputデータ保存先
 pathname.rawdata038=getenv('rawdata038_path');%dtacq a038のrawdataの保管場所
 pathname.woTFdata=getenv('woTFdata_path');%rawdata（TFoffset引いた）の保管場所
 
-pathname.rawdata=getenv('rawdata_path');%dtacqのrawdataの保管場所
+%pathname.rawdata=getenv('rawdata_path');%dtacqのrawdataの保管場所
 
+pathname.rawdata='C:\Users\uswk0\OneDrive\ドキュメント\GitHub\test-open\道家\卒論\data\230119\rawdata';
 %%%%実験オペレーションの取得
 %直接入力の場合
 dtacqlist=[38 39];
-shotlist=[10194 228];%【input】dtacqの保存番号
-tfshotlist=[0 0];
-date = 221220;%【input】計測日
+shotlist=[10474 413];%【input】dtacqの保存番号
+tfshotlist=[10472 411];
+date = 230119;%【input】計測日
 n_data=numel(shotlist(:,1));%計測データ数
 
 i_EF = 150;%【input】EF電流
@@ -40,8 +41,8 @@ end
 
 function plot_psi200ch(date, dtacq_num, shot, tfshot, pathname, n,i_EF,trange)
 
-filename1=strcat(pathname.rawdata038,'rawdata_noTF_dtacq',num2str(shot(1)),'.mat');
-% filename1=strcat(pathname.rawdata,'\rawdata_dtacq',num2str(dtacq_num(1)),'_shot',num2str(shot(1)),'_tfshot',num2str(tfshot(1)),'.mat');
+%filename1=strcat(pathname.rawdata038,'rawdata_noTF_dtacq',num2str(shot(1)),'.mat');
+filename1=strcat(pathname.rawdata,'\rawdata_dtacq',num2str(dtacq_num(1)),'_shot',num2str(shot(1)),'_tfshot',num2str(tfshot(1)),'.mat');
 load(filename1,'rawdata');%a038
 rawdata1=rawdata;
 clear rawdata
@@ -63,8 +64,8 @@ sheets2 = sheetnames('coeff200ch.xlsx');
 sheets2 = str2double(sheets2);
 sheet_date2=max(sheets2(sheets2<=date));
 
-C1 = readmatrix('coeff125ch.xlsx');
-C2 = readmatrix('coeff200ch.xlsx');
+C1 = readmatrix('coeff125ch.xlsx','Sheet',num2str(sheet_date1));
+C2 = readmatrix('coeff200ch.xlsx','Sheet',num2str(sheet_date2));
 
 %a039
 ok2 = logical(C2(:,14));
@@ -78,7 +79,7 @@ ch2=C2(:,7);
 
 b2=rawdata2.*coeff2';%較正係数RC/NS
 b2=b2.*P2';%極性揃え
-b2=smoothdata(b2,1);
+b2=smoothdata(b2,1,'lowess',3);
 
 %デジタイザchからプローブ通し番号順への変換
 bz2=zeros(1000,100);
@@ -113,32 +114,43 @@ rpos1=C1(:,10);
 probe_num1=C1(:,5);
 probe_ch1=C1(:,6);
 ch1=C1(:,7);
-d2c=C1(:,15);
-ch_p1=C1(:,18);
-ch_p1(isnan(ch_p1))=[];
+p_ch= readmatrix('coeff125ch.xlsx','Sheet','p_ch');
 
 b1=rawdata1.*coeff1';%較正係数RC/NS
 b1=b1.*P1';%極性揃え
 b1=double(b1);
-b1=smoothdata(b1,1);
+b1=smoothdata(b1,1,'lowess',3);
 %デジタイザchからプローブ通し番号順への変換
-ind=1:128;
-b1=b1(:,d2c);
-b1=b1(:,ind(ch_p1));
-ok1=ok1(d2c);
-ok1=ok1(ind(ch_p1));
-zpos1=zpos1(d2c);
-zpos1=zpos1(ind(ch_p1));
-rpos1=rpos1(d2c);
-rpos1=rpos1(ind(ch_p1));
+bz1=zeros(1000,126);
+ok_bz1=true(100,1);
+rpos_bz1=zeros(126,1);
+zpos_bz1=rpos_bz1;
 
-ok1([9 10 51 84 87 93 109 110 111])=false;%積分器故障？
+for i=1:128
+    if ch1(i)>0
+        bz1(:,ch1(i))=b1(:,i);
+        ok_bz1(ch1(i))=ok1(i);
+        rpos_bz1(ch1(i))=rpos1(i);
+        zpos_bz1(ch1(i))=zpos1(i);
+    end
+end
+bz1(:,63)=[];
+ok_bz1(63)=[];
+rpos_bz1(63)=[];
+zpos_bz1(63)=[];
+
+% ok1([9 10 51 84 87 93 109 110 111])=false;%積分器故障？
 
 %データ統合
-bz=[b1 bz2];%time1000×ch225
-zpos_bz=[zpos1; zpos_bz2];
-rpos_bz=[rpos1; rpos_bz2];
-ok_bz=[ok1;ok_bz2];
+% bz=[bz1 bz2];%time1000×ch225
+% zpos_bz=[zpos_bz1; zpos_bz2];
+% rpos_bz=[rpos_bz1; rpos_bz2];
+% ok_bz=[ok_bz1;ok_bz2];
+
+bz=bz1;%time1000×ch225
+zpos_bz=zpos_bz1;
+rpos_bz=rpos_bz1;
+ok_bz=ok_bz1;
 
 [zq,rq]=meshgrid(linspace(min(zpos_bz),max(zpos_bz),n),linspace(min(rpos_bz),max(rpos_bz),n));
 grid2D=struct('zq',zq,'rq',rq);
@@ -163,11 +175,11 @@ data2D=struct('psi',zeros(size(grid2D.rq,1),size(grid2D.rq,2),size(trange,2)),'B
 
 for i=1:size(trange,2)
     t=trange(i);
-    %%Bzの二次元補間(rbfinterp)
-    vq = bz_rbfinterp(rpos_bz, zpos_bz, grid2D, bz, ok_bz, t);
+    %%Bzの二次元補間(線形)
+    vq = b_interp(rpos_bz, zpos_bz, grid2D, bz, ok_bz, t);
     B_z = -Bz_EF+vq;
     %%PSI計算
-    data2D.psi(:,:,i) = cumtrapz(grid2D.rq(:,1),B_z,1);
+    data2D.psi(:,:,i) = cumtrapz(grid2D.rq(:,1),2.*pi.*grid2D.rq(:,1).*B_z,1);
     %このままだと1/2πrが計算されてないので
     [data2D.Br(:,:,i),data2D.Bz(:,:,i)]=gradient(data2D.psi(:,:,i),grid2D.zq(1,:),grid2D.rq(:,1)) ;
     data2D.Br(:,:,i)=-data2D.Br(:,:,i)./(2.*pi.*grid2D.rq);
@@ -183,7 +195,7 @@ if isstruct(grid2D)==0 %もしdtacqデータがない場合次のloopへ(デー�
 end
 
 figure('Position', [0 0 1500 1500],'visible','on');
-start=10;
+start=20;
 %  t_start=470+start;
  for m=1:10 %図示する時間
      i=start+m; %end
@@ -195,7 +207,7 @@ start=10;
     axis image
     axis tight manual
 %     caxis([-2.5*1e+6,2.5*1e+6]) %カラーバーの軸の範囲
-    caxis([-0.05,0.05])
+    caxis([-0.1,0.1])
     colorbar('Location','eastoutside')
     %カラーバーのラベル付け
 %     c = colorbar;

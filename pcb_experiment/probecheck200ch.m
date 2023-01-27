@@ -18,9 +18,9 @@ pathname.rawdata=getenv('rawdata_path');%dtacqのrawdataの保管場所
 %%%%実験オペレーションの取得
 %直接入力の場合
 dtacqlist=39;
-shotlist=240;%241;%【input】dtacqの保存番号
-tfshotlist=0;%237;
-date = 221223;%【input】計測日
+shotlist=320;%【input】dtacqの保存番号
+tfshotlist=317;
+date = 230110;%【input】計測日
 n=numel(shotlist);%計測データ数
 
 % %磁気面出す場合は適切な値を入力、磁場信号のみプロットする場合は変更不要
@@ -51,11 +51,11 @@ if numel(rawdata)< 500
 end
 
 %較正係数のバージョンを日付で判別
-sheets = sheetnames('coeff200ch.xlsx');
+sheets = sheetnames('C:\Users\kuru1\OneDrive - g.ecc.u-tokyo.ac.jp\labo\experiment\coeff200ch.xlsx');
 sheets = str2double(sheets);
 sheet_date=max(sheets(sheets<=date));
 
-C = readmatrix('coeff200ch.xlsx','Sheet',num2str(sheet_date));
+C = readmatrix('C:\Users\kuru1\OneDrive - g.ecc.u-tokyo.ac.jp\labo\experiment\coeff200ch.xlsx','Sheet',num2str(sheet_date));
 ok = logical(C(:,14));
 P=C(:,13);
 coeff=C(:,12);
@@ -88,34 +88,30 @@ for i=1:192
     end
 end
 
-Pcheck=[1	-1	1	1	-1	-1	-1	1	1	1	1	1	1	-1	-1	0	-1	-1	1	-1	1	0	1	-1	-1	1	-1	-1	1	-1	-1	1	-1	1	-1	1	-1	-1	-1	1	-1	-1	1	1	-1	-1	-1	-1	-1	-1	1	-1	-1	-1	-1	-1	-1	-1	-1	-1	1	1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	1	-1	1	-1	-1	-1	-1	1	-1	-1	1	-1	-1	1	-1	-1	1	1	1	-1	1	-1	-1	1	1	1	-1];
-bz=bz.*Pcheck;
-ok_bz([5 6 11 16 20 22 31 33 39 49 63 66 71 72 79 80 95 100])=false;
+% bz(:,[57 67 68 77 87])=-bz(:,[57 67 68 77 87]);
+% ok_bz(28)=false;
 
-% log_d2bz=~isnan(d2bz);
-% ok_bz=ok(log_d2bz);
-% d2bz=d2bz(log_d2bz);
-% bz=b(:,d2bz');
-% ok_bz=ok_bz(d2bz);
-% 
-% log_d2bt=~isnan(d2bt);
-% ok_bt=ok(log_d2bt);
-% d2bt=d2bt(log_d2bt);
-% bt=b(:,d2bt');
-% ok_bt=ok_bt(d2bt);
-% 
-% log_d2p=~isnan(d2p);
-% ok=ok(log_d2p);
-% d2p=d2p(log_d2p);
-% b=b(:,d2p');
-% ok=ok(d2p);
+% [bz, ok_bz, ok_bz_plot] = ng_replace(bz, ok_bz, sheet_date);
+ok_bz_plot=ok_bz;
+
+% 221219ver
+% Pcheck=[1	-1	1	1	-1	-1	-1	1	1	1	1	1	1	-1	-1	0	-1	-1	1	-1	1	0	1	-1	-1	1	-1	-1	1	-1	-1	1	-1	1	-1	1	-1	-1	-1	1	-1	-1	1	1	-1	-1	-1	-1	-1	-1	1	-1	-1	-1	-1	-1	-1	-1	-1	-1	1	1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	1	-1	1	-1	-1	-1	-1	1	-1	-1	1	-1	-1	1	-1	-1	1	1	1	-1	1	-1	-1	1	1	1	-1];
+% bz=bz.*Pcheck;
+% bz(:,[37 47 57])=-bz(:,[37 47 57]);
+% bz(:,70)=-bz(:,70);
+% for i=0:9
+%     bz(:,[7 8 9 10]+10.*i)=-bz(:,[7 8 9 10]+10.*i);
+% end
+% ok_bz([5 6 11 16 20 22 31 33 39 49 63 66 71 72 79 80 95 100])=false;
+% ok_bz(49)=true;
+% bz(:,49)=-bz(:,49);
 
 %生信号描画用パラメータ
 r = 5;%プローブ本数＝グラフ出力時の縦に並べる個数
 col = 10;%グラフ出力時の横に並べる個数
-y_upper_lim = 0.02;%3e-3;%0.1;%縦軸プロット領域（b_z上限）
-y_lower_lim = -0.02;%3e-3;%-0.1;%縦軸プロット領域（b_z下限）
-t_start=300;%430;%455;%横軸プロット領域（開始時間）
+y_upper_lim = 0.05;%3e-3;%0.1;%縦軸プロット領域（b_z上限）
+y_lower_lim = -0.05;%3e-3;%-0.1;%縦軸プロット領域（b_z下限）
+t_start=350;%430;%455;%横軸プロット領域（開始時間）
 t_end=600;%550;%横軸プロット領域（終了時間）
 % r_ch=col1+col2;%r方向から挿入した各プローブのチャンネル数
 
@@ -124,7 +120,7 @@ f1.WindowState = 'maximized';
 for i=1:r
     for j=1:col
         subplot(r,col,(i-1)*col+j)
-        if ok_bz(col*(i-1)+j)==1 %okなチャンネルはそのままプロット
+        if ok_bz_plot(col*(i-1)+j)==1 %okなチャンネルはそのままプロット
             plot(t_start:t_end,bz(t_start:t_end,col*(i-1)+j))
         else %NGなチャンネルは赤色点線でプロット
             plot(t_start:t_end,bz(t_start:t_end,col*(i-1)+j),'r:')
@@ -141,7 +137,7 @@ f2.WindowState = 'maximized';
 for i=1:r
     for j=1:col
         subplot(r,col,(i-1)*col+j)
-        if ok_bz(col*(i+r-1)+j)==1 %okなチャンネルはそのままプロット
+        if ok_bz_plot(col*(i+r-1)+j)==1 %okなチャンネルはそのままプロット
             plot(t_start:t_end,bz(t_start:t_end,col*(i+r-1)+j))
         else %NGなチャンネルは赤色点線でプロット
             plot(t_start:t_end,bz(t_start:t_end,col*(i+r-1)+j),'r:')
@@ -153,41 +149,71 @@ for i=1:r
 end
 sgtitle('Bz signal probe6-10')
 
-% f3=figure;
-% f3.WindowState = 'maximized';
-% for i=1:r
-%     for j=1:col
-%         subplot(r,col,(i-1)*col+j)
-%         if ok_bt(col*(i-1)+j)==1 %okなチャンネルはそのままプロット
-%             plot(t_start:t_end,bt(t_start:t_end,col*(i-1)+j))
-%         else %NGなチャンネルは赤色点線でプロット
-%             plot(t_start:t_end,bt(t_start:t_end,col*(i-1)+j),'r:')
-%         end   
-%         title(num2str(2.*(col*(i-1)+j)));
-%         xticks([t_start t_end]);
-%         ylim([y_lower_lim y_upper_lim]);
-%     end
-% end
-% sgtitle('Bt signal probe1-5')
-% 
-% f4=figure;
-% f4.WindowState = 'maximized';
-% for i=1:r
-%     for j=1:col
-%         subplot(r,col,(i-1)*col+j)
-%         if ok_bt(col*(i+r-1)+j)==1 %okなチャンネルはそのままプロット
-%             plot(t_start:t_end,bt(t_start:t_end,col*(i+r-1)+j))
-%         else %NGなチャンネルは赤色点線でプロット
-%             plot(t_start:t_end,bt(t_start:t_end,col*(i+r-1)+j),'r:')
-%         end   
-%         title(num2str(2.*(col*(i+r-1)+j)));
-%         xticks([t_start t_end]);
-%         ylim([y_lower_lim y_upper_lim]);
-%     end
-% end
-% sgtitle('Bt signal probe6-10')
+f3=figure;
+f3.WindowState = 'maximized';
+for i=1:r
+    for j=1:col
+        subplot(r,col,(i-1)*col+j)
+        if ok_bt(col*(i-1)+j)==1 %okなチャンネルはそのままプロット
+            plot(t_start:t_end,bt(t_start:t_end,col*(i-1)+j))
+        else %NGなチャンネルは赤色点線でプロット
+            plot(t_start:t_end,bt(t_start:t_end,col*(i-1)+j),'r:')
+        end   
+        title(num2str(2.*(col*(i-1)+j)));
+        xticks([t_start t_end]);
+        ylim([y_lower_lim y_upper_lim]);
+    end
+end
+sgtitle('Bt signal probe1-5')
+
+f4=figure;
+f4.WindowState = 'maximized';
+for i=1:r
+    for j=1:col
+        subplot(r,col,(i-1)*col+j)
+        if ok_bt(col*(i+r-1)+j)==1 %okなチャンネルはそのままプロット
+            plot(t_start:t_end,bt(t_start:t_end,col*(i+r-1)+j))
+        else %NGなチャンネルは赤色点線でプロット
+            plot(t_start:t_end,bt(t_start:t_end,col*(i+r-1)+j),'r:')
+        end   
+        title(num2str(2.*(col*(i+r-1)+j)));
+        xticks([t_start t_end]);
+        ylim([y_lower_lim y_upper_lim]);
+    end
+end
+sgtitle('Bt signal probe6-10')
 
 % saveas(gcf,strcat(pathname.save,'\date',num2str(date),'_dtacq',num2str(d_tacq),'_02','.png'))
 % close
+
+%横軸z, 縦軸Bzのプロット
+f5=figure;
+f5.WindowState = 'maximized';
+t=465;
+for i=1:10
+    zline=(1:10:91)+(i-1);
+    bz_zline=bz(t,zline);
+    bz_zline(ok_bz(zline)==false)=NaN;
+    plot([-0.17 -0.1275 -0.0850 -0.0315 -0.0105 0.0105 0.0315 0.0850 0.1275 0.17],bz_zline,'-*')
+    clear bz_zline
+    hold on
+end
+hold off
+xlabel('z [m]')
+ylabel('Bz')
+yline(0,'k--')
+title(strcat('t=',num2str(t),' us'))
+legend('r1','r2','r3','r4','r5','r6','r7','r8','r9','r10',Location='eastoutside')
+
+% bz1=[bz(t,1) bz(t,11) bz(t,21) bz(t,31) bz(t,41) bz(t,51) bz(t,61) bz(t,71) bz(t,81) bz(t,91)];
+% bz2=[bz(t,2) bz(t,12) bz(t,22) bz(t,32) bz(t,42) bz(t,52) bz(t,62) bz(t,72) bz(t,82) bz(t,92)];
+% bz3=[bz(t,3) bz(t,13) bz(t,23) bz(t,33) bz(t,43) bz(t,53) bz(t,63) bz(t,73) bz(t,83) bz(t,93)];
+% bz4=[bz(t,4) bz(t,14) bz(t,24) bz(t,34) bz(t,44) bz(t,54) bz(t,64) bz(t,74) bz(t,84) bz(t,94)];
+% bz5=[bz(t,5) bz(t,15) bz(t,25) bz(t,35) bz(t,45) bz(t,55) bz(t,65) bz(t,75) bz(t,85) bz(t,95)];
+% bz6=[bz(t,6) bz(t,16) bz(t,26) bz(t,36) bz(t,46) bz(t,56) bz(t,66) bz(t,76) bz(t,86) bz(t,96)];
+% bz7=[bz(t,7) bz(t,17) bz(t,27) bz(t,37) bz(t,47) bz(t,57) bz(t,67) bz(t,77) bz(t,87) bz(t,97)];
+% bz8=[bz(t,8) bz(t,18) bz(t,28) bz(t,38) bz(t,48) bz(t,58) bz(t,68) bz(t,78) bz(t,88) bz(t,98)];
+% bz9=[bz(t,9) bz(t,19) bz(t,29) bz(t,39) bz(t,49) bz(t,59) bz(t,69) bz(t,79) bz(t,89) bz(t,99)];
+% bz10=[bz(t,10) bz(t,20) bz(t,30) bz(t,40) bz(t,50) bz(t,60) bz(t,70) bz(t,80) bz(t,90) bz(t,100)];
 
 end
