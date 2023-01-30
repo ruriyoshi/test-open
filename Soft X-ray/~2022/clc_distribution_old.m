@@ -1,4 +1,4 @@
-function EE = clc_distribution(M,K,gm2d,U,s,v,VectorImage,plot_flag,NL)
+function EE = clc_distribution_old(M,K,gm2d,U,s,v,VectorImage,plot_flag,NL)
 
 Z=U'*VectorImage.';
 

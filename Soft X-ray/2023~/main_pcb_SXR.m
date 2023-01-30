@@ -27,9 +27,9 @@ addpath(genpath('/Users/shinjirotakeda/Documents/GitHub/test-open'));
 
 % %直接入力の場合【注意】全て同じサイズの行列になるように記入
 dtacqlist=39;
-shotlist=396;%【input】実験ログのa039の番号
-tfshotlist=391;%【input】実験ログのa039_TFの番号
-date = 230118;%【input】計測日
+shotlist=638;%【input】実験ログのa039の番号
+tfshotlist=632;%【input】実験ログのa039_TFの番号
+date = 230127;%【input】計測日
 n_data=numel(shotlist);%計測データ数
 EFlist = 150;%【input】EF電流
 
@@ -56,7 +56,7 @@ for i=1:n_data
     [grid2D,data2D] = process_PCBdata(date, dtacq_num, shot, tfshot, pathname, n,i_EF,trange);
 %     shot_SXR = IDXlist(i);
     shot_SXR = 14;
-    SXRfilename = strcat('/Users/shinjirotakeda/OneDrive - The University of Tokyo/Documents/SXR_Images/',num2str(date),'/shot',num2str(shot_SXR,'%03i'),'.tif');
+%     SXRfilename = strcat('/Users/shinjirotakeda/OneDrive - The University of Tokyo/Documents/SXR_Images/',num2str(date),'/shot',num2str(shot_SXR,'%03i'),'.tif');
 %     [EE_high,EE_low] = plot_SXR_at_t(grid2D,data2D,date,shot_SXR,t,show_xpoint,show_localmax,start,interval,save,SXRfilename,filter,NL);
     Brec = clc_Breconnection(grid2D,data2D);
 end

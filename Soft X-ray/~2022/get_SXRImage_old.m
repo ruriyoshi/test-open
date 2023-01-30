@@ -1,4 +1,4 @@
-function [VectorImage1,VectorImage2] = get_SXRImage(date,number,SXRfilename,filter)
+function [VectorImage1,VectorImage2] = get_SXRImage_old(date,number,SXRfilename,filter)
 % % 画像を切り取る
 N_projection = 80;
 % VectorImages = CutImage(date,shot,N_projection/230,false);

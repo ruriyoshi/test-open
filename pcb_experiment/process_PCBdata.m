@@ -62,6 +62,8 @@ for i=1:192
 end
 [bz, ok_bz, ok_bz_plot] = ng_replace(bz, ok_bz, sheet_date);
 % ok_bz_plot=ok_bz;
+ok_bz(32) = false;
+ok_bz(42) = false;
 
 [zq,rq]=meshgrid(linspace(min(zpos_bz),max(zpos_bz),n),linspace(min(rpos_bz),max(rpos_bz),n));
 grid2D=struct('zq',zq,'rq',rq);

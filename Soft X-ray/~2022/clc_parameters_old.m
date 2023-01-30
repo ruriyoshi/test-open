@@ -1,6 +1,6 @@
-function [] = clc_parameters(N_projection,N_grid)
+function [] = clc_parameters_old(N_projection,N_grid)
 
-filepath = '/Users/shinjirotakeda/Documents/GitHub/test-open/Soft X-ray/parameters.mat';
+filepath = '/Users/shinjirotakeda/Documents/GitHub/test-open/Soft X-ray/~2022/parameters.mat';
 
 % 視線の分布、重み行列の作成
 zhole1=40;zhole2=-40;

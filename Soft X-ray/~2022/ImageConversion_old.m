@@ -1,4 +1,4 @@
-function [] = ImageConversion(foldername)
+function [] = ImageConversion_old(foldername)
 % path = '/Users/shinjirotakeda/OneDrive - The University of Tokyo/Documents/SXR_Images/';
 % path = strcat(path,foldername);
 path = foldername;% 軟X線画像の保存されているフォルダのパス

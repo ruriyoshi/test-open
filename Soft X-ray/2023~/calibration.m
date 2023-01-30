@@ -1,7 +1,9 @@
+clear
+date = 230118;
 CalibrationPath = strcat('/Users/shinjirotakeda/OneDrive - The University of Tokyo/Documents/SXR_Images/',num2str(date),'/PositionCheck.tif');
 CalibrationImage = imread(CalibrationPath);
 [centers,radii]=FindFibers(CalibrationImage);
-IW = round(mean(radii));
+IW = round(min(radii));
 centers = round(centers);
 
 Center = zeros(2,8,2);
@@ -12,8 +14,8 @@ Center(2,:,:) = centers([2,4,5,7,10,12,13,15],:);
 
 RawImage = CalibrationImage;
 % disp(Center);
-whos RawImage
-whos TimeRapsImage
+% whos RawImage
+% whos TimeRapsImage
 
 for i = 1:8
     UpRangeV = Center(1,i,1)-IW+1:Center(1,i,1)+IW;
@@ -32,6 +34,7 @@ BackGround = ones(size(BackGround))*mean(BackGround,'all');
 N_projection = 80;
 k = FindCircle(N_projection/2);
 VectorImages = zeros(2,8,numel(k));
+% vector_images_filtered = zeros(2,8,numel(k));
 
 check_flag = true;
 
@@ -42,6 +45,7 @@ if check_flag
 end
 
 resolution = N_projection/(IW*2);
+measurement_error = zeros(2,8);
 
 for i=1:8
     SingleImage1 = squeeze(TimeRapsImage(1,i,:,:))-BackGround;
@@ -77,10 +81,20 @@ for i=1:8
 
     VectorImages(1,i,:) = RoughImage1(k);
     VectorImages(2,i,:) = RoughImage2(k);
+    measurement_error(1,i) = std(VectorImages(1,i,:));
+    measurement_error(2,i) = std(VectorImages(2,i,:));
+%     rough_images_filtered1 = imgaussfilt(RoughImage1);
+%     rough_images_filtered2 = imgaussfilt(RoughImage2);
+%     vector_images_filtered(1,i,:) = rough_images_filtered1(k);
+%     vector_images_filtered(2,i,:) = rough_images_filtered2(k);
 end
 
+% mean_filtered = mean(vector_images_filtered,'all');
+% calibration_factor_filtered = mean_filtered./vector_images_filtered;
 MeanIntensity = mean(VectorImages,'all');
 CalibrationFactor = MeanIntensity./VectorImages;
+
+% calibrated_images = calibration_factor_filtered.*VectorImages;
 
 % if check_flag
 %     f2=figure;

@@ -1,4 +1,4 @@
-function plot_save_SXR(B_z,r_probe,z_probe,range,date,shot,t,EE1,EE2,show_localmax,show_xpoint,save,filter,NL)
+function plot_save_SXR_old(B_z,r_probe,z_probe,range,date,shot,t,EE1,EE2,show_localmax,show_xpoint,save,filter,NL)
 % plot SXR emission and psi in rz plane and save the result
 % input:
 %   3d array of double: B_z (r,z,t), offsetted at zero and smoothed
