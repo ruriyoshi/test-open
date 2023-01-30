@@ -1,4 +1,4 @@
-function [ch1,ch2,ch3,ch4,ch5,ch6,ch7,ch8] = get_oscillo(date,TF_only,shot,offset_TF,offset_EF,folder_path)
+function [time,ch1,ch2,ch3,ch4,ch5,ch6,ch7,ch8,ch9] = get_oscillo(date,TF_only,shot,offset_TF,offset_EF,folder_path)
 %GET_IP 
 % input:
 %   date:実験日, TF_only:未使用, shot：ショット番号, offset_TF:未使用, offset_EF:未使用
@@ -16,11 +16,15 @@ function [ch1,ch2,ch3,ch4,ch5,ch6,ch7,ch8] = get_oscillo(date,TF_only,shot,offse
 % else
 %     disp('More than 999 shots! You need some rest!!!')
 % end
-data_dir =fullfile(folder_path,num2str(date),[num2str(date),num2str(shot,'%03i'),'.rgw']);
+
+
+%data_dir =fullfile(folder_path,num2str(date),[num2str(date),num2str(shot,'%03i'),'.rgw']);
+data_dir =fullfile(folder_path,[num2str(date),num2str(shot,'%03i'),'.rgw']);
 
 data=dlmread(data_dir,'\t',1,1);
 
 % set data
+time = data(:,1);
 ch1=data(:,2);
 ch2=data(:,3);
 ch3=data(:,4);
@@ -29,7 +33,7 @@ ch5=data(:,6);
 ch6=data(:,7);
 ch7=data(:,8);
 ch8=data(:,9);
-
+ch9 = data(:,10);
 %ip_current = (ch1*0.1);
 %cep_test = (ch4*-782.5873*0.8222);
 %cep1 = (ch5);%*7.1644e+02);

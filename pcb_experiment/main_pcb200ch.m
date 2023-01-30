@@ -14,13 +14,13 @@ pathname.rawdata38=getenv('rawdata038_path');%dtacq a038のrawdataの保管場�
 pathname.woTFdata=getenv('woTFdata_path');%rawdata（TFoffset引いた）の保管場所
 
 %pathname.rawdata=getenv('rawdata_path');%dtacqのrawdataの保管場所
-pathname.rawdata='C:\Users\uswk0\OneDrive\ドキュメント\GitHub\test-open\道家\卒論\data\230119\'; %rawdataの保管場所
+pathname.rawdata='C:\Users\uswk0\OneDrive\ドキュメント\GitHub\test-open\道家\卒論\data\230119\rawdata\'; %rawdataの保管場所
 %%%%実験オペレーションの取得
 %直接入力の場合
 dtacqlist=39;
-shotlist=321;%240;%【input】dtacqの保存番号
-tfshotlist=317;%0;
-date = 230110;%【input】計測日
+shotlist=414;%240;%【input】dtacqの保存番号
+tfshotlist=411;%0;
+date = 230119;%【input】計測日
 n_data=numel(shotlist);%計測データ数
 
 i_EF = 150;%150;%【input】EF電流
@@ -48,11 +48,11 @@ if numel(rawdata)< 500
 end
 
 %較正係数のバージョンを日付で判別
-sheets = sheetnames('C:\Users\kuru1\OneDrive - g.ecc.u-tokyo.ac.jp\labo\experiment\coeff200ch.xlsx');
+sheets = sheetnames('C:\Users\uswk0\OneDrive\ドキュメント\GitHub\test-open\pcb_experiment\coeff200ch.xlsx');
 sheets = str2double(sheets);
 sheet_date=max(sheets(sheets<=date));
 
-C = readmatrix('C:\Users\kuru1\OneDrive - g.ecc.u-tokyo.ac.jp\labo\experiment\coeff200ch.xlsx','Sheet',num2str(sheet_date));
+C = readmatrix('C:\Users\uswk0\OneDrive\ドキュメント\GitHub\test-open\pcb_experiment\coeff200ch.xlsx','Sheet',num2str(sheet_date));
 ok = logical(C(:,14));
 P=C(:,13);
 coeff=C(:,12);
@@ -166,8 +166,8 @@ start=30;
 %     caxis([-0.1,0.1])
     colorbar('Location','eastoutside')
     %カラーバーのラベル付け
-%     c = colorbar;
-%     c.Label.String = 'Jt [A/m^{2}]';
+     c = colorbar;
+     c.Label.String = 'Jt [A/m^{2}]';
     hold on
 %     plot(grid2D.zq(1,squeeze(mid(:,:,i))),grid2D.rq(:,1))
 % contour(grid2D.zq(1,:),grid2D.rq(:,1),squeeze(data2D.psi(:,:,i)),20,'black')
@@ -178,8 +178,8 @@ start=30;
     plot(ok_z,ok_r,"k.",'MarkerSize', 6)%測定位置
     hold off
     title(string(t)+' us')
-%     xlabel('z [m]')
-%     ylabel('r [m]')
+     xlabel('z [m]')
+     ylabel('r [m]')
  end
 
 end
