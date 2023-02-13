@@ -1,9 +1,9 @@
 function [] = rgw2txt(date)
 
 % Get all rgw files in the current folder
-% current_folder = strcat('/Users/shinjirotakeda/mountpoint/',date,'/');
 date = num2str(date);
-current_folder = strcat('/Users/shinjirotakeda/OneDrive - The University of Tokyo/Documents/probedata/',date,'/');
+folder_directory_rogo = getenv('rogo_path');
+current_folder = strcat(folder_directory_rogo,date,'/');%strcat('/Users/shinjirotakeda/OneDrive - The University of Tokyo/Documents/probedata/',date,'/');
 files = dir(strcat(current_folder,'*.rgw'));
 % Loop through each
 % disp(length(files));
