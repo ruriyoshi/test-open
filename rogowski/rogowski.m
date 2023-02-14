@@ -12,9 +12,8 @@ folder_directory_rogo = getenv('rogo_path');
 % folder_directory_rogo = 'C:\Users\denjo\OneDrive - The University of Tokyo\data\mag_probe\';
 
 % channels to display
-channels = [1,5,7]; %TF＋FC1PF＋FC2PF
-%channels = [1,9,8]; %TF＋SEP2PF＋SEP1PF  
-
+% channels = [1,5,7]; %TF＋FC1PF＋FC2PF
+channels = [1,9,8]; %TF＋SEP2PF＋SEP1PF 
 
 t_start = 1; % us
 t_end = 1000; % us
@@ -26,13 +25,17 @@ lower = -40;%-0.4; % lower limit of y axis
 perc = 0.04; % span used in smoothing
 windowSize = 5; % window size in filtering
 
+% calibration for each channel.
+% ch1:TF, ch2:Ip, ch3, ch4, ch5:FC1 PF, ch6, ch7:FC2 PF, ch8:FC2 TF, ch9:FC1 TF
 if date<230118
     calibration = [116.6647, -1, 1, 1, 63.9568, 1, 223.2319, 1, 1, 1,];
+elseif date<230126
+    calibration = [116.6647, -1, 1, 1, 63.9568, 1, 18.1794, 202.1929, 8.8940, 1,]; 
 else
-    calibration = [1, -1, 1, 1, 1, 1, 1, 1, 1, 1,]; 
+    calibration = [116.6647, -1, 1, 1, 63.9568, 1, 18.1794, 167.6939, 8.1687, 1,];
 end
 %calibration = [1, -1516.4, 1, 1, 1533.2, 80, 140, 480, 1, 1,]; % calibration for each channel. I'm not sure about the exact calibration coefficient.
-% calibration for each channel. 
+ 
 plot_columns = 3;
 plot_rows = fix(length(channels)/plot_columns)+(rem(length(channels),plot_columns)~=0)+1;
 
@@ -40,7 +43,7 @@ plot_rows = fix(length(channels)/plot_columns)+(rem(length(channels),plot_column
 
 % transfer all rgw file to txt file; do nothing if there is no rgw file in the folder
 % 初めてデータを取得する場合テキスト形式に変換
-%rgw2txt(date_str);
+% rgw2txt(date_str);
 
 if ~isfile(path)
     disp(strcat('No such file: ',path));
