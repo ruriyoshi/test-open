@@ -124,7 +124,7 @@ legend('TF coil','PF coil 1','PF coil 2');
 ylim([lower upper]);
 xlim([0 t_end+offset]);
 xlabel('time [us]','FontSize',18);
-ylabel('I [kA]','FontSize',18);
+ylabel('I [kA・turn]','FontSize',18);
 ax = gca;
 ax.FontSize = 18;
 ax.LineWidth = 1; 
