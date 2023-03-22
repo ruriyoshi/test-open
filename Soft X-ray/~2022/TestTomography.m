@@ -73,8 +73,8 @@ EE_max = max(max(EE));
 error_high_value = sum(sum((EE_high./EE_max).^2))/N;
 error_low_value = sum(sum((EE_low./EE_max).^2))/N;
 
-mean_error_positive = mean(error_high_image,'all')
-mean_error_negative = mean(error_low_image,'all')
+mean_error_positive = mean(error_high_image,'all');
+mean_error_negative = mean(error_low_image,'all');
 
 % plot_save_SXR(B_z,r_probe,z_probe,range,date,shot,t,EE_high,EE_low,show_localmax,show_xpoint,save,filter,NL);
 

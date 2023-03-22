@@ -76,7 +76,7 @@ subplot('Position',pos1);
 h1.LineStyle = 'none';
 caxis([0,0.2]);
 % caxis([0,1]);
-c=colorbar;c.Label.String='Intensity [a.u.]';c.FontSize=24;
+c=colorbar;c.Label.String='Intensity [a.u.]';c.FontSize=18;
 hold on
 
 [~,hp1]=contourf(psi_mesh_z,psi_mesh_r,psi,contour_layer,'-k','Fill','off');
@@ -109,7 +109,7 @@ title(strcat(num2str(t),' us'));
 xlabel('z [m]');
 ylabel('r [m]');
 ax = gca;
-ax.FontSize = 24; 
+ax.FontSize = 18; 
 hold off
 
 subplot('Position',pos2);
@@ -117,8 +117,8 @@ subplot('Position',pos2);
 [SXR_mesh_z2,SXR_mesh_r2] = meshgrid(z_space_SXR2,r_space_SXR2);
 [~,h2] = contourf(SXR_mesh_z2,SXR_mesh_r2,EE2,20);
 h2.LineStyle = 'none';
+% caxis([0,0.15]);
 caxis([0,0.1]);
-% % caxis([0,1]);
 c=colorbar;c.Label.String='Intensity [a.u.]';c.FontSize=18;
 hold on
 

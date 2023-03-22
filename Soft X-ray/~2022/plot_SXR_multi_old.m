@@ -46,7 +46,7 @@ else
 end
 
 % 再構成計算に必要なパラメータを計算するなら読み込む
-filepath = '/Users/shinjirotakeda/Documents/GitHub/test-open/Soft X-ray/parameters.mat';
+filepath = '/Users/shinjirotakeda/Documents/GitHub/test-open/Soft X-ray/~2022/parameters.mat';
 if clc_flag
     N_projection_new = 80;
     N_grid_new = 100;
@@ -96,7 +96,7 @@ for t = times
         EE_low = readmatrix(loadpath_low);
     end
     
-    plot_save_SXR(B_z,r_probe,z_probe,range,date,shot,t,EE_high,EE_low,show_localmax,show_xpoint,save,filter,NL);
+    plot_save_SXR_old(B_z,r_probe,z_probe,range,date,shot,t,EE_high,EE_low,show_localmax,show_xpoint,save,filter,NL);
 
 end
 
