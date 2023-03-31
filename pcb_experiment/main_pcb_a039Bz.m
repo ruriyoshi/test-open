@@ -15,6 +15,7 @@ pathname.rawdata=getenv('rawdata_path');%dtacqのrawdataの保管場所
 % pat=230119;
 % T=searchlog(T,node,pat);
 % IDXlist=69;%[4:6 8:11 13 15:19 21:23 24:30 33:37 39:40 42:51 53:59 61:63 65:69 71:74];
+% date=pat;
 % n_data=numel(IDXlist);%計測データ数
 % shotlist=T.a039(IDXlist);
 % tfshotlist=T.a039_TF(IDXlist);
@@ -24,9 +25,9 @@ pathname.rawdata=getenv('rawdata_path');%dtacqのrawdataの保管場所
 
 % %直接入力の場合【注意】全て同じサイズの行列になるように記入
 dtacqlist=39;
-shotlist=395;%【input】実験ログのa039の番号
-tfshotlist=391;%【input】実験ログのa039_TFの番号
-date = 230119;%【input】計測日
+shotlist=330;%【input】実験ログのa039の番号
+tfshotlist=326;%【input】実験ログのa039_TFの番号
+date = 230111;%【input】計測日
 n_data=numel(shotlist);%計測データ数
 EFlist = 150;%【input】EF電流
 
@@ -38,7 +39,7 @@ for i=1:n_data
     shot=shotlist(i);
     tfshot=tfshotlist(i);
     i_EF=EFlist(i);
-    TF=TFlist(i);
+    TF=4;%TFlist(i);
     plot_psi200ch(date, dtacq_num, shot, tfshot, pathname,n,i_EF,trange,TF); 
 end
 
@@ -162,6 +163,19 @@ start=30;
 %     xlabel('z [m]')
 %     ylabel('r [m]')
  end
+
+ figure('Position', [0 0 1500 1500],'visible','on');
+start=32;
+     i=start; %end
+     t=trange(i);
+     
+     contour(grid2D.zq(1,:),grid2D.rq(:,1),squeeze(data2D.psi(:,:,i)),[-20e-3:0.2e-3:40e-3],'black')
+     axis image
+     axis tight manual
+     title(string(t)+' us')
+%     xlabel('z [m]')
+%     ylabel('r [m]')
+ 
 
 %カラーコンターあり
 % figure('Position', [0 0 1500 1500],'visible','on');

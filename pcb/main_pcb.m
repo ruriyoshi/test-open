@@ -28,7 +28,7 @@ pathname.save=getenv('save_path'); %保存先
 
 %%%%(3)指定したshotの解析
 % IDXlist=[2897 2906 2907 2912 2913] ; %2870:2921; %【input】テーブルから解析したいshot番号を抽出して入力
-IDXlist=[2911:2913 2925 2926 2927 2931 2933 2947:2950 2942 2943 2946];
+IDXlist=2611;%[2911:2913 2925 2926 2927 2931 2933 2947:2950 2942 2943 2946];
 for IDX=IDXlist(1,1) %42
 plot_psi(T, pathname,IDX); %通常の時系列プロット
 %plot_position(T, pathname, IDX); %計測位置、各位置での生信号も含めた確認用プロット
@@ -90,7 +90,7 @@ end
 % f=figure;
 % f.WindowState = 'maximized';
 figure('Position', [0 0 1500 1500],'visible','on');
- start=7; %460+?
+ start=5; %460+?
 %  t_start=470+start;
  for m=1:10 %図示する時間
      i=start+m; %end

@@ -18,9 +18,9 @@ pathname.rawdata=getenv('rawdata_path');%dtacqのrawdataの保管場所
 %%%%実験オペレーションの取得
 %直接入力の場合
 dtacqlist=38;
-shotlist=10531;%【input】dtacqの保存番号
-tfshotlist=10530;
-date = 230119;%【input】計測日
+shotlist=10695;%【input】dtacqの保存番号
+tfshotlist=0;
+date = 230128;%【input】計測日
 n=numel(shotlist);%計測データ数
 
 % %磁気面出す場合は適切な値を入力、磁場信号のみプロットする場合は変更不要
@@ -41,7 +41,7 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%
 
 function check_signal(date, dtacq_num, shot, tfshot, pathname)
-filename=strcat(pathname.rawdata,'\rawdata_dtacq',num2str(dtacq_num),'_shot',num2str(shot),'_tfshot',num2str(tfshot),'.mat');
+filename=strcat(pathname.rawdata,'rawdata_dtacq',num2str(dtacq_num),'_shot',num2str(shot),'_tfshot',num2str(tfshot),'.mat');
 % filename=strcat(pathname.rawdata,'rawdata_noTF_dtacq',num2str(d_tacq),'.mat');
 load(filename,'rawdata');%1000×192
 
@@ -87,24 +87,25 @@ end
 bz(:,63)=[];
 ok_bz(63)=[];
 
+% P2=ones(1,125);
+% P2([23 47 48 49 50 71 72 73 74 75 98 99 100 122 123 125])=-1;
+% bz=bz.*P2;
+ok_bz(51)=false;
+ok_bz([64 65 76])=false;
+% ok_bz1([93 94])=false;
+ok_bz([19 31 38 83])=false;
+% ok_bz1([40:43])=false;
+
 % [bz, ok_bz, ok_bz_plot] = ng_replace(bz, ok_bz, sheet_date);
-
-
-bz_s=bz;
-for i=1:125
-    bz_s(:,i)=lowpass(bz(:,i),0.4e5,1e6);
-end
-% bz_s=filloutliers(bz_s,"previous","movmean",5);
-ok_bz([5 54 31 8 61 37 62 13 38 16 40 20 45 47 23 48 25])=false;
 
 %生信号描画用パラメータ
 r = 5;%プローブ本数＝グラフ出力時の縦に並べる個数
 col1 = 12;%1枚目のグラフ出力時の横に並べる個数
 col2 = 13;%2枚目のグラフ出力時の横に並べる個数
-y_upper_lim = 0.05;%3e-3;%0.1;%縦軸プロット領域（b_z上限）
-y_lower_lim = -0.05;%3e-3;%-0.1;%縦軸プロット領域（b_z下限）
+y_upper_lim = 0.1;%3e-3;%0.1;%縦軸プロット領域（b_z上限）
+y_lower_lim = -0.1;%3e-3;%-0.1;%縦軸プロット領域（b_z下限）
 t_start=350;%430;%455;%横軸プロット領域（開始時間）
-t_end=530;%550;%横軸プロット領域（終了時間）
+t_end=600;%550;%横軸プロット領域（終了時間）
 r_ch=col1+col2;%r方向から挿入した各プローブのチャンネル数
 
 f=figure;
@@ -114,8 +115,6 @@ for i=1:r
         subplot(r,col1,(i-1)*col1+j)
         if ok_bz(r_ch*(i-1)+j)==1 %okなチャンネルはそのままプロット
             plot(t_start:t_end,bz(t_start:t_end,r_ch*(i-1)+j))
-            hold on
-            plot(t_start:t_end,bz_s(t_start:t_end,r_ch*(i-1)+j))
         else %NGなチャンネルは赤色点線でプロット
             plot(t_start:t_end,bz(t_start:t_end,r_ch*(i-1)+j),'r:')
         end   
@@ -136,8 +135,6 @@ for i=1:r
         subplot(r,col2,(i-1)*col2+j-col1)
         if ok_bz(r_ch*(i-1)+j)==1 
             plot(t_start:t_end,bz(t_start:t_end,r_ch*(i-1)+j))
-            hold on
-            plot(t_start:t_end,bz_s(t_start:t_end,r_ch*(i-1)+j))
         else 
             plot(t_start:t_end,bz(t_start:t_end,r_ch*(i-1)+j),'r:')
         end   
@@ -154,7 +151,7 @@ end
 %横軸z, 縦軸Bzのプロット
 f5=figure;
 f5.WindowState = 'maximized';
-t=470;
+t=485;
 subplot(3,1,1)
 for i=1:8
     zline=(1:25:101)+(i-1);

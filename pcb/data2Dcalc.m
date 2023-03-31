@@ -20,7 +20,7 @@ for i=1:size(trange,2)
     
     B_z = -Bz_EF+vq;
     %%PSI計算
-    data2D.psi(:,:,i) = cumtrapz(grid2D.rq(:,1),B_z,1);
+    data2D.psi(:,:,i) = cumtrapz(grid2D.rq(:,1),2.*pi.*grid2D.rq(:,1).*B_z,1);
     %このままだと1/2πrが計算されてないので
     [data2D.Br(:,:,i),data2D.Bz(:,:,i)]=gradient(data2D.psi(:,:,i),grid2D.zq(1,:),grid2D.rq(:,1)) ;
     data2D.Br(:,:,i)=-data2D.Br(:,:,i)./(2.*pi.*grid2D.rq);

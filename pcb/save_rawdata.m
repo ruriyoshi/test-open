@@ -1,7 +1,7 @@
 %1000*128のrawdataをmat形式で保存
 
 %%%offsetなしのrawdataを保存する場合
-pathname.rawdata=getenv('rawdata_path'); %保存先
+pathname.rawdata38=getenv('rawdata_path'); %保存先
 dtacqlist=10005:10007;%IDXではなくdtacqの通し番号
 
 for dtacq=dtacqlist(1,:)

@@ -6,8 +6,13 @@ function [grid2D, data2D] = pcbdata(date, d_tacq,d_tacqTF,trange, coeff, n,EF)
 % [rawdata]=getvalue(d_tacq,d_tacqTF);
 
 %localに保管したrawdataから読み込み
-pathname.rawdata='C:\Users\kuru1\OneDrive - g.ecc.u-tokyo.ac.jp\rawdata_a038\'; %rawdataの保管場所
+pathname.rawdata='C:\Users\kuru1\OneDrive - g.ecc.u-tokyo.ac.jp\labo\experiment\rawdata_a038\'; %rawdataの保管場所
 filename=strcat(pathname.rawdata,'rawdata_dtacq',num2str(d_tacq),'.mat');
+
+%noTF
+% pathname.rawdata='C:\Users\kuru1\OneDrive - g.ecc.u-tokyo.ac.jp\labo\experiment\rawdata_a038_noTF\'; %rawdataの保管場所
+% filename=strcat(pathname.rawdata,'rawdata_noTF_dtacq',num2str(d_tacq),'.mat');
+
 load(filename,'rawdata');
 
 if numel(rawdata)< 500
@@ -22,14 +27,15 @@ end
 
 % チャンネルごとの生信号のプロット
 bz=smoothdata(bz,1);
-% r = 5;
-% col1 = 12;
-% col2 = 13;
-% y_upper_lim = 0.1;
-% y_lower_lim = -0.1;
-% t_start=455;
-% t_end=520;
-% r_ch=col1+col2;
+
+% r = 5;%プローブ本数＝グラフ出力時の縦に並べる個数
+% col1 = 12;%1枚目のグラフ出力時の横に並べる個数
+% col2 = 13;%2枚目のグラフ出力時の横に並べる個数
+% y_upper_lim = 0.05;%0.1;%縦軸プロット領域（b_z上限）
+% y_lower_lim = -0.05;%-0.1;%縦軸プロット領域（b_z下限）
+% t_start=350;%455;%横軸プロット領域（開始時間）
+% t_end=600;%横軸プロット領域（終了時間）
+% r_ch=col1+col2;%r方向から挿入した各プローブのチャンネル数
 % plotbzsignal(y_upper_lim, col2, col1, t_end, p_ch, y_lower_lim, t_start, bz, ok, r_ch, r);
 % clear r col1 col2 y_upper_lim y_lower_lim t t_start t_end
 

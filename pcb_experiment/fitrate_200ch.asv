@@ -10,9 +10,9 @@ pathname.rawdata=getenv('rawdata_path');%dtacqのrawdataの保管場所
 DOCID='1wG5fBaiQ7-jOzOI-2pkPAeV6SDiHc_LrOdcbWlvhHBw';%スプレッドシートのID
 T=getTS6log(DOCID);
 node='date';
-pat=230127;
+pat=230111;
 T=searchlog(T,node,pat);
-IDXlist=63;%[4:6 8:11 13 15:19 21:23 24:30 33:37 39:40 42:51 53:59 61:63 65:69 71:74];
+IDXlist=9;%[4:6 8:11 13 15:19 21:23 24:30 33:37 39:40 42:51 53:59 61:63 65:69 71:74];
 date=pat;
 n_data=numel(IDXlist);%計測データ数
 shotlist=T.a039(IDXlist);
@@ -30,7 +30,7 @@ dtacqlist=39.*ones(n_data,1);
 % EFlist = 150;%150;%【input】EF電流
 % TFlist=4;
 
-trange=437:510;%【input】計算時間範囲
+trange=460:510;%【input】計算時間範囲
 n=50; %【input】rz方向のメッシュ数
 
 for i=1:n_data
@@ -203,10 +203,8 @@ for i=1:frame
         psi_pr(3,i)=max_psi(min_psi_ind,i);
 %         xJt(1,i)=data2D.Jt(xr,min_psi_ind,i);
 %         xEt(1,i)=data2D.Et(xr,min_psi_ind,i);
-%         xJt(1,i)=min(data2D.Jt(xr-1:xr+1,xz-1:xz+1,i),[],'all');
-%         xEt(1,i)=min(data2D.Et(xr-1:xr+1,xz-1:xz+1,i),[],'all');
-        xJt(1,i)=mean(data2D.Jt(xr-1:xr+1,xz-1:xz+1,i),'all');
-        xEt(1,i)=mean(data2D.Et(xr-1:xr+1,xz-1:xz+1,i),'all');
+        xJt(1,i)=min(data2D.Jt(xr-1:xr+1,xz-1:xz+1,i),[],'all');
+        xEt(1,i)=min(data2D.Et(xr-1:xr+1,xz-1:xz+1,i),[],'all');
         xpos(1,i)=grid2D.zq(1,min_psi_ind);
         xpos(2,i)=grid2D.rq(xr,1);
         end
@@ -234,35 +232,38 @@ xeta=xEt(1,:)./xJt(1,:);
 % fitrate(20)=NaN;
 % xJt([19 25])=NaN;
 % xEt([1 8 12 19 25])=NaN;
-% xeta([1 8 12 19 25 35])=NaN;
+% xeta([1 8 12 19 25])=NaN;
 % %xeta([5 20 22])=NaN;
-% %23011114 
-% psi_pr(:,1:3)=NaN;
-% fitrate(1:3)=NaN;
+%23011114 
+psi_pr(:,1:3)=NaN;
+fitrate(1:3)=NaN;
+% xJt([19 25])=NaN;
+% xEt([1 8 12 19 25])=NaN;
+% xeta([1 8 12 19 25])=NaN;
 
 
-% %合体率のplot
-% figure('Position',[700,350,500,300])
-% yyaxis left
-% plot(trange,psi_pr(1,:),'k--+','LineWidth',1)
-% hold on
-% plot(trange,psi_pr(2,:),'k--+','LineWidth',1)
-% plot(trange,psi_pr(3,:),'b--+','LineWidth',1)
-% hold off
-% ylabel('Psi [Wb]')
-% xlabel('Time [us]')
-% ylim([0 inf])
-% yyaxis right
-% plot(trange,fitrate,'r-+','LineWidth',1)
-% ylabel('Fitrate')
-% legend('Psi_{private1}','Psi_{private2}','Psi_{common}','Fitrate','Location','eastoutside')
-% ylim([0 1])
-% ha1 = gca;
-% ha1.LineWidth = 1;
-% ha1.FontSize=10;
-% % % saveas(gcf,strcat('C:\Users\kuru1\OneDrive - g.ecc.u-tokyo.ac.jp\labo\experiment\230123\fitrate\',num2str(shot),'_fitrate_TF',num2str(TF),'kV.png'))
-% % % save(strcat('C:\Users\kuru1\OneDrive - g.ecc.u-tokyo.ac.jp\labo\experiment\230123\fitrate\fitrate_',num2str(shot),'.mat'),'date','i_EF','fitrate','n','psi_pr','shot','TF','tfshot','trange')
-% % % close
+%合体率のplot
+figure('Position',[700,350,500,300])
+yyaxis left
+plot(trange,psi_pr(1,:),'k--+','LineWidth',1)
+hold on
+plot(trange,psi_pr(2,:),'k--+','LineWidth',1)
+plot(trange,psi_pr(3,:),'b--+','LineWidth',1)
+hold off
+ylabel('Psi [Wb]')
+xlabel('Time [us]')
+ylim([0 inf])
+yyaxis right
+plot(trange,fitrate,'r-+','LineWidth',1)
+ylabel('Fitrate')
+legend('Psi_{private1}','Psi_{private2}','Psi_{common}','Fitrate','Location','eastoutside')
+ylim([0 1])
+ha1 = gca;
+ha1.LineWidth = 1;
+ha1.FontSize=10;
+% % saveas(gcf,strcat('C:\Users\kuru1\OneDrive - g.ecc.u-tokyo.ac.jp\labo\experiment\230123\fitrate\',num2str(shot),'_fitrate_TF',num2str(TF),'kV.png'))
+% % save(strcat('C:\Users\kuru1\OneDrive - g.ecc.u-tokyo.ac.jp\labo\experiment\230123\fitrate\fitrate_',num2str(shot),'.mat'),'date','i_EF','fitrate','n','psi_pr','shot','TF','tfshot','trange')
+% % close
 
 %%合体率とX点Jt,Et,etaのplot
 figure('Position',[0,0,300,700])
@@ -271,7 +272,7 @@ plot(trange,fitrate,'k-+','LineWidth',1)
 ylabel('Merge Ratio')
 xlabel('Time [us]')
 ylim([0 1])
-xlim([437 477])%xlim([463 490])
+xlim([463 490])
 ha1 = gca;
 ha1.LineWidth = 1;
 ha1.FontSize=10;
@@ -281,13 +282,13 @@ yyaxis left
 plot(trange,-1.*xJt,'b-+','LineWidth',1)
 ylabel('Jt [A/m^{2}]')
 xlabel('Time [us]')
-xlim([437 477])%xlim([463 490])
+xlim([460 500])
 ylim([0 8e5])
 yyaxis right
 plot(trange,-1.*xEt,'r-+','LineWidth',1)
 ylabel('Et [V/m]')
-xlim([437 477])%xlim([463 490])
-ylim([0 500])%ylim([0 200])
+xlim([460 500])
+ylim([0 500])
 ha2 = gca;
 ha2.LineWidth = 1;
 ha2.FontSize=10;
@@ -296,8 +297,8 @@ subplot(3,1,3)
 plot(trange,xeta,'k-+','LineWidth',1)
 ylabel('η [Ω m]')
 xlabel('Time [us]')
-xlim([437 477])%xlim([463 490])
-ylim([0 0.001])
+xlim([460 500])
+ylim([0 0.002])
 ha1 = gca;
 ha1.LineWidth = 1;
 ha1.FontSize=10;
@@ -306,43 +307,43 @@ ha1.FontSize=10;
 % save(strcat('C:\Users\kuru1\OneDrive - g.ecc.u-tokyo.ac.jp\labo\experiment\230123\xpoint\xpoint_',num2str(shot),'.mat'),'date','i_EF','fitrate','n','psi_pr','shot','TF','tfshot','trange','xEt','xeta','xJt','xpos')
 % close
 
-% %%X点と磁気面の重ね合わせ
-% figure('Position', [0 0 1500 1500],'visible','on');
-% start=0;
-%  %t_start=470+start;
-%  for m=1:10 %図示する時間
-%      i=start+m; %end
-%      t=trange(i);
-%      subplot(2,5,m)
-%     %contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.Bz(:,:,i),30,'LineStyle','none')
-%     %contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.psi(:,:,i),40,'LineStyle','none')
-%     contourf(grid2D.zq(1,:),grid2D.rq(:,1),-1.*data2D.Jt(:,:,i),30,'LineStyle','none')
-%     %contourf(grid2D.zq(1,:),grid2D.rq(:,1),-1.*data2D.Et(:,:,i),20,'LineStyle','none')
-%     colormap(jet)
-%     axis image
-%     axis tight manual
-%     caxis([-1.6*1e+6,1.3*1e+6]) %jt%カラーバーの軸の範囲
-%     %caxis([-0.07,0.07])%Bz
-%     %caxis([-5e-3,5e-3])%psi
-%     %caxis([-500,400])%Et
-%     %colorbar('Location','eastoutside')
-% %     %カラーバーのラベル付け
-% %     c = colorbar;
-% %     c.Label.String = 'Jt [A/m^{2}]';
-%     hold on
-%     %plot(grid2D.zq(1,squeeze(mid(:,:,i))),grid2D.rq(:,1))
-% %contour(grid2D.zq(1,:),grid2D.rq(:,1),squeeze(data2D.psi(:,:,i)),20,'black')
-% %contour(grid2D.zq(1,:),grid2D.rq(:,1),squeeze(data2D.psi(:,:,i)),40,'black')
-%     contour(grid2D.zq(1,:),grid2D.rq(:,1),squeeze(data2D.psi(:,:,i)),[-20e-3:0.2e-3:40e-3],'black')
-% %     plot(grid2D.zq(1,squeeze(mid(opoint(:,:,i),:,i))),grid2D.rq(opoint(:,:,i),1),"bo")
-% %     plot(grid2D.zq(1,squeeze(mid(xpoint(:,:,i),:,i))),grid2D.rq(xpoint(:,:,i),1),"bx")
-%     %plot(ok_z,ok_r,"k.",'MarkerSize', 6)%測定位置
-%     plot(xpos(1,i),xpos(2,i),'bx')%X点
-%     hold off
-%     title(string(t)+' us')
-%     xlabel('z [m]')
-%     ylabel('r [m]')
-%  end
-% % %  saveas(gcf,strcat('C:\Users\kuru1\OneDrive - g.ecc.u-tokyo.ac.jp\labo\experiment\230123\psi-jt\',num2str(shot),'_jt_TF',num2str(TF),'kV_t466us.png'))
-% % %  close
+%%X点と磁気面の重ね合わせ
+figure('Position', [0 0 1500 1500],'visible','on');
+start=0;
+ %t_start=470+start;
+ for m=1:10 %図示する時間
+     i=start+m; %end
+     t=trange(i);
+     subplot(2,5,m)
+    %contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.Bz(:,:,i),30,'LineStyle','none')
+    %contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.psi(:,:,i),40,'LineStyle','none')
+    contourf(grid2D.zq(1,:),grid2D.rq(:,1),-1.*data2D.Jt(:,:,i),30,'LineStyle','none')
+    %contourf(grid2D.zq(1,:),grid2D.rq(:,1),-1.*data2D.Et(:,:,i),20,'LineStyle','none')
+    colormap(jet)
+    axis image
+    axis tight manual
+    caxis([-1.6*1e+6,1.3*1e+6]) %jt%カラーバーの軸の範囲
+    %caxis([-0.07,0.07])%Bz
+    %caxis([-5e-3,5e-3])%psi
+    %caxis([-500,400])%Et
+    %colorbar('Location','eastoutside')
+%     %カラーバーのラベル付け
+%     c = colorbar;
+%     c.Label.String = 'Jt [A/m^{2}]';
+    hold on
+    %plot(grid2D.zq(1,squeeze(mid(:,:,i))),grid2D.rq(:,1))
+%contour(grid2D.zq(1,:),grid2D.rq(:,1),squeeze(data2D.psi(:,:,i)),20,'black')
+%contour(grid2D.zq(1,:),grid2D.rq(:,1),squeeze(data2D.psi(:,:,i)),40,'black')
+    contour(grid2D.zq(1,:),grid2D.rq(:,1),squeeze(data2D.psi(:,:,i)),[-20e-3:0.2e-3:40e-3],'black')
+%     plot(grid2D.zq(1,squeeze(mid(opoint(:,:,i),:,i))),grid2D.rq(opoint(:,:,i),1),"bo")
+%     plot(grid2D.zq(1,squeeze(mid(xpoint(:,:,i),:,i))),grid2D.rq(xpoint(:,:,i),1),"bx")
+    %plot(ok_z,ok_r,"k.",'MarkerSize', 6)%測定位置
+    plot(xpos(1,i),xpos(2,i),'bx')%X点
+    hold off
+    title(string(t)+' us')
+    xlabel('z [m]')
+    ylabel('r [m]')
+ end
+% %  saveas(gcf,strcat('C:\Users\kuru1\OneDrive - g.ecc.u-tokyo.ac.jp\labo\experiment\230123\psi-jt\',num2str(shot),'_jt_TF',num2str(TF),'kV_t466us.png'))
+% %  close
 end

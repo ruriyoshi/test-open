@@ -17,28 +17,34 @@ tstartlist=[472 472 472 477 477 477 482 482];
 tendlist=[482 482 482 487 487 487 500 500];
 
 figure
+aslope=zeros(3,11);
 for i=1:3
     IDX=IDXlist(i);
     tstart=tstartlist(i);
     tend=tendlist(i);
     p=cal_diff(T, IDX, pathname, tstart, tend);
     plot(tstart:tend,p(1,:).*180./pi,'ko-','LineWidth',1)
+    aslope(i,:)=p(1,:).*180./pi;
     hold on
 end
+bslope=zeros(3,11);
 for i=4:6
     IDX=IDXlist(i);
     tstart=tstartlist(i);
     tend=tendlist(i);
     p=cal_diff(T, IDX, pathname, tstart, tend);
     plot(tstart:tend,p(1,:).*180./pi,'ro-','LineWidth',1)
+    bslope(i-3,:)=p(1,:).*180./pi;
     hold on
 end
+cslope=zeros(2,19);
 for i=7:8
     IDX=IDXlist(i);
     tstart=tstartlist(i);
     tend=tendlist(i);
     p=cal_diff(T, IDX, pathname, tstart, tend);
     plot(tstart:tend,p(1,:).*180./pi,'bo-','LineWidth',1)
+    cslope(i-6,:)=p(1,:).*180./pi;
     hold on
 end
 yline(0,'k-')

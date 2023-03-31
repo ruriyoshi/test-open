@@ -18,9 +18,9 @@ pathname.rawdata=getenv('rawdata_path');%dtacqのrawdataの保管場所
 %%%%実験オペレーションの取得
 %直接入力の場合
 dtacqlist=[38 39];
-shotlist=[10314 255];%【input】dtacqの保存番号
-tfshotlist=[10312 253];
-date = 230103;%【input】計測日
+shotlist=[10531 470];%【input】dtacqの保存番号
+tfshotlist=[10530 469];
+date = 230119;%【input】計測日
 n_data=numel(shotlist(:,1));%計測データ数
 
 i_EF = 150;%【input】EF電流
@@ -40,12 +40,12 @@ end
 
 function plot_psi200ch(date, dtacq_num, shot, tfshot, pathname, n,i_EF,trange)
 
-filename1=strcat(pathname.rawdata038,'rawdata_noTF_dtacq',num2str(shot(1)),'.mat');
-% filename1=strcat(pathname.rawdata,'\rawdata_dtacq',num2str(dtacq_num(1)),'_shot',num2str(shot(1)),'_tfshot',num2str(tfshot(1)),'.mat');
+% filename1=strcat(pathname.rawdata038,'rawdata_noTF_dtacq',num2str(shot(1)),'.mat');
+filename1=strcat(pathname.rawdata,'rawdata_dtacq',num2str(dtacq_num(1)),'_shot',num2str(shot(1)),'_tfshot',num2str(tfshot(1)),'.mat');
 load(filename1,'rawdata');%a038
 rawdata1=rawdata;
 clear rawdata
-filename2=strcat(pathname.rawdata,'\rawdata_dtacq',num2str(dtacq_num(2)),'_shot',num2str(shot(2)),'_tfshot',num2str(tfshot(2)),'.mat');
+filename2=strcat(pathname.rawdata,'rawdata_dtacq',num2str(dtacq_num(2)),'_shot',num2str(shot(2)),'_tfshot',num2str(tfshot(2)),'.mat');
 load(filename2,'rawdata');%a039
 rawdata2=rawdata;
 clear rawdata
@@ -56,15 +56,15 @@ if numel(rawdata1)< 500||numel(rawdata2)<500
 end
 
 %較正係数のバージョンを日付で判別
-sheets1 = sheetnames('coeff125ch.xlsx');
+sheets1 = sheetnames('C:\Users\kuru1\OneDrive - g.ecc.u-tokyo.ac.jp\labo\experiment\coeff125ch.xlsx');
 sheets1 = str2double(sheets1);
 sheet_date1=max(sheets1(sheets1<=date));
-sheets2 = sheetnames('coeff200ch.xlsx');
+sheets2 = sheetnames('C:\Users\kuru1\OneDrive - g.ecc.u-tokyo.ac.jp\labo\experiment\coeff200ch.xlsx');
 sheets2 = str2double(sheets2);
 sheet_date2=max(sheets2(sheets2<=date));
 
-C1 = readmatrix('coeff125ch.xlsx','Sheet',num2str(sheet_date1));
-C2 = readmatrix('coeff200ch.xlsx','Sheet',num2str(sheet_date2));
+C1 = readmatrix('C:\Users\kuru1\OneDrive - g.ecc.u-tokyo.ac.jp\labo\experiment\coeff125ch.xlsx','Sheet',num2str(sheet_date1));
+C2 = readmatrix('C:\Users\kuru1\OneDrive - g.ecc.u-tokyo.ac.jp\labo\experiment\coeff200ch.xlsx','Sheet',num2str(sheet_date2));
 
 %a039
 ok2 = logical(C2(:,14));
@@ -78,7 +78,6 @@ ch2=C2(:,7);
 
 b2=rawdata2.*coeff2';%較正係数RC/NS
 b2=b2.*P2';%極性揃え
-b2=smoothdata(b2,1,'lowess',3);
 
 %デジタイザchからプローブ通し番号順への変換
 bz2=zeros(1000,100);
@@ -104,6 +103,8 @@ for i=1:192
     end
 end
 
+[bz2, ok_bz2, ok_bz_plot2] = ng_replace(bz2, ok_bz2, sheet_date2);
+
 %a038
 ok1 = logical(C1(:,14));
 P1=C1(:,13);
@@ -118,7 +119,7 @@ p_ch= readmatrix('coeff125ch.xlsx','Sheet','p_ch');
 b1=rawdata1.*coeff1';%較正係数RC/NS
 b1=b1.*P1';%極性揃え
 b1=double(b1);
-b1=smoothdata(b1,1,'lowess',3);
+
 %デジタイザchからプローブ通し番号順への変換
 bz1=zeros(1000,126);
 ok_bz1=true(100,1);
@@ -138,18 +139,28 @@ ok_bz1(63)=[];
 rpos_bz1(63)=[];
 zpos_bz1(63)=[];
 
+% P1_reverse=ones(1,125);
+% P1_reverse([23 47 48 49 50 71 72 73 74 75 98 99 100 122 123 125])=-1;
+% bz1=bz1.*P1_reverse;
+% ok_bz1(51)=false;
+
 % ok1([9 10 51 84 87 93 109 110 111])=false;%積分器故障？
+for i=1:125
+    bz1(:,i)=lowpass(bz1(:,i),0.5e5,1e6);
+end
+ok_bz1([5 54 31 8 61 37 62 13 38 16 40 20 45 47 23 48 25 28 29 30])=false;
 
 %データ統合
-% bz=[bz1 bz2];%time1000×ch225
-% zpos_bz=[zpos_bz1; zpos_bz2];
-% rpos_bz=[rpos_bz1; rpos_bz2];
-% ok_bz=[ok_bz1;ok_bz2];
+bz=[bz1 bz2(:,31:70)];%time1000×ch225
+zpos_bz=[zpos_bz1; zpos_bz2(31:70)];
+rpos_bz=[rpos_bz1; rpos_bz2(31:70)];
+ok_bz=[ok_bz1;ok_bz2(31:70)];
+bz=smoothdata(bz,1);
 
-bz=bz1;%time1000×ch225
-zpos_bz=zpos_bz1;
-rpos_bz=rpos_bz1;
-ok_bz=ok_bz1;
+% bz=bz1;%time1000×ch225
+% zpos_bz=zpos_bz1;
+% rpos_bz=rpos_bz1;
+% ok_bz=ok_bz1;
 
 [zq,rq]=meshgrid(linspace(min(zpos_bz),max(zpos_bz),n),linspace(min(rpos_bz),max(rpos_bz),n));
 grid2D=struct('zq',zq,'rq',rq);
@@ -175,7 +186,7 @@ data2D=struct('psi',zeros(size(grid2D.rq,1),size(grid2D.rq,2),size(trange,2)),'B
 for i=1:size(trange,2)
     t=trange(i);
     %%Bzの二次元補間(線形)
-    vq = b_interp(rpos_bz, zpos_bz, grid2D, bz, ok_bz, t);
+    vq = bz_rbfinterp(rpos_bz, zpos_bz, grid2D, bz, ok_bz, t);
     B_z = -Bz_EF+vq;
     %%PSI計算
     data2D.psi(:,:,i) = cumtrapz(grid2D.rq(:,1),2.*pi.*grid2D.rq(:,1).*B_z,1);
@@ -194,7 +205,7 @@ if isstruct(grid2D)==0 %もしdtacqデータがない場合次のloopへ(デー�
 end
 
 figure('Position', [0 0 1500 1500],'visible','on');
-start=20;
+start=10;
 %  t_start=470+start;
  for m=1:10 %図示する時間
      i=start+m; %end

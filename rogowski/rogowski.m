@@ -12,8 +12,8 @@ folder_directory_rogo = getenv('rogo_path');
 % folder_directory_rogo = 'C:\Users\denjo\OneDrive - The University of Tokyo\data\mag_probe\';
 
 % channels to display
-% channels = [1,5,7]; %TF＋FC1PF＋FC2PF
-channels = [1,9,8]; %TF＋SEP2PF＋SEP1PF 
+channels = [1,5,7]; %TF＋FC1PF＋FC2PF
+% channels = [1,9,8]; %TF＋SEP2PF＋SEP1PF 
 
 t_start = 1; % us
 t_end = 1000; % us

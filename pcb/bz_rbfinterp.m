@@ -16,4 +16,9 @@ z=double(bz(t,ok))';
 %%補間
 vq= rbfinterp([grid2D.zq(:)'; grid2D.rq(:)'], rbfcreate([x' ; y'], z','RBFFunction',func,'RBFConstant',const,'RBFSmooth', smoothval ));%,'RBFSmooth', smoothval,'RBFConstant',const));
 vq = reshape(vq, size(grid2D.zq));
+
+% f = fit([x,y],z,'lowess','Span',0.1);%  f = fit([x,y],z,'cubicinterp');
+% vq=f(grid2D.zq,grid2D.rq);
+% % plot(f,[x,y],z,'Style','Residuals'); %vq=f(grid2D.zq,grid2D.rq);;contourf(vq)
+% vq = fillmissing(vq,'linear');
 end
