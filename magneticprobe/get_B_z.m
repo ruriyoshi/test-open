@@ -13,6 +13,7 @@ function [B_z,r_probe,z_probe,ch_dist,B_z_return,data_return,shot_num] = get_B_z
 
 %************** Folder directory *****************
 %folder_directory = 'C:/Users/take_/OneDrive/デスクトップ/program/fluctuation/data/';
+%folder_directory_Bz ='D:/result/';
 folder_directory_Bz = strcat(folder_path,'/');
 
 %************** Physical Constants ***************

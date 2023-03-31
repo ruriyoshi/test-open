@@ -173,6 +173,7 @@ end
 %}
 
 n = 1;
+% color_store=-1.*color_store;
 min_color = min(color_store(:));
 max_color = max(color_store(:));
 contour_layer_color =  min_color:(max_color-min_color)/50:max_color;
@@ -186,11 +187,11 @@ for i = time
         if (show_jt || show_Et || show_Bz)
             contourf(psi_mesh_z,psi_mesh_r,color_store(:,:,i),contour_layer_color,'LineStyle','none');
         end
-        contourf(psi_mesh_z,psi_mesh_r,psi_store(:,:,i),contour_layer,'Fill','off','LineWidth',1);
+        contourf(psi_mesh_z,psi_mesh_r,psi_store(:,:,i),contour_layer,'Fill','off','LineWidth',0.5);
     end
     
     if show_probe
-        plot(probe_mesh_z,probe_mesh_r,'*','color','k','markersize',1)
+        plot(probe_mesh_z,probe_mesh_r,'*','color','r','markersize',4)
     end
     
     if show_xo
@@ -204,10 +205,18 @@ for i = time
 %     xlim([-0.1 0.1])
     title(strcat(num2str(i),' us'),'FontSize',12);
     ax = gca;
+
+%     xlim([-0.05 0.05])
     
-    xlabel('z (m)','FontSize',12);
-    ylabel('r (m)','FontSize',12);
-    ax.FontSize = 12;
+%     xlabel('z (m)','FontSize',12);
+%     ylabel('r (m)','FontSize',12);
+%     ax.FontSize = 12;
+
+%     caxis([-1.6*1e+6,0])
+    colorbar('Location','eastoutside')
+    c = colorbar;
+    c.Label.String = 'Jt [A/m^{2}]';
+    c.FontSize = 12;
     
     %k = 0.04;
     %ax.TickLength = [k, k]; % Make tick marks longer.

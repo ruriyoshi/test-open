@@ -1,19 +1,20 @@
 %clear all
 clearvars
-folder_path=getenv('ts3u_path');%ts-3uまでのパス
+folder_path='C:\Users\kuru1\OneDrive - g.ecc.u-tokyo.ac.jp\labo\experiment\rgwdata';getenv('ts3u_path');%ts-3uまでのパス
 %%%%%ここが各PCのパス
 %環境変数を設定していない場合はパスを''内に全て記入する（使用しないパスは空白''で良い）
 %pathname.ts3u='ts3u_path';%old-koalaのts-3uまでのパス（mrdなど）
-pathname.fourier='fourier_path';%fourierのmd0（データックのショットが入ってる）までのpath
-pathname.save='/Users/mgar/CAO_save'; %保存先
+pathname.fourier=getenv('fourier_path');%fourierのmd0（データックのショットが入ってる）までのpath
+% pathname.save='/Users/mgar/CAO_save'; %保存先
 
 %%%%(1)spread sheetから ログのテーブルを取得してTに格納
 %Github/test-open/getTS6log.mを使用
 DOCID='1wG5fBaiQ7-jOzOI-2pkPAeV6SDiHc_LrOdcbWlvhHBw';%スプレッドシートのID
 T=getTS6log(DOCID);
 
-IDXlist=[2911:2913 2925 2926 2927 2931 2933 2947:2950 2942 2943 2946];
-IDX=IDXlist(1,15); %42
+%IDXlist=[2911:2913 2925 2926 2927 2931 2933 2947:2950 2942 2943 2946];
+IDXlist=2911;
+IDX=IDXlist(1,1); %42
     date=T.date(IDX);
     shot=T.shot(IDX);
     TF_shot=T.TFoffset(IDX);
@@ -69,14 +70,15 @@ r_probe = r_probe([2,3,4,6,7,8]);
 % parameters:(B_z,ch_dist,start_time,end_time)
 % plot_B_z_in_time(B_z,ch_dist,350,600);
 
-% plot_psi_multi(B_z,r_probe,z_probe,461:1:475,true,true,true,false);
+%  plot_psi_multi(B_z,r_probe,z_probe,460:2:480,true,true,true,false);
 % plot_psi_multi(B_z,r_probe,z_probe,476:1:491,true,true,true,false);
 % plot_psi_multi(B_z,r_probe,z_probe,492:1:507,true,true,true,false);
 %plot_psi_multi(B_z,r_probe,z_probe,466:1:485,true,true,true,false);
 %plot_psi_multi(B_z,r_probe,z_probe,461:1:480,true,true,true,false,shot);
 
-plot_psi_xpoint(B_z,r_probe,z_probe,471:1:490,true,true,true,false,true,IDX);
-plot_psi_xpoint(B_z,r_probe,z_probe,491:1:510,true,true,true,false,true,IDX);
+plot_psi_xpoint(B_z,r_probe,z_probe,466:1:480,true,true,true,false,true,IDX);
+%plot_psi_xpoint(B_z,r_probe,z_probe,471:1:490,true,true,true,false,true,IDX);
+%plot_psi_xpoint(B_z,r_probe,z_probe,491:1:510,true,true,true,false,true,IDX);
 %plot_psi_xpoint(B_z,r_probe,z_probe,501:1:520,true,true,true,false,true,IDX);
 
 % parameters:(B_z,r_probe,z_probe,t,fitting,fill,fixed_Clayer,show_probe)
@@ -84,6 +86,3 @@ plot_psi_xpoint(B_z,r_probe,z_probe,491:1:510,true,true,true,false,true,IDX);
 
 %parameters:(B_z,r_probe)
 % plot_fitrate(B_z,r_probe,shot);
-
-
-

@@ -124,7 +124,7 @@ for i = time
     hold on
     
     if fill
-        contourf(psi_mesh_z,psi_mesh_r,psi_store(:,:,i),contour_layer,'Fill','on');
+        contourf(psi_mesh_z,psi_mesh_r,psi_store(:,:,i),contour_layer,'Fill','on');%fill offでjtのコンター出さない場合白黒、fill onならpsiのカラーコンターが出る
     else
         if (show_jt || show_Et || show_Bz)
             contourf(psi_mesh_z,psi_mesh_r,color_store(:,:,i),contour_layer_color,'LineStyle','none');

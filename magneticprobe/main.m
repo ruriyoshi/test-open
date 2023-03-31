@@ -1,9 +1,9 @@
 clear all
-folder_path=getenv('ts3u_path');%ts-3uまでのパス
-date=211224;
-TF_shot = 1 ;
+folder_path='C:\Users\kuru1\OneDrive - g.ecc.u-tokyo.ac.jp\labo\experiment\rgwdata';%getenv('ts3u_path');%ts-3uまでのパス
+date=211223;
+TF_shot = 30 ;
 offset_TF = true;
-shot = 6;
+shot = 42;
 i_EF=150;
 % ********* ALWAYS RUN THIS FUNCTION FIRST ***********
 % parameters:(date,TF_shot,shot,offset_TF,offset_EF)
@@ -45,7 +45,7 @@ r_probe = r_probe([2,3,4,6,7,8]);
 % parameters:(B_z,ch_dist,start_time,end_time)
 % plot_B_z_in_time(B_z,ch_dist,350,600);
 
-plot_psi_multi(B_z,r_probe,z_probe,461:1:475,true,true,true,false);
+plot_psi_multi(B_z,r_probe,z_probe,466:1:480,true,true,true,false);
 % plot_psi_multi(B_z,r_probe,z_probe,476:1:491,true,true,true,false);
 % plot_psi_multi(B_z,r_probe,z_probe,492:1:507,true,true,true,false);
 % plot_psi_multi(B_z,r_probe,z_probe,508:1:523,true,true,true,false);
