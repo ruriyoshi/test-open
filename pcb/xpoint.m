@@ -15,7 +15,7 @@ T=getTS6log(DOCID);
 pathname.ts3u=getenv('ts3u_path');%old-koalaのts-3uまでのパス（mrdなど）
 pathname.fourier=getenv('fourier_path');%fourierのmd0（データックのショットが入ってる）までのpath
 pathname.NIFS=getenv('NIFS_path');%resultsまでのpath（ドップラー、SXR）
-pathname.save='C:\Users\uswk0\OneDrive\デスクトップ\data\a038_out\'; %保存先
+pathname.save='C:\Users\kuru1\OneDrive - g.ecc.u-tokyo.ac.jp\過去データ解析\220928'; %保存先
 %pathname.rawdata='/Users/mgar/rawdata_a038/'; %rawdataの保管場所
 
 %%%%(2)ログから解析したいデータを検索
@@ -29,7 +29,7 @@ pathname.save='C:\Users\uswk0\OneDrive\デスクトップ\data\a038_out\'; %保�
 %%%%(3)指定したshotの解析
 % IDXlist=[2897 2906 2907 2912 2913] ; %2870:2921; %【input】テーブルから解析したいshot番号を抽出して入力
 IDXlist=[2911:2913 2925 2926 2927 2931 2933 2947:2950 2942 2943 2946];
-for IDX=IDXlist%(1,1)
+for IDX=IDXlist(1,1)
 [xr,xz]=plot_xpoint(T, pathname,IDX);
 end
 
@@ -106,15 +106,15 @@ end
 %X点r座標プロット
 figure
 plot(trange,xr,'b*','MarkerSize',8)
-ylabel('r [m]','Fontsize',12)
-xlabel('Time [us]','Fontsize', 12)
+ylabel('r [m]')
+xlabel('Time [us]')
 % xlim([460 482])
 title(strcat('IDX=',num2str(IDX)))
 ha1 = gca;
 ha1.LineWidth = 1;
 ha1.FontSize=13;
-saveas(gcf,strcat(pathname.save,'\',num2str(IDX),'_xr.png'))
-close
+% saveas(gcf,strcat(pathname.save,'\',num2str(IDX),'_xr.png'))
+% close
 
 % % %%磁気面時間発展プロット
 % f=figure;

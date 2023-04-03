@@ -19,15 +19,15 @@ pathname.fourier='/Users/mgar/data/';%fourierのmd0（データックのショ�
 pathname.save='/Users/mgar/pcb_save'; %保存先
 
 %%%%(3)指定したshotの解析
-dtacqlist=3122:3149; %【input】テーブルから解析したいshot番号を抽出して入力
+dtacqlist=3252; %【input】テーブルから解析したいshot番号を抽出して入力
 
-date = 211126;
-d_tacqTF = 3123;
-i_EF = 150;
+date = 211210;
+d_tacqTF = 3246;
+i_EF = 0;
 trange=460:490;
 n=50; %rz方向のメッシュ数
 
-for d_tacq=dtacqlist(1,7)
+for d_tacq=dtacqlist(1,1)
 plot_psi(date, d_tacq, d_tacqTF,trange, n, i_EF, pathname); %通常の時系列プロット
 %plot_position(date, d_tacq, d_tacqTF,trange, n, i_EF, pathname); %計測位置、各位置での生信号も含めた確認用プロット
 end
@@ -65,13 +65,14 @@ f.WindowState = 'maximized';
      i=start+m; %end
      t=trange(i);
      subplot(2,5,m)
-    contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.Jt(:,:,i),10,'LineStyle','none')
+    contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.Bz(:,:,i),20,'LineStyle','none')
     colormap(jet) %jet/parula
     axis image
     axis tight manual
     %     xlim([-0.02 0.02])
     %     ylim([0.12 0.27])
-    caxis([-10*1e+6,10*1e+6]) %カラーバーの軸の範囲
+    caxis([-9e-3,9e-3])%Bz
+%     caxis([-10*1e+6,10*1e+6]) %カラーバーの軸の範囲
     %caxis([-maxrange,maxrange])
     colorbar('Location','eastoutside')
     %zlim([-1 1])

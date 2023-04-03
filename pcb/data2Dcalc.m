@@ -20,14 +20,16 @@ for i=1:size(trange,2)
     
     B_z = -Bz_EF+vq;
     %%PSI計算
-    data2D.psi(:,:,i) = cumtrapz(grid2D.rq(:,1),B_z,1);
+    data2D.psi(:,:,i) = cumtrapz(grid2D.rq(:,1),2.*pi.*grid2D.rq(:,1).*B_z,1);
     %このままだと1/2πrが計算されてないので
     [data2D.Br(:,:,i),data2D.Bz(:,:,i)]=gradient(data2D.psi(:,:,i),grid2D.zq(1,:),grid2D.rq(:,1)) ;
     data2D.Br(:,:,i)=-data2D.Br(:,:,i)./(2.*pi.*grid2D.rq);
     data2D.Bz(:,:,i)=data2D.Bz(:,:,i)./(2.*pi.*grid2D.rq);
     data2D.Jt(:,:,i)= curl(grid2D.zq(1,:),grid2D.rq(:,1),data2D.Bz(:,:,i),data2D.Br(:,:,i))./(4*pi*1e-7);
 end
-data2D.Et=diff(data2D.psi,1,3);
+data2D.Et=diff(data2D.psi,1,3).*1e+6; 
+%diffは単なる差分なので時間方向のsizeが1小さくなる %ステップサイズは1us
+data2D.Et=data2D.Et./(2.*pi.*grid2D.rq);
 %data2D=struct('psi',psi,'Bz',Bz,'Br',Br,'Jt',Jt,'trange',trange);
 clear vq bz Bz_EF B_z ok ng rpos zpos i t
 end

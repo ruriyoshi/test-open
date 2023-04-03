@@ -15,7 +15,7 @@ T=getTS6log(DOCID);
 pathname.ts3u=getenv('ts3u_path');%old-koalaのts-3uまでのパス（mrdなど）
 pathname.fourier=getenv('fourier_path');%fourierのmd0（データックのショットが入ってる）までのpath
 pathname.NIFS=getenv('NIFS_path');%resultsまでのpath（ドップラー、SXR）
-pathname.save=getenv('save_path'); %保存先
+pathname.save=getenv('savedata_path'); %保存先
 %pathname.rawdata='/Users/mgar/rawdata_a038/'; %rawdataの保管場所
 
 %%%%(2)ログから解析したいデータを検索
@@ -30,7 +30,7 @@ pathname.save=getenv('save_path'); %保存先
 % IDXlist=[2897 2906 2907 2912 2913] ; %2870:2921; %【input】テーブルから解析したいshot番号を抽出して入力
 IDXlist=4180:4193;%[2911:2913 2925 2926 2927 2931 2933 2947:2950 2942 2943 2946];
 IDXlist=IDXlist;
-for IDX=IDXlist(1,11) %42
+for IDX=IDXlist(1,1) %42
     plot_psi(T, pathname,IDX); %通常の時系列プロット
     %plot_position(T, pathname, IDX); %計測位置、各位置での生信号も含めた確認用プロット
 end
@@ -43,22 +43,22 @@ end
 %%%%getinput:実験ログ（T）からshot番号（IDX）におけるオペレーションの値を出力
 %出力は構造体に変更しても良いかも
 function [date, shot, TF_shot, offset_TF, i_EF, start, Doppler_t, d_tacq, d_tacqTF, trange, t, n] = getinput(T,IDX)
-date=T.date(IDX);
-shot=T.shot(IDX);
-TF_shot=T.TFoffset(IDX);
-offset_TF=isfinite(TF_shot);
-
-if isnan(T.EF_A_(IDX))%%NaNでないことを確認（ログが空白だとNaNになる）
-    i_EF=150;
-else  %NaNなら150をとりあえず代入、記入されているときはその値を使う
-    i_EF=T.EF_A_(IDX);
-end
+date=211223;%221115;%T.date(IDX);
+shot='';%T.shot(IDX);
+TF_shot='';%T.TFoffset(IDX);
+offset_TF='';%isfinite(TF_shot);
+i_EF=150;
+% if isnan(T.EF_A_(IDX))%%NaNでないことを確認（ログが空白だとNaNになる）
+%     i_EF=150;
+% else  %NaNなら150をとりあえず代入、記入されているときはその値を使う
+%     i_EF=T.EF_A_(IDX);
+% end
 
 start=T.Period_StartTime_(IDX);
 Doppler_t=T.DopplerDelay(IDX);
 
-d_tacq=T.d_tacq(IDX);
-d_tacqTF=T.TFdtacq(IDX);
+d_tacq=3592;%10150;%T.d_tacq(IDX);
+d_tacqTF='';%T.TFdtacq(IDX);
 
 trange=460:510;
 t=T.DopplerDelay(IDX);
@@ -97,14 +97,15 @@ figure('Position', [0 0 1500 1500],'visible','on');
      i=start+m*2; %end
      t=trange(i);
      subplot(2,5,m)
-    contourf(grid2D.zq(1,:),grid2D.rq(:,1),-1.*data2D.Jt(:,:,i),10,'LineStyle','none')
-    %colormap(jet)
+    contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.Bz(:,:,i),30,'LineStyle','none')
+%     contourf(grid2D.zq(1,:),grid2D.rq(:,1),-1.*data2D.Jt(:,:,i),10,'LineStyle','none')
+    colormap(jet)
     axis image
     axis tight manual
     %     xlim([-0.02 0.02])
     %     ylim([0.12 0.27])
     %caxis([-2.5*1e+6,2.5*1e+6]) %カラーバーの軸の範囲
-    %caxis([-1*1e+6,1*1e+6])
+    caxis([-0.3,0.3])%caxis([-7.5e-3,7.5e-3])
     %caxis([-maxrange,maxrange])
     colorbar('Location','eastoutside')
     %zlim([-1 1])
@@ -113,10 +114,10 @@ figure('Position', [0 0 1500 1500],'visible','on');
 %     c = colorbar;
 %     c.Label.String = 'Jt [A/m^{2}]';
     hold on
-    plot(grid2D.zq(1,squeeze(mid(:,:,i))),grid2D.rq(:,1))
-    contour(grid2D.zq(1,:),grid2D.rq(:,1),squeeze(data2D.psi(:,:,i)),50,'black')
-    plot(grid2D.zq(1,squeeze(mid(opoint(:,:,i),:,i))),grid2D.rq(opoint(:,:,i),1),"bo")
-    plot(grid2D.zq(1,squeeze(mid(xpoint(:,:,i),:,i))),grid2D.rq(xpoint(:,:,i),1),"bx")
+%     plot(grid2D.zq(1,squeeze(mid(:,:,i))),grid2D.rq(:,1))
+    contour(grid2D.zq(1,:),grid2D.rq(:,1),squeeze(data2D.psi(:,:,i)),30,'black')
+%     plot(grid2D.zq(1,squeeze(mid(opoint(:,:,i),:,i))),grid2D.rq(opoint(:,:,i),1),"bo")
+%     plot(grid2D.zq(1,squeeze(mid(xpoint(:,:,i),:,i))),grid2D.rq(xpoint(:,:,i),1),"bx")
     hold off
     title(string(t)+' us')
     xlabel('z [m]')
@@ -127,7 +128,8 @@ figure('Position', [0 0 1500 1500],'visible','on');
 %     ax.YTickLabel = cell(size(ax.YTickLabel)); 
  end
  
- sgtitle(strcat('IDX=',num2str(IDX),': shot=',num2str(date),num2str(shot,'%03i'),': dtacq=',num2str(T.d_tacq(IDX))))
+%  sgtitle(strcat('IDX=',num2str(IDX),': shot=',num2str(date),num2str(shot,'%03i'),': dtacq=',num2str(T.d_tacq(IDX))))
+ sgtitle(strcat('date=',num2str(date),num2str(shot,'%03i'),': dtacq=',num2str(d_tacq)))
 
 %figureの保存
 % saveas(gcf,strcat(pathname.save,'\IDX',num2str(IDX),'pcb_1.png'))

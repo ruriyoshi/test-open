@@ -7,8 +7,8 @@ pathname.save=getenv('savedata_path'); %保存先
 
 %【input】date, i_EF(EF電流), d_tacq
 date=221119;%T.date(IDX);
-i_EF=150;%150;
-d_tacq=10194;%T.d_tacq(IDX);
+i_EF=150;
+d_tacq=10229;%T.d_tacq(IDX);
 
 %【input】とりあえず変更しなくて良い
 shot='';%T.shot(IDX);
@@ -16,14 +16,14 @@ TF_shot='';%T.TFoffset(IDX);
 offset_TF='';%isfinite(TF_shot);
 
 d_tacqTF='';%T.TFdtacq(IDX);
-trange=460:520;
+trange=400:500;%460:520;
 n=50; %rz方向のメッシュ数
 
 %pcbdata.m
-% pathname.rawdata='C:\Users\kuru1\OneDrive - g.ecc.u-tokyo.ac.jp\labo\experiment\rawdata_a038_noTF\'; %rawdataの保管場所
-% filename=strcat(pathname.rawdata,'rawdata_noTF_dtacq',num2str(d_tacq),'.mat');
-pathname.rawdata='C:\Users\kuru1\OneDrive - g.ecc.u-tokyo.ac.jp\labo\experiment\rawdata_a038\'; %rawdataの保管場所
-filename=strcat(pathname.rawdata,'rawdata_dtacq',num2str(d_tacq),'.mat');
+pathname.rawdata='C:\Users\kuru1\OneDrive - g.ecc.u-tokyo.ac.jp\labo\experiment\rawdata_a038_noTF\'; %rawdataの保管場所
+filename=strcat(pathname.rawdata,'rawdata_noTF_dtacq',num2str(d_tacq),'.mat');
+% pathname.rawdata='C:\Users\kuru1\OneDrive - g.ecc.u-tokyo.ac.jp\labo\experiment\rawdata_a038\'; %rawdataの保管場所
+% filename=strcat(pathname.rawdata,'rawdata_dtacq',num2str(d_tacq),'.mat');
 load(filename,'rawdata');
 if numel(rawdata)< 500
     grid2D=NaN;
@@ -92,7 +92,7 @@ end
 % チャンネルごとの生信号のプロット
 bz=smoothdata(bz,1);%各ch内のデータを時間に関してsmoothing
 
-ok([9 10 51 84 87 93 109 110 111])=false;%積分器故障？
+% ok([9 10 51 84 87 93 109 110 111])=false;%積分器故障？
 % bz(:,9)=(2.*bz(:,8)+bz(:,11))./3;
 % bz(:,10)=(bz(:,8)+2.*bz(:,11))./3;
 % bz(:,84)=(bz(:,83)+bz(:,85))./2;
@@ -121,8 +121,8 @@ ok([9 10 51 84 87 93 109 110 111])=false;%積分器故障？
 % bz(:,50)=(bz(:,25)+bz(:,75))./2;
 % bz(:,49)=(bz(:,24)+bz(:,74))./2;
 
-%移動平均
-% bz=movmean(bz,5,1);
+% 移動平均
+bz=movmean(bz,5,1);
 
 % r = 5;%プローブ本数＝グラフ出力時の縦に並べる個数
 % col1 = 12;%1枚目のグラフ出力時の横に並べる個数
@@ -169,7 +169,7 @@ for i=1:size(trange,2)
 
     B_z = -Bz_EF+vq;
     %%PSI計算
-    data2D.psi(:,:,i) = cumtrapz(grid2D.rq(:,1),B_z,1);
+    data2D.psi(:,:,i) = cumtrapz(grid2D.rq(:,1),2.*pi.*grid2D.rq(:,1).*B_z,1);
     %このままだと1/2πrが計算されてないので
     [data2D.Br(:,:,i),data2D.Bz(:,:,i)]=gradient(data2D.psi(:,:,i),grid2D.zq(1,:),grid2D.rq(:,1)) ;
     data2D.Br(:,:,i)=-data2D.Br(:,:,i)./(2.*pi.*grid2D.rq);
@@ -191,19 +191,19 @@ if isstruct(grid2D)==0 %もしdtacqデータがない場合次のloopへ(デー�
 end
 
 figure('Position', [0 0 1500 1500],'visible','on');
-start=10; %460+?
+start=70;
 %  t_start=470+start;
  for m=1:10 %図示する時間
-     i=start+m.*2; %end
+     i=start+m; %end
      t=trange(i);
      subplot(2,5,m)
-%     contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.Bz(:,:,i),30,'LineStyle','none')
-    contourf(grid2D.zq(1,:),grid2D.rq(:,1),-1.*data2D.Jt(:,:,i),10,'LineStyle','none')
+    contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.Br(:,:,i),30,'LineStyle','none')
+%     contourf(grid2D.zq(1,:),grid2D.rq(:,1),-1.*data2D.Jt(:,:,i),10,'LineStyle','none')
     colormap(jet)
     axis image
     axis tight manual
-    caxis([-2.5*1e+6,2.5*1e+6]) %カラーバーの軸の範囲
-%     caxis([-1e-1,1e-1])
+%     caxis([-2.5*1e+6,2.5*1e+6]) %カラーバーの軸の範囲
+    caxis([-0.1,0.1])
     %caxis([-maxrange,maxrange])
     colorbar('Location','eastoutside')
     %カラーバーのラベル付け
