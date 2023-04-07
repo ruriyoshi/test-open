@@ -76,7 +76,7 @@ subplot('Position',pos1);
 h1.LineStyle = 'none';
 caxis([0,0.2]);
 % caxis([0,1]);
-c=colorbar;c.Label.String='Intensity [a.u.]';c.FontSize=18;
+c=colorbar('westoutside');c.Label.String='Intensity [a.u.]';c.FontSize=18;
 hold on
 
 [~,hp1]=contourf(psi_mesh_z,psi_mesh_r,psi,contour_layer,'-k','Fill','off');
