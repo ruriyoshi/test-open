@@ -13,14 +13,14 @@ pathname.save=getenv('savedata_path');%outputデータ保存先
 pathname.rawdata38=getenv('rawdata038_path');%dtacq a038のrawdataの保管場所
 pathname.woTFdata=getenv('woTFdata_path');%rawdata（TFoffset引いた）の保管場所
 
-pathname.rawdata=getenv('rawdata_path');%dtacqのrawdataの保管場所
+pathname.rawdata='/Users/yunhancai/Google Drive/Data/pcb/raw';%dtacqのrawdataの保管場所
 
 %%%%実験オペレーションの取得
 %直接入力の場合
 dtacqlist=39;
-shotlist=418;%【input】dtacqの保存番号
-tfshotlist=411;
-date = 230119;%【input】計測日
+shotlist=918;%【input】dtacqの保存番号
+tfshotlist=0;
+date = 230217;%【input】計測日
 n=numel(shotlist);%計測データ数
 
 % %磁気面出す場合は適切な値を入力、磁場信号のみプロットする場合は変更不要
@@ -41,7 +41,7 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%
 
 function check_signal(date, dtacq_num, shot, tfshot, pathname)
-filename=strcat(pathname.rawdata,'\rawdata_dtacq',num2str(dtacq_num),'_shot',num2str(shot),'_tfshot',num2str(tfshot),'.mat');
+filename=strcat(pathname.rawdata,'/rawdata_dtacq',num2str(dtacq_num),'_shot',num2str(shot),'_tfshot',num2str(tfshot),'.mat');
 % filename=strcat(pathname.rawdata,'rawdata_noTF_dtacq',num2str(d_tacq),'.mat');
 load(filename,'rawdata');%1000×192
 
@@ -51,11 +51,11 @@ if numel(rawdata)< 500
 end
 
 %較正係数のバージョンを日付で判別
-sheets = sheetnames('C:\Users\kuru1\OneDrive - g.ecc.u-tokyo.ac.jp\labo\experiment\coeff200ch.xlsx');
+sheets = sheetnames('coeff200ch.xlsx');
 sheets = str2double(sheets);
 sheet_date=max(sheets(sheets<=date));
 
-C = readmatrix('C:\Users\kuru1\OneDrive - g.ecc.u-tokyo.ac.jp\labo\experiment\coeff200ch.xlsx','Sheet',num2str(sheet_date));
+C = readmatrix('coeff200ch.xlsx','Sheet',num2str(sheet_date));
 ok = logical(C(:,14));
 P=C(:,13);
 coeff=C(:,12);
@@ -83,15 +83,12 @@ for i=1:192
         bz(:,ceil(ch(i)/2))=b(:,i);
         ok_bz(ceil(ch(i)/2))=ok(i);
     elseif rem(ch(i),2)==0
-        bt(:,ch(i)/2)=b(:,i);
+        bt(:,ceil(ch(i)/2))=b(:,i);
         ok_bt(ceil(ch(i)/2))=ok(i);
     end
 end
-ok_bz([9 10 96 17])=false;
-ok_bz([49 57])=true;
-% bz(:,[57 67 68 77 87])=-bz(:,[57 67 68 77 87]);
-% [bz, ok_bz, ok_bz_plot] = ng_replace(bz, ok_bz, sheet_date);
 ok_bz_plot=ok_bz;
+ok_bt([4 5 6 7 8 9 10 15 21 27 30 42 43 49 53 69 84 87 92 94 95 96 97 98 99 100]) = false;
 
 % 221219ver
 % Pcheck=[1	-1	1	1	-1	-1	-1	1	1	1	1	1	1	-1	-1	0	-1	-1	1	-1	1	0	1	-1	-1	1	-1	-1	1	-1	-1	1	-1	1	-1	1	-1	-1	-1	1	-1	-1	1	1	-1	-1	-1	-1	-1	-1	1	-1	-1	-1	-1	-1	-1	-1	-1	-1	1	1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	1	-1	1	-1	-1	-1	-1	1	-1	-1	1	-1	-1	1	-1	-1	1	1	1	-1	1	-1	-1	1	1	1	-1];
@@ -108,8 +105,8 @@ ok_bz_plot=ok_bz;
 %生信号描画用パラメータ
 r = 5;%プローブ本数＝グラフ出力時の縦に並べる個数
 col = 10;%グラフ出力時の横に並べる個数
-y_upper_lim = 0.05;%3e-3;%0.1;%縦軸プロット領域（b_z上限）
-y_lower_lim = -0.05;%3e-3;%-0.1;%縦軸プロット領域（b_z下限）
+y_upper_lim = 0.1;%3e-3;%0.1;%縦軸プロット領域（b_z上限）
+y_lower_lim = -0.1;%3e-3;%-0.1;%縦軸プロット領域（b_z下限）
 t_start=350;%430;%455;%横軸プロット領域（開始時間）
 t_end=600;%550;%横軸プロット領域（終了時間）
 % r_ch=col1+col2;%r方向から挿入した各プローブのチャンネル数
@@ -160,6 +157,7 @@ for i=1:r
         end   
         title(num2str(2.*(col*(i-1)+j)));
         xticks([t_start t_end]);
+        %ylim([-0.2 0.2]);
         ylim([y_lower_lim y_upper_lim]);
     end
 end
@@ -177,6 +175,7 @@ for i=1:r
         end   
         title(num2str(2.*(col*(i+r-1)+j)));
         xticks([t_start t_end]);
+        %ylim([-0.2 0.2]);
         ylim([y_lower_lim y_upper_lim]);
     end
 end
@@ -186,23 +185,23 @@ sgtitle('Bt signal probe6-10')
 % close
 
 %横軸z, 縦軸Bzのプロット
-f5=figure;
-f5.WindowState = 'maximized';
-t=465;
-for i=1:10
-    zline=(1:10:91)+(i-1);
-    bz_zline=bz(t,zline);
-    bz_zline(ok_bz(zline)==false)=NaN;
-    plot([-0.17 -0.1275 -0.0850 -0.0315 -0.0105 0.0105 0.0315 0.0850 0.1275 0.17],bz_zline,'-*')
-    clear bz_zline
-    hold on
-end
-hold off
-xlabel('z [m]')
-ylabel('Bz')
-yline(0,'k--')
-title(strcat('t=',num2str(t),' us'))
-legend('r1','r2','r3','r4','r5','r6','r7','r8','r9','r10',Location='eastoutside')
+% f5=figure;
+% f5.WindowState = 'maximized';
+% t=465;
+% for i=1:10
+%     zline=(1:10:91)+(i-1);
+%     bz_zline=bz(t,zline);
+%     bz_zline(ok_bz(zline)==false)=NaN;
+%     plot([-0.17 -0.1275 -0.0850 -0.0315 -0.0105 0.0105 0.0315 0.0850 0.1275 0.17],bz_zline,'-*')
+%     clear bz_zline
+%     hold on
+% end
+% hold off
+% xlabel('z [m]')
+% ylabel('Bz')
+% yline(0,'k--')
+% title(strcat('t=',num2str(t),' us'))
+% legend('r1','r2','r3','r4','r5','r6','r7','r8','r9','r10',Location='eastoutside')
 
 % bz1=[bz(t,1) bz(t,11) bz(t,21) bz(t,31) bz(t,41) bz(t,51) bz(t,61) bz(t,71) bz(t,81) bz(t,91)];
 % bz2=[bz(t,2) bz(t,12) bz(t,22) bz(t,32) bz(t,42) bz(t,52) bz(t,62) bz(t,72) bz(t,82) bz(t,92)];

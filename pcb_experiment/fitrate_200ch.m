@@ -6,29 +6,29 @@
 %【※コードを使用する前に】環境変数を設定しておくか、matlab内のコマンドからsetenv('パス名','アドレス')で指定してから動かす
 pathname.rawdata=getenv('rawdata_path');%dtacqのrawdataの保管場所
 
-% %%%%実験オペレーションの取得
-% DOCID='1wG5fBaiQ7-jOzOI-2pkPAeV6SDiHc_LrOdcbWlvhHBw';%スプレッドシートのID
-% T=getTS6log(DOCID);
-% node='date';
-% pat=230118;
-% T=searchlog(T,node,pat);
-% IDXlist=[4:6 8:11 13 15:19 21:23 24:30 33:37 39:40 42:51 53:59 61:63 65:69 71:74];
-% date=pat;
-% n_data=numel(IDXlist);%計測データ数
-% shotlist=T.a039(IDXlist);
-% tfshotlist=T.a039_TF(IDXlist);
-% EFlist=T.EF_A_(IDXlist);
-% TFlist=T.TF_kV_(IDXlist);
-% dtacqlist=39.*ones(n_data,1);
+%%%%実験オペレーションの取得
+DOCID='1wG5fBaiQ7-jOzOI-2pkPAeV6SDiHc_LrOdcbWlvhHBw';%スプレッドシートのID
+T=getTS6log(DOCID);
+node='date';
+pat=230119;
+T=searchlog(T,node,pat);
+IDXlist=[4:6 8:11 13 15:19 21:23 24:30 33:37 39:40 42:51 53:59 61:63 65:69 71:74];
+date=pat;
+n_data=numel(IDXlist);%計測データ数
+shotlist=T.a039(IDXlist);
+tfshotlist=T.a039_TF(IDXlist);
+EFlist=T.EF_A_(IDXlist);
+TFlist=T.TF_kV_(IDXlist);
+dtacqlist=39.*ones(n_data,1);
 
-% %直接入力の場合
-dtacqlist=39;
-shotlist=630;%【input】実験ログのa039の番号
-tfshotlist=584;%【input】実験ログのa039_TFの番号
-date = 230127;%【input】計測日
-n_data=numel(shotlist);%計測データ数
-EFlist = 150;%【input】EF電流
-TFlist=4;
+% % %直接入力の場合
+% dtacqlist=39;
+% shotlist=413;%240;%【input】dtacqの保存番号
+% tfshotlist=411;%0;
+% date = 230119;%【input】計測日
+% n_data=numel(shotlist);%計測データ数
+% EFlist = 150;%150;%【input】EF電流
+% TFlist=4;
 
 trange=450:510;%【input】計算時間範囲
 n=50; %【input】rz方向のメッシュ数
@@ -59,11 +59,11 @@ if numel(rawdata)< 500
 end
 
 %較正係数のバージョンを日付で判別
-sheets = sheetnames('coeff200ch.xlsx');
+sheets = sheetnames('C:\Users\kuru1\OneDrive - g.ecc.u-tokyo.ac.jp\labo\experiment\coeff200ch.xlsx');
 sheets = str2double(sheets);
 sheet_date=max(sheets(sheets<=date));
 
-C = readmatrix('coeff200ch.xlsx','Sheet',num2str(sheet_date));
+C = readmatrix('C:\Users\kuru1\OneDrive - g.ecc.u-tokyo.ac.jp\labo\experiment\coeff200ch.xlsx','Sheet',num2str(sheet_date));
 ok = logical(C(:,14));
 P=C(:,13);
 coeff=C(:,12);
@@ -105,8 +105,6 @@ for i=1:192
 end
 [bz, ok_bz, ok_bz_plot] = ng_replace(bz, ok_bz, sheet_date);
 % ok_bz_plot=ok_bz;
-ok_bz(32) = false;
-ok_bz(42) = false;
 
 % %中心領域4+2本のみ
 % prange=21:80;%31:70;

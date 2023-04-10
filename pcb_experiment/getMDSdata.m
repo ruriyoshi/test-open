@@ -31,7 +31,7 @@ for i=1:ch_num
     x(:,i)=x(:,i)-x(1,i);% オフセット調整
 end
 if tfshot>0 
-    mdsopen('a038', tfshot);
+    mdsopen(dtacq, tfshot);
     for i=1:ch_num
     %各チャンネルにおいて「.AI:CHXXX」というノードを指定するためのノード名を作る
     chname=".AI:CH"+num2str(transpose(i),'%03i');

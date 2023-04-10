@@ -24,9 +24,9 @@ pathname.rawdata=getenv('rawdata_path');%dtacqのrawdataの保管場所
 
 % %直接入力の場合【注意】全て同じサイズの行列になるように記入
 dtacqlist=39;
-shotlist=638;%【input】実験ログのa039の番号
-tfshotlist=632;%【input】実験ログのa039_TFの番号
-date = 230127;%【input】計測日
+shotlist=395;%【input】実験ログのa039の番号
+tfshotlist=391;%【input】実験ログのa039_TFの番号
+date = 230119;%【input】計測日
 n_data=numel(shotlist);%計測データ数
 EFlist = 150;%【input】EF電流
 
@@ -38,7 +38,7 @@ for i=1:n_data
     shot=shotlist(i);
     tfshot=tfshotlist(i);
     i_EF=EFlist(i);
-%     TF=TFlist(i);
+    TF=TFlist(i);
     plot_psi200ch(date, dtacq_num, shot, tfshot, pathname,n,i_EF,trange,TF); 
 end
 
@@ -105,8 +105,6 @@ for i=1:192
 end
 [bz, ok_bz, ok_bz_plot] = ng_replace(bz, ok_bz, sheet_date);
 % ok_bz_plot=ok_bz;
-ok_bz(32) = false;
-ok_bz(42) = false;
 
 [zq,rq]=meshgrid(linspace(min(zpos_bz),max(zpos_bz),n),linspace(min(rpos_bz),max(rpos_bz),n));
 grid2D=struct('zq',zq,'rq',rq);
@@ -152,7 +150,7 @@ end
 
  %カラーコンターなし
 figure('Position', [0 0 1500 1500],'visible','on');
-start=0;
+start=30;
  for m=1:10 %図示する時間
      i=start+m; %end
      t=trange(i);

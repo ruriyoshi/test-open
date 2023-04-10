@@ -24,4 +24,3 @@ for i=1:n
         save(strcat(pathname.rawdata,'/rawdata_dtacq',num2str(dtacq_num),'_shot',num2str(shot),'_tfshot0.mat'),'rawdata0');
     end
 end
-
