@@ -1,9 +1,13 @@
-function [] = manual_main(auto,date,shot,trg,exp_w,gain,gas,NofCH,nz,plot_fitting,cal_flow,plot_flow,save_flow,save_fig,factor,r_measured,z_measured)
-%auto_mainを使う(TorF)/実験日/shot番号/トリガ/露光時間/Andor gain/ガス種(Ar:1,H:2)/ファイバーCH数/z方向データ数(数値)/フィッティングを表示(TorF)/流速を計算(TorF)/流速を表示(TorF)/流速を保存(TorF)/figを保存(TorF)/矢印サイズ(数値:0.05など)/false/false
+function [] = plot_ionflow(date,shot,trg,exp_w,gain,gas,NofCH,nz,show_offset,plot_fit,plot_flow,save_flow,save_fig,factor,r_measured,z_measured)
+%auto_mainを使う(TorF)/実験日/shot番号/トリガ/露光時間/Andor gain/ガス種('Ar','H')/ファイバーCH数/z方向データ数/offsetを表示/フィッティングを表示(TorF)/流速を表示(TorF)/流速を保存(TorF)/figを保存(TorF)/矢印サイズ(数値:0.05など)/false/false
 
-%パラメータを定義
+%------【input】-------
+width = 3;%【input】チャンネル方向(Y方向)足し合わせ幅
+l = 7;%【input】波長方向移動平均長さ
+
+%物理定数
 Vc = 299792.458;%光速(km/s)
-
+Angle = 30;%入射角(度)
 switch gas
     case 'Ar'%アルゴンの時
         A = 40;%原子量
@@ -15,52 +19,24 @@ switch gas
         A = 1;%原子量
         lambda0 = 486.135;%使用スペクトル(nm)
         % center_file = 'Hbeta_calibration.txt';%中心データファイル名
+        warning('Sorry, not ready for H experiment.')%gasの入力エラー
+        return;
     otherwise
         warning('Input error in gas.')%gasの入力エラー
         return;
 end
 
-Angle = 30;%入射角(度)
-width = 3;%Y方向足し合わせ幅
-l = 7;%移動平均長さ
-
-if  ~auto
-    r_measured = zeros(NofCH/4,nz);%ベクトルプロットr座標1列目data1、2列目data2
-    z_measured = zeros(NofCH/4,nz);%ベクトルプロットz座標1列目data1、2列目data2
-end
-
-%------------------------ファイル名と対応する計測点を入力--------------------------
-if  ~auto
-    date = 230309;%日付(nz=1)
-    shot = 9;%ショット番号
-    trg = 480;%ICCDトリガ時間
-    exp_w = 2;%ICCD露光時間
-    gain = 4095;%Andor gain
-    z_measured(:,1) = 2.1;%data1のz座標
-    r_measured(:,1) = [12.5, 15, 17.5, 20, 22.5, 25, 27.5];%data1のr座標
-    if nz == 2
-        r_measured(:,2) = [12.5, 15, 17.5, 20, 22.5, 25, 27.5];%data2のr座標
-        z_measured(:,2) = -2.1;%data2のz座標
-    end
-end
 time = trg + round(exp_w/2);%計測時刻
 dir1 = ['/Volumes/experiment/results/Doppler/Andor/IDSP/' num2str(date)];%ディレクトリ1(nz=1)
 if nz == 1
     filename1 = [dir1 '/shot' num2str(shot) '_' num2str(trg) 'us_w=' num2str(exp_w) '_gain=' num2str(gain) '.asc'];%ICCDファイル名
-    if exist(filename1,"file")==0
+    if not(exist(filename1,"file"))
         warning(strcat(filename1,' does not exist.'));
         return
     end
 end
 
-% filename1 = '/Users/Ryo/Doppler/211111/ascii/shot8_466us_w=2_gain=3800.asc';%data1ファイル名
-% z_measured(:,1) = -2.1;%data1のz座標
-% r_measured(:,1) = [12.5, 15, 17.5, 20, 22.5, 25, 27.5];%data1のr座標
-% filename2 = '/Users/Ryo/Doppler/211110/ascii/shot50_464us_w=2_gain=3800.asc';%data2ファイル名
-% z_measured(:,2) = 2.1;%data2のz座標
-% r_measured(:,1) = [22.5, 25, 27.5, 30, 32.5, 35, 37.5];%data2のr座標
 %----------------------------------------------------------------------------
-
 center = importdata(center_file);%中心座標を取得
 % centerX = repmat(center(:,3),1,nz);%チャンネル対応中心相対X座標
 if nz == 1
@@ -152,7 +128,7 @@ Ti = zeros(NofCH/4,nz);%1列目data1・温度(eV)、2列目data1・平均温度(eV)
 offset = zeros(NofCH/4,nz);
 
 %data1のガウスフィッティング
-if plot_fitting
+if plot_fit
     figure('Position',[300 50 1000 1000])
 end
 for k = 1:NofCH/4
@@ -177,7 +153,10 @@ for k = 1:NofCH/4
         sigma((k-1)*4+i,1) = sqrt(coef(3)^2-(center((k-1)*4+i,5)*px2nm((k-1)*4+i,1))^2);
         T((k-1)*4+i,1) = 1.69e8*A*(2*sigma((k-1)*4+i,1)*sqrt(2*log(2))/lambda0)^2;
     end
-    offset(k,1) = (shift((k-1)*4+1,1) + shift((k-1)*4+2,1))/2%対向視線から得られたオフセット[nm]
+    offset(k,1) = (shift((k-1)*4+1,1) + shift((k-1)*4+2,1))/2;%対向視線から得られたオフセット[nm]
+    if show_offset
+        disp(offset(k,1))
+    end
     %オフセットを引いてガウスフィッティング
     for i = 1:4
         S1 = [L1_shaped(:,(k-1)*4+i)-offset(k,1) spectrum1(:,(k-1)*4+i)]; %(k-1)*4+i番目のチャンネルの[波長,強度]
@@ -198,7 +177,7 @@ for k = 1:NofCH/4
         shift((k-1)*4+i,1) = coef(2)-lambda0;
         sigma((k-1)*4+i,1) = sqrt(coef(3)^2-(center((k-1)*4+i,5)*px2nm((k-1)*4+i,1))^2);
         T((k-1)*4+i,1) = 1.69e8*A*(2*sigma((k-1)*4+i,1)*sqrt(2*log(2))/lambda0)^2;
-        if plot_fitting
+        if plot_fit
             subplot(NofCH/4,4,(k-1)*4+i);
             plot(f,S1(:,1),S1(:,2));
             xline(lambda0);
@@ -209,27 +188,25 @@ for k = 1:NofCH/4
         end
     end
 end
-if plot_fitting
+if plot_fit
     sgtitle('Fitting data1 (Horizontal：Channel Vertical：Position)')
 end
 
 %data1の流速、温度を計算
-if cal_flow
-    for i = 1:NofCH/4
-        set = (i-1)*4;
-        Va = -shift(set+4,1)/lambda0*Vc;
-        Vb = -shift(set+3,1)/lambda0*Vc;
-        V(i,1) = (Va-Vb)/(2*cos(Angle*pi/180));%Vz
-        V(i,2) = -(Va+Vb)/(2*sin(Angle*pi/180));%Vr
-        absV(i,1) = sqrt(V(i,1)^2 + V(i,2)^2);
-        %        fprintf('(z, r) = (%.2f, %.2f) cm\n (Vz, Vr) = (%.2f, %.2f) km/s\n'...
-        %             ,z(i,1),r(i,1),V(i,1),V(i,2));
-        %             fprintf('Ti: %.2f, %.2f, %.2f, %.2f eV\n'...
-        %                     ,T(set+1,1),T(set+2,1),T(set+3,1),T(set+4,1));
-        %         Ti(i,1) = (T(set+1,1)+T(set+2,1)+T(set+3,1)+T(set+4,1))/4;
-        Ti(i,1) = trimmean(T(set+1:set+4,1),50);
-        %         fprintf('%.2f\n',Ti(i,1));
-    end
+for i = 1:NofCH/4
+    set = (i-1)*4;
+    Va = -shift(set+4,1)/lambda0*Vc;
+    Vb = -shift(set+3,1)/lambda0*Vc;
+    V(i,1) = (Va-Vb)/(2*cos(Angle*pi/180));%Vz
+    V(i,2) = -(Va+Vb)/(2*sin(Angle*pi/180));%Vr
+    absV(i,1) = sqrt(V(i,1)^2 + V(i,2)^2);
+    %        fprintf('(z, r) = (%.2f, %.2f) cm\n (Vz, Vr) = (%.2f, %.2f) km/s\n'...
+    %             ,z(i,1),r(i,1),V(i,1),V(i,2));
+    %             fprintf('Ti: %.2f, %.2f, %.2f, %.2f eV\n'...
+    %                     ,T(set+1,1),T(set+2,1),T(set+3,1),T(set+4,1));
+    %         Ti(i,1) = (T(set+1,1)+T(set+2,1)+T(set+3,1)+T(set+4,1))/4;
+    Ti(i,1) = trimmean(T(set+1:set+4,1),50);
+    %         fprintf('%.2f\n',Ti(i,1));
 end
 
 %data1の計算結果を保存
@@ -242,7 +219,7 @@ end
 
 %data2のガウスフィッティング
 if nz == 2
-    if plot_fitting
+    if plot_fit
         figure('Position',[300 50 1000 1000])
     end
     for k = 1:NofCH/4
@@ -268,6 +245,9 @@ if nz == 2
             T((k-1)*4+i,2) = 1.69e8*A*(2*sigma((k-1)*4+i,2)*sqrt(2*log(2))/lambda0)^2;
         end
         offset(k,2) = (shift((k-1)*4+1,2) + shift((k-1)*4+2,2))/2;%対向視線から得られたオフセット[nm]
+        if show_offset
+            disp(offset(k,2))
+        end
         %オフセットを引いてガウスフィッティング
         for i = 1:4
             S2 = [L1_shaped(:,(k-1)*4+i) spectrum2(:,(k-1)*4+i)]; %(k-1)*4+i番目のチャンネルの[波長,強度]
@@ -288,7 +268,7 @@ if nz == 2
             shift((k-1)*4+i,2) = coef(2)-lambda0;
             sigma((k-1)*4+i,2) = sqrt(coef(3)^2-(center((k-1)*4+i,5)*px2nm((k-1)*4+i,1))^2);
             T((k-1)*4+i,2) = 1.69e8*A*(2*sigma((k-1)*4+i,2)*sqrt(2*log(2))/lambda0)^2;
-            if plot_fitting
+            if plot_fit
                 subplot(NofCH/4,4,(k-1)*4+i);
                 plot(f,S2(:,1),S2(:,2));
                 xline(lambda0);
@@ -299,80 +279,76 @@ if nz == 2
             end
         end
     end
-    if plot_fitting
+    if plot_fit
         sgtitle('Fitting data1 (Horizontal：Channel Vertical：Position)')
     end
 
     %data2の流速、温度を計算
-    if cal_flow
-        for i = 1:NofCH/4
-            set = (i-1)*4;
-            Va = -shift(set+4,2)/lambda0*Vc;
-            Vb = -shift(set+3,2)/lambda0*Vc;
-            V(i,3) = (Va-Vb)/(2*cos(Angle*pi/180));%Vz
-            V(i,4) = -(Va+Vb)/(2*sin(Angle*pi/180));%Vr
-            absV(i,2) = sqrt(V(i,3)^2 + V(i,4)^2);
-            %        fprintf('(z, r) = (%.2f, %.2f) cm\n (Vz, Vr) = (%.2f, %.2f) km/s\n'...
-            %             ,z(i,2),r(i,2),V(i,3),V(i,4));
-            %             fprintf('Ti: %.2f, %.2f, %.2f, %.2f eV\n'...
-            %                     ,T(set+1,2),T(set+2,2),T(set+3,2),T(set+4,2));
-            Ti1=(T(set+1,2)+T(set+2,2)+T(set+3,2)+T(set+4,2))/4;
-            fprintf('%.2f\n',Ti1);
-        end
+    for i = 1:NofCH/4
+        set = (i-1)*4;
+        Va = -shift(set+4,2)/lambda0*Vc;
+        Vb = -shift(set+3,2)/lambda0*Vc;
+        V(i,3) = (Va-Vb)/(2*cos(Angle*pi/180));%Vz
+        V(i,4) = -(Va+Vb)/(2*sin(Angle*pi/180));%Vr
+        absV(i,2) = sqrt(V(i,3)^2 + V(i,4)^2);
+        %        fprintf('(z, r) = (%.2f, %.2f) cm\n (Vz, Vr) = (%.2f, %.2f) km/s\n'...
+        %             ,z(i,2),r(i,2),V(i,3),V(i,4));
+        %             fprintf('Ti: %.2f, %.2f, %.2f, %.2f eV\n'...
+        %                     ,T(set+1,2),T(set+2,2),T(set+3,2),T(set+4,2));
+        Ti1=(T(set+1,2)+T(set+2,2)+T(set+3,2)+T(set+4,2))/4;
+        fprintf('%.2f\n',Ti1);
     end
 end
 
 %流速、温度をプロット
-if cal_flow
-    if plot_flow
-        figure('Position',[600 150 300 600])
-        Ticon = repmat(Ti(:,1),1,5);%等高線図用平均イオン温度
-        zcon = z_measured(1,1);
-        s = pcolor([zcon-2 zcon-1 zcon zcon+1 zcon+2],r_measured,Ticon);
-        s.FaceColor = 'interp';
-        s.EdgeAlpha = 0;
-        colormap('jet')
-        colorbar
-        hold on
-        plot(z_measured,r_measured,'xr');
-        hold on
-        if nz == 1
-            q = quiver(z_measured,r_measured,V(:,1)*factor,V(:,2)*factor);
+if plot_flow
+    figure('Position',[600 150 300 600])
+    Ticon = repmat(Ti(:,1),1,5);%等高線図用平均イオン温度
+    zcon = z_measured(1,1);
+    s = pcolor([zcon-2 zcon-1 zcon zcon+1 zcon+2],r_measured,Ticon);
+    s.FaceColor = 'interp';
+    s.EdgeAlpha = 0;
+    colormap('jet')
+    colorbar
+    hold on
+    plot(z_measured,r_measured,'xr');
+    hold on
+    if nz == 1
+        q = quiver(z_measured,r_measured,V(:,1)*factor,V(:,2)*factor);
+    end
+    if nz == 2
+        q = quiver(z_measured,r_measured,[V(:,1),V(:,3)]*factor,[V(:,2),V(:,4)]*factor);
+    end
+    q.LineWidth = 2;
+    q.MaxHeadSize = 10;
+    q.AutoScale = 'off';
+    q.Color = 'k';
+    xlim([min(z_measured,[],'all')-2.5 max(z_measured,[],'all')+2.5])
+    ylim([min(r_measured,[],'all')-2.5 max(r_measured,[],'all')+2.5])
+    title([num2str(time) '[us] - shot' num2str(shot) newline 'Ion Flow [km/s]'],'Color','black','FontWeight','bold')
+    absV = round(absV,1);
+    for j = 1:nz
+        for i = 1:NofCH/4
+            txt = text(z_measured(i,j)+0.5,r_measured(i,j)-0.2,num2str(absV(i,j)));
+            txt.FontSize = 18;
+            txt.Color = 'k';
+            txt.FontWeight = 'bold';
         end
-        if nz == 2
-            q = quiver(z_measured,r_measured,[V(:,1),V(:,3)]*factor,[V(:,2),V(:,4)]*factor);
+    end
+    xlabel('Z [cm]')
+    ylabel('R [cm]')
+    ax = gca;
+    ax.FontSize = 14;
+    grid on
+    daspect([1 1 1])
+    if save_fig
+        if not(exist(['ionflow_fig/',num2str(date)],'dir'))
+            mkdir(sprintf("ionflow_fig/%s", num2str(date)));
         end
-        q.LineWidth = 2;
-        q.MaxHeadSize = 10;
-        q.AutoScale = 'off';
-        q.Color = 'k';
-        xlim([min(z_measured,[],'all')-2.5 max(z_measured,[],'all')+2.5])
-        ylim([min(r_measured,[],'all')-2.5 max(r_measured,[],'all')+2.5])
-        title([num2str(time) '[us] - shot' num2str(shot) newline 'Ion Flow [km/s]'],'Color','black','FontWeight','bold')
-        absV = round(absV,1);
-        for j = 1:nz
-            for i = 1:NofCH/4
-                txt = text(z_measured(i,j)+0.5,r_measured(i,j)-0.2,num2str(absV(i,j)));
-                txt.FontSize = 18;
-                txt.Color = 'k';
-                txt.FontWeight = 'bold';
-            end
-        end
-        xlabel('Z [cm]')
-        ylabel('R [cm]')
-        ax = gca;
-        ax.FontSize = 14;
-        grid on
-        daspect([1 1 1])
-        if save_fig
-            if not(exist(['ionflow_fig/',num2str(date)],'dir'))
-                mkdir(sprintf("ionflow_fig/%s", num2str(date)));
-            end
-            saveas(gcf,['ionflow_fig/',num2str(date),'/',num2str(time),'us_shot',num2str(shot),'.png'])
-            hold off
-            close
-        else
-            hold off
-        end
+        saveas(gcf,['ionflow_fig/',num2str(date),'/',num2str(time),'us_shot',num2str(shot),'.png'])
+        hold off
+        close
+    else
+        hold off
     end
 end

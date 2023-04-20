@@ -1,9 +1,11 @@
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%ドップラープローブによるイオン温度、イオンフローとその瞬間の磁気面をプロット
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%ショット番号、撮影パラメータなどを実験ログから自動取得して
+%ドップラープローブによるイオン温度、フローとその瞬間の磁気面をプロット
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function [] = auto_main(plot_fitting,cal_flow,plot_flow,save_flow,save_fig,plot_psi)
-%ガウスフィッティングを表示(TorF)/流速を計算(TorF)/流速をプロット(TorF)/流速を保存(TorF)/figを保存(TorF)/磁気面をプロット
+function [] = main_pcb_ionflow_auto(show_offset,plot_fit,plot_flow,save_flow,save_fig,plot_psi)
+%offsetを表示/ガウスフィッティングを表示/流速をプロット/流速データを保存/流速figを保存/磁気面をプロット
+%全てtrue or false
 
 %%%%%ここが各PCのパス
 %【※コードを使用する前に】環境変数を設定しておくか、matlab内のコマンドからsetenv('パス名','アドレス')で指定してから動かす
@@ -96,7 +98,7 @@ if start_i <= end_row
         if plot_psi
             plot_psi200ch_at_t(round(trg+exp_w/2), date, dtacq_num, dtacq_shot, dtacq_tfshot, pathname,mesh_rz,i_EF,trange,false);
         end
-        manual_main(true,date,shot,trg,exp_w,gain,gas,NofCH,nz,plot_fitting,cal_flow,plot_flow,save_flow,save_fig,factor,r_measured,z_measured);
+        plot_ionflow(date,shot,trg,exp_w,gain,gas,NofCH,nz,show_offset,plot_fit,plot_flow,save_flow,save_fig,factor,r_measured,z_measured);
     end
 else
     warning('begin_cal must <= %d.', exp_log(end_row,4))

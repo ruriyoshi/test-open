@@ -15,8 +15,8 @@ pathname.rawdata=[getenv('rsGdrive') '/pcb'];%dtacqのrawdataの保管場所
 
 %------【input】-------
 date = 230313;%【input】実験日(yymmdd)
-begin_cal = 1;%【input】計算始めshot番号(実験ログD列)
-end_cal = 2;%【input】計算終わりshot番号(実験ログD列)(0にするとbegin_cal以降同日の全shot計算)
+begin_cal = 3;%【input】計算始めshot番号(実験ログD列)
+end_cal = 3;%【input】計算終わりshot番号(実験ログD列)(0にするとbegin_cal以降同日の全shot計算)
 Nplot = 16;%【input】磁気面subplot枚数(16以下の4の倍数or3以下)
 t_start = 460;%【input】磁気面subplot開始時間(us)
 dt = 2;%【input】磁気面subplot時間間隔(us)
