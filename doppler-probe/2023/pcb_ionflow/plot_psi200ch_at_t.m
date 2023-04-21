@@ -1,7 +1,11 @@
-function [] = plot_psi200ch_at_t(time, date, dtacq_num, dtacq_shot, dtacq_tfshot, pathname, mesh_rz,i_EF,trange,cmap)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%プロット時間を指定して磁気面を1枚プロット
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+function [] = plot_psi200ch_at_t(time,date,dtacq_num,dtacq_shot,dtacq_tfshot,pathname,mesh_rz,i_EF,trange,cmap)
 %プロット時刻/実験日/dtacq番号(39)/dtacqshot番号/dtacqtfshot番号/pathname/rz方向メッシュ数/EF電流/計算時間範囲/カラーマップ(TorF)
 
-filename=strcat(pathname.rawdata,'/rawdata_dtacq',num2str(dtacq_num),'_shot',num2str(dtacq_shot),'_tfshot',num2str(dtacq_tfshot),'.mat');
+filename=strcat(pathname.rawdata,'/',num2str(date),'/rawdata_dtacq',num2str(dtacq_num),'_shot',num2str(dtacq_shot),'_tfshot',num2str(dtacq_tfshot),'.mat');
 if exist(filename,"file")==0
     warning(strcat(filename,' does not exist.'));
     return
@@ -128,40 +132,42 @@ end
 
 figure('Position', [0 0 1500 1500],'visible','on');
 %  t_start=470+start;
-    i=(time-trange(1)+1);
-    t=trange(i);
-    if cmap
-        %     contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.Bz(:,:,i),30,'LineStyle','none')
-        %     contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.psi(:,:,i),40,'LineStyle','none')
-        contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.Bt(:,:,i),-100e-3:0.5e-3:100e-3,'LineStyle','none')
-            % contourf(grid2D.zq(1,:),grid2D.rq(:,1),-1.*data2D.Jt(:,:,i),30,'LineStyle','none')
-        %     contourf(grid2D.zq(1,:),grid2D.rq(:,1),-1.*data2D.Et(:,:,i),20,'LineStyle','none')
-        colormap(jet)
-        axis image
-        axis tight manual
-        %     caxis([-0.8*1e+6,0.8*1e+6]) %jt%カラーバーの軸の範囲
-        %     caxis([-0.01,0.01])%Bz
-        caxis([-0.1,0.1])%Bt
-        %     caxis([-5e-3,5e-3])%psi
-        %     caxis([-500,400])%Et
-        %     colorbar('Location','eastoutside')
-        %カラーバーのラベル付け
-        %     c = colorbar;
-        %     c.Label.String = 'Jt [A/m^{2}]';
-        hold on
-    end
-    %     plot(grid2D.zq(1,squeeze(mid(:,:,i))),grid2D.rq(:,1))
-    %     contour(grid2D.zq(1,:),grid2D.rq(:,1),squeeze(data2D.psi(:,:,i)),20,'black')
-    %     contour(grid2D.zq(1,:),grid2D.rq(:,1),squeeze(data2D.psi(:,:,i)),20,'black')
-    contour(grid2D.zq(1,:),grid2D.rq(:,1),squeeze(data2D.psi(:,:,i)),[-20e-3:0.2e-3:40e-3],'black','LineWidth',1)
-    %     plot(grid2D.zq(1,squeeze(mid(opoint(:,:,i),:,i))),grid2D.rq(opoint(:,:,i),1),"bo")
-    %     plot(grid2D.zq(1,squeeze(mid(xpoint(:,:,i),:,i))),grid2D.rq(xpoint(:,:,i),1),"bx")
+i=(time-trange(1)+1);
+t=trange(i);
+if cmap
+    %     contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.Bz(:,:,i),30,'LineStyle','none')
+    %     contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.psi(:,:,i),40,'LineStyle','none')
+    contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.Bt(:,:,i),-100e-3:0.5e-3:100e-3,'LineStyle','none')
+    % contourf(grid2D.zq(1,:),grid2D.rq(:,1),-1.*data2D.Jt(:,:,i),30,'LineStyle','none')
+    %     contourf(grid2D.zq(1,:),grid2D.rq(:,1),-1.*data2D.Et(:,:,i),20,'LineStyle','none')
+    colormap(jet)
+    axis image
+    axis tight manual
+    %     caxis([-0.8*1e+6,0.8*1e+6]) %jt%カラーバーの軸の範囲
+    %     caxis([-0.01,0.01])%Bz
+    caxis([-0.1,0.1])%Bt
+    %     caxis([-5e-3,5e-3])%psi
+    %     caxis([-500,400])%Et
+    %     colorbar('Location','eastoutside')
+    %カラーバーのラベル付け
+    %     c = colorbar;
+    %     c.Label.String = 'Jt [A/m^{2}]';
     hold on
-    plot(ok_z,ok_r,"k.",'MarkerSize', 6)%測定位置
-    hold on
-    title(string(t)+' us')
-    xlabel('z [m]')
-    ylabel('r [m]')
+end
+%     plot(grid2D.zq(1,squeeze(mid(:,:,i))),grid2D.rq(:,1))
+%     contour(grid2D.zq(1,:),grid2D.rq(:,1),squeeze(data2D.psi(:,:,i)),20,'black')
+%     contour(grid2D.zq(1,:),grid2D.rq(:,1),squeeze(data2D.psi(:,:,i)),20,'black')
+contour(grid2D.zq(1,:),grid2D.rq(:,1),squeeze(data2D.psi(:,:,i)),[-20e-3:0.2e-3:40e-3],'black','LineWidth',1)
+%     plot(grid2D.zq(1,squeeze(mid(opoint(:,:,i),:,i))),grid2D.rq(opoint(:,:,i),1),"bo")
+%     plot(grid2D.zq(1,squeeze(mid(xpoint(:,:,i),:,i))),grid2D.rq(xpoint(:,:,i),1),"bx")
+hold on
+plot(ok_z,ok_r,"k.",'MarkerSize', 6)%測定位置
+hold on
+title(string(t)+' us')
+xlabel('z [m]')
+ylabel('r [m]')
+ax = gca;
+ax.FontSize = 14;
 
 % figure('Position', [0 0 1500 1500],'visible','on');
 % for m=1:16 %図示する時間

@@ -1,6 +1,10 @@
-function plot_psi200ch_multi(Nplot,t_start,dt,date, dtacq_num, dtac_qshot, dtacq_tfshot, pathname, mesh_rz,i_EF,trange,cmap,cbar)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%プロット枚数、プロット開始時間、
+%プロット時間間隔を指定して磁気面をプロット
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function plot_psi200ch_multi(Nplot,t_start,dt,date,dtacq_num,dtac_qshot,dtacq_tfshot,pathname,mesh_rz,i_EF,trange,cmap,cbar)
 
-filename=strcat(pathname.rawdata,'/rawdata_dtacq',num2str(dtacq_num),'_shot',num2str(dtac_qshot),'_tfshot',num2str(dtacq_tfshot),'.mat');
+filename=strcat(pathname.rawdata,'/',num2str(date),'/rawdata_dtacq',num2str(dtacq_num),'_shot',num2str(dtac_qshot),'_tfshot',num2str(dtacq_tfshot),'.mat');
 if exist(filename,"file")==0
     warning(strcat(filename,' does not exist.'));
     return
@@ -130,7 +134,6 @@ for m=1:Nplot %図示する時間
     i=(t_start-trange(1)+1)+(m-1)*dt; %end
     t=trange(i);
     if Nplot == 1
-        break
     elseif Nplot == 4
         subplot(2,2,m);
     elseif mod(Nplot,4) == 0
