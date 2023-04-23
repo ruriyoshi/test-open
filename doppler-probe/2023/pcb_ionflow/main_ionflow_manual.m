@@ -3,12 +3,6 @@
 %ドップラープローブによるイオン温度、フローをプロット
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function [] = main_ionflow_manual(cal_flow,save_flow,load_flow,plot_flow,save_fig)
-%流速を計算/流速データを保存/流速データを読み込み/流速をプロット/流速figを保存
-%全てtrue or false
-%実行例)main_ionflow_manual(true,true,false,true,false)流速データを保存してプロット
-%実行例)main_ionflow_manual(false,false,true,true,false)保存済み流速データからプロット
-
 %%%%%ここが各PCのパス
 %【※コードを使用する前に】環境変数を設定しておくか、matlab内のコマンドからsetenv('パス名','アドレス')で指定してから動かす
 pathname.ts3u=getenv('ts3u_path');%old-koalaのts-3uまでのパス（mrdなど）
@@ -39,6 +33,11 @@ n_z = 1;%【input】ドップラープローブz方向データ数(数値)(1)
 factor = 0.05;%【input】イオンフロー矢印サイズ(数値:0.05など)
 show_offset = false;%【input】分光offsetを表示(true,false)
 plot_fit = false;%【input】ガウスフィッティングを表示(true,false)
+cal_flow = true;%【input】流速を計算(true,false)
+save_flow = true;%【input】流速データを保存(true,false)
+load_flow = false;%【input】流速データを読み込む(true,false)
+plot_flow = true;%【input】流速をプロット(true,false)
+save_fig = false;%【input】流速figを保存(true,false)
 
 %計測点配列を生成
 mpoints = make_mpoints(n_CH,min_r,int_r,n_z,min_z,int_z);

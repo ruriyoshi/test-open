@@ -3,12 +3,6 @@
 %ドップラープローブによるイオン温度、フローとその瞬間の磁気面をプロット
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function [] = main_ionflow_pcb200ch_auto(cal_flow,save_flow,load_flow,plot_psi,plot_flow,overlay_plot,save_fig)
-%流速を計算/流速データを保存/流速データを読み込む/磁気面をプロット/流速をプロット/流速と磁気面を重ねる/流速figを保存
-%全てtrue or false
-%実行例)main_ionflow_pcb200ch_auto(true,true,false,true,true,true,false)流速データを保存してプロット
-%実行例)main_ionflow_pcb200ch_auto(false,false,true,true,true,true,false)保存済み流速データからプロット
-
 %%%%%ここが各PCのパス
 %【※コードを使用する前に】環境変数を設定しておくか、matlab内のコマンドからsetenv('パス名','アドレス')で指定してから動かす
 pathname.ts3u=getenv('ts3u_path');%old-koalaのts-3uまでのパス（mrdなど）
@@ -37,11 +31,18 @@ n_z = 1;%【input】ドップラープローブz方向データ数(数値)(1)
 factor = 0.05;%【input】イオンフロー矢印サイズ(数値:0.05など)
 show_offset = false;%【input】分光offsetを表示(true,false)
 plot_fit = false;%【input】ガウスフィッティングを表示(true,false)
-dtacq_num = 39;%【input】磁気プローブdtacq番号
-mesh_rz = 50;%【input】磁気プローブrz方向のメッシュ数(ほぼ固定)
-trange = 430:590;%【input】磁気プローブ計算時間範囲(ほぼ固定)
+cal_flow = true;%【input】流速を計算(true,false)
+save_flow = true;%【input】流速データを保存(true,false)
+load_flow = false;%【input】流速データを読み込む(true,false)
+plot_psi = true;%【input】磁気面をプロット(true,false)
+plot_flow = true;%【input】流速をプロット(true,false)
+overlay_plot = true;%【input】流速と磁気面を重ねる(true,false)
+save_fig = false;%【input】流速figを保存(true,false)
+dtacq_num = 39;%【input】磁気プローブdtacq番号(39)
+mesh_rz = 50;%【input】磁気プローブrz方向のメッシュ数(50)
+trange = 430:590;%【input】磁気プローブ計算時間範囲(430:590)
 
-%計測点配列を生成
+%ドップラープローブ計測点配列を生成
 mpoints = make_mpoints(n_CH,min_r,int_r,n_z,min_z,int_z);
 
 %実験ログ読み取り
@@ -102,4 +103,4 @@ if start_i <= end_row
 else
     error('begin_cal must <= %d.', exp_log(end_row,4))
 end
-end
+
