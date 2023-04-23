@@ -41,13 +41,13 @@ end
 %----------------------------------------------------------------------------
 center = importdata(center_file);%中心座標を取得
 % centerX = repmat(center(:,3),1,mpoints.n_z);%チャンネル対応中心相対X座標
-switch mpoints.n_z 
+switch mpoints.n_z
     case 1
-    centerY = center(:,2);%チャンネル対応中心Y座標
+        centerY = center(:,2);%チャンネル対応中心Y座標
     case 2
-    warning('Sorry, not ready for n_z = 2.')%ICCD.lineの入力エラー
-    return
-    centerY = repmat(center(:,2),1,mpoints.n_z);%チャンネル対応中心Y座標
+        warning('Sorry, not ready for n_z = 2.')%ICCD.lineの入力エラー
+        return
+        centerY = repmat(center(:,2),1,mpoints.n_z);%チャンネル対応中心Y座標
 end
 
 X1 = data1(:,1);%X1(ピクセル)軸を定義
@@ -208,93 +208,93 @@ for i = 1:mpoints.n_r
     %         fprintf('%.2f\n',T_i(i,1));
 end
 
-%data1の計算結果を保存
+% %data2のガウスフィッティング
+% if mpoints.n_z == 2
+%     if plot_fit
+%         figure('Position',[300 50 1000 1000])
+%     end
+%     for k = 1:mpoints.n_r
+%         %0度ペアスペクトルからオフセットを検出
+%         for i = 1:2
+%             S2 = [L1_shaped(:,(k-1)*4+i) spectrum2(:,(k-1)*4+i)]; %(k-1)*4+i番目のチャンネルの[波長,強度]
+%             s2 = size(S1);%S1の[行数,列数]
+%             MAX2 = max(spectrum2(:,(k-1)*4+i)); %スペクトルの最大値
+%             j = 1;
+%             while j < s2(1)+1 %SNの悪いデータを除く
+%                 if S2(j,2) < MAX2*0.5
+%                     S2(j,:) = [];
+%                 else
+%                     j = j+1;
+%                 end
+%                 s2 = size(S2);
+%             end
+%             f = fit(S2(:,1),S2(:,2),'gauss1');
+%             coef=coeffvalues(f);
+%             amp((k-1)*4+i,2) = coef(1);
+%             shift((k-1)*4+i,2) = coef(2)-lambda0;
+%             sigma((k-1)*4+i,2) = sqrt(coef(3)^2-(center((k-1)*4+i,5)*px2nm((k-1)*4+i,1))^2);
+%             T_CH((k-1)*4+i,2) = 1.69e8*A*(2*sigma((k-1)*4+i,2)*sqrt(2*log(2))/lambda0)^2;
+%         end
+%         offset(k,2) = (shift((k-1)*4+1,2) + shift((k-1)*4+2,2))/2;%対向視線から得られたオフセット[nm]
+%         if show_offset
+%             disp(offset(k,2))
+%         end
+%         %オフセットを引いてガウスフィッティング
+%         for i = 1:4
+%             S2 = [L1_shaped(:,(k-1)*4+i) spectrum2(:,(k-1)*4+i)]; %(k-1)*4+i番目のチャンネルの[波長,強度]
+%             s2 = size(S1);%S1の[行数,列数]
+%             MAX2 = max(spectrum2(:,(k-1)*4+i)); %スペクトルの最大値
+%             j = 1;
+%             while j < s2(1)+1 %SNの悪いデータを除く
+%                 if S2(j,2) < MAX2*0.5
+%                     S2(j,:) = [];
+%                 else
+%                     j = j+1;
+%                 end
+%                 s2 = size(S2);
+%             end
+%             f = fit(S2(:,1),S2(:,2),'gauss1');
+%             coef=coeffvalues(f);
+%             amp((k-1)*4+i,2) = coef(1);
+%             shift((k-1)*4+i,2) = coef(2)-lambda0;
+%             sigma((k-1)*4+i,2) = sqrt(coef(3)^2-(center((k-1)*4+i,5)*px2nm((k-1)*4+i,1))^2);
+%             T_CH((k-1)*4+i,2) = 1.69e8*A*(2*sigma((k-1)*4+i,2)*sqrt(2*log(2))/lambda0)^2;
+%             if plot_fit
+%                 subplot(mpoints.n_r,4,(k-1)*4+i);
+%                 plot(f,S2(:,1),S2(:,2));
+%                 xline(lambda0);
+%                 title([num2str(T_CH((k-1)*4+i,2)),' eV'])
+%                 legend('off')
+%                 xlabel('Wavelength [nm]')
+%                 ylabel('Intensity [cnt]')
+%             end
+%         end
+%     end
+%     if plot_fit
+%         sgtitle('Fitting data1 (Horizontal：Channel Vertical：Position)')
+%     end
+% 
+%     %data2の流速、温度を計算
+%     for i = 1:mpoints.n_r
+%         set = (i-1)*4;
+%         Va = -shift(set+4,2)/lambda0*Vc;
+%         Vb = -shift(set+3,2)/lambda0*Vc;
+%         V_i(i,3) = (Va-Vb)/(2*cos(Angle*pi/180));%Vz
+%         V_i(i,4) = -(Va+Vb)/(2*sin(Angle*pi/180));%Vr
+%         absV(i,2) = sqrt(V_i(i,3)^2 + V_i(i,4)^2);
+%         %        fprintf('(z, r) = (%.2f, %.2f) cm\n (Vz, Vr) = (%.2f, %.2f) km/s\n'...
+%         %             ,z(i,2),r(i,2),V(i,3),V(i,4));
+%         %             fprintf('T_i: %.2f, %.2f, %.2f, %.2f eV\n'...
+%         %                     ,T(set+1,2),T(set+2,2),T(set+3,2),T(set+4,2));
+%         T_i1=(T_CH(set+1,2)+T_CH(set+2,2)+T_CH(set+3,2)+T_CH(set+4,2))/4;
+%         fprintf('%.2f\n',T_i1);
+%     end
+% end
+
+%流速データを保存
 if save_flow
-    if not(exist('ionflow_mat','dir'))
-        mkdir ionflow_mat
+    if not(exist([pathname.flowdata,'/',num2str(date)],'dir'))
+        mkdir(sprintf("%s", pathname.flowdata), sprintf("%s", num2str(date)));
     end
-    save(['ionflow_mat/',num2str(time),'us_shot',num2str(ICCD.shot),'.mat'],'V_i','T_i')
-end
-
-%data2のガウスフィッティング
-if mpoints.n_z == 2
-    if plot_fit
-        figure('Position',[300 50 1000 1000])
-    end
-    for k = 1:mpoints.n_r
-        %0度ペアスペクトルからオフセットを検出
-        for i = 1:2
-            S2 = [L1_shaped(:,(k-1)*4+i) spectrum2(:,(k-1)*4+i)]; %(k-1)*4+i番目のチャンネルの[波長,強度]
-            s2 = size(S1);%S1の[行数,列数]
-            MAX2 = max(spectrum2(:,(k-1)*4+i)); %スペクトルの最大値
-            j = 1;
-            while j < s2(1)+1 %SNの悪いデータを除く
-                if S2(j,2) < MAX2*0.5
-                    S2(j,:) = [];
-                else
-                    j = j+1;
-                end
-                s2 = size(S2);
-            end
-            f = fit(S2(:,1),S2(:,2),'gauss1');
-            coef=coeffvalues(f);
-            amp((k-1)*4+i,2) = coef(1);
-            shift((k-1)*4+i,2) = coef(2)-lambda0;
-            sigma((k-1)*4+i,2) = sqrt(coef(3)^2-(center((k-1)*4+i,5)*px2nm((k-1)*4+i,1))^2);
-            T_CH((k-1)*4+i,2) = 1.69e8*A*(2*sigma((k-1)*4+i,2)*sqrt(2*log(2))/lambda0)^2;
-        end
-        offset(k,2) = (shift((k-1)*4+1,2) + shift((k-1)*4+2,2))/2;%対向視線から得られたオフセット[nm]
-        if show_offset
-            disp(offset(k,2))
-        end
-        %オフセットを引いてガウスフィッティング
-        for i = 1:4
-            S2 = [L1_shaped(:,(k-1)*4+i) spectrum2(:,(k-1)*4+i)]; %(k-1)*4+i番目のチャンネルの[波長,強度]
-            s2 = size(S1);%S1の[行数,列数]
-            MAX2 = max(spectrum2(:,(k-1)*4+i)); %スペクトルの最大値
-            j = 1;
-            while j < s2(1)+1 %SNの悪いデータを除く
-                if S2(j,2) < MAX2*0.5
-                    S2(j,:) = [];
-                else
-                    j = j+1;
-                end
-                s2 = size(S2);
-            end
-            f = fit(S2(:,1),S2(:,2),'gauss1');
-            coef=coeffvalues(f);
-            amp((k-1)*4+i,2) = coef(1);
-            shift((k-1)*4+i,2) = coef(2)-lambda0;
-            sigma((k-1)*4+i,2) = sqrt(coef(3)^2-(center((k-1)*4+i,5)*px2nm((k-1)*4+i,1))^2);
-            T_CH((k-1)*4+i,2) = 1.69e8*A*(2*sigma((k-1)*4+i,2)*sqrt(2*log(2))/lambda0)^2;
-            if plot_fit
-                subplot(mpoints.n_r,4,(k-1)*4+i);
-                plot(f,S2(:,1),S2(:,2));
-                xline(lambda0);
-                title([num2str(T_CH((k-1)*4+i,2)),' eV'])
-                legend('off')
-                xlabel('Wavelength [nm]')
-                ylabel('Intensity [cnt]')
-            end
-        end
-    end
-    if plot_fit
-        sgtitle('Fitting data1 (Horizontal：Channel Vertical：Position)')
-    end
-
-    %data2の流速、温度を計算
-    for i = 1:mpoints.n_r
-        set = (i-1)*4;
-        Va = -shift(set+4,2)/lambda0*Vc;
-        Vb = -shift(set+3,2)/lambda0*Vc;
-        V_i(i,3) = (Va-Vb)/(2*cos(Angle*pi/180));%Vz
-        V_i(i,4) = -(Va+Vb)/(2*sin(Angle*pi/180));%Vr
-        absV(i,2) = sqrt(V_i(i,3)^2 + V_i(i,4)^2);
-        %        fprintf('(z, r) = (%.2f, %.2f) cm\n (Vz, Vr) = (%.2f, %.2f) km/s\n'...
-        %             ,z(i,2),r(i,2),V(i,3),V(i,4));
-        %             fprintf('T_i: %.2f, %.2f, %.2f, %.2f eV\n'...
-        %                     ,T(set+1,2),T(set+2,2),T(set+3,2),T(set+4,2));
-        T_i1=(T_CH(set+1,2)+T_CH(set+2,2)+T_CH(set+3,2)+T_CH(set+4,2))/4;
-        fprintf('%.2f\n',T_i1);
-    end
+    save([pathname.flowdata,'/',num2str(date),'/shot',num2str(ICCD.shot),'_',num2str(ICCD.trg),'us_w=',num2str(ICCD.exp_w),'_gain=',num2str(ICCD.gain),'.mat'],'V_i','absV','T_i')
 end

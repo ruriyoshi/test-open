@@ -24,6 +24,7 @@ t_start = 460;%【input】磁気面subplot開始時間(us)
 dt = 2;%【input】磁気面subplot時間間隔(us)
 cmap = false;%【input】磁気面カラーマップ('psi','Bz','Bt','Jt','Et',false)
 cbar = true;%【input】カラーバー(true,false)
+%------詳細設定【input】-------
 dtacq_num = 39;%【input】磁気プローブdtacq番号(ほぼ固定)
 mesh_rz = 50;%【input】磁気プローブrz方向のメッシュ数(ほぼ固定)
 trange = 430:590;%【input】磁気プローブ計算時間範囲(ほぼ固定)

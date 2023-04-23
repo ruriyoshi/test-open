@@ -27,9 +27,7 @@ exp_log = readmatrix('exp_log.xlsx','Sheet','log','Range', ['A' num2str(load_s) 
 [n_row,~] = size(exp_log);
 begin_row = find(exp_log(:,3) == date);%実験日の最初のshotの行番号を取得
 if isempty(begin_row)
-    end_row = 0;
-    warning('実験日が実験ログ中に存在しません。')
-    return
+    error('実験日が実験ログ中に存在しません。')
 end
 end_row = begin_row;
 while end_row<n_row && isnan(exp_log(end_row+1,3)) && exp_log(end_row+1,4)%日付がNaN&&shot番号が記入済=実験日のshot
