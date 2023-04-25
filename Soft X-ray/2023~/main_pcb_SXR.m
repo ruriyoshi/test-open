@@ -8,7 +8,7 @@ clear
 pathname.NIFS=getenv('NIFS_path');%192.168.1.111
 pathname.rawdata=getenv('rawdata_path');%dtacqのrawdataの保管場所
 
-addpath(genpath('/Users/shinjirotakeda/Documents/GitHub/test-open'));
+addpath(genpath('/Users/yuleo/Documents/GitHub/test-open'));
 
 % %%%%実験オペレーションの取得
 % DOCID='1wG5fBaiQ7-jOzOI-2pkPAeV6SDiHc_LrOdcbWlvhHBw';%スプレッドシートのID
@@ -39,8 +39,8 @@ n=50; %【input】rz方向のメッシュ数
 t = 475;
 show_xpoint = false;
 show_localmax = false;
-start = 450;
-interval = 5;
+start = 450; % 撮影条件
+interval = 5; % 撮影条件
 save = false;
 filter = false;
 NL = false;
@@ -51,12 +51,13 @@ for i=1:n_data
     tfshot=tfshotlist(i);
     i_EF=EFlist(i);
 %     TF=TFlist(i);
-    TF=4;
+    TF=4; % unit == kV
 %     plot_psi200ch(date, dtacq_num, shot, tfshot, pathname,n,i_EF,trange,TF); 
     [grid2D,data2D] = process_PCBdata(date, dtacq_num, shot, tfshot, pathname, n,i_EF,trange);
 %     shot_SXR = IDXlist(i);
-    shot_SXR = 14;
-    SXRfilename = strcat('/Users/shinjirotakeda/OneDrive - The University of Tokyo/Documents/SXR_Images/',num2str(date),'/shot',num2str(shot_SXR,'%03i'),'.tif');
+    shot_SXR = 14; % 放電番号
+    % この前に.tifのファイル名を変更する必要があると思う，デフォルトは日付.tifだけど変えないとだめでしょ
+    SXRfilename = strcat('G:/マイドライブ/X-ray/Data/TIF/',num2str(date),'/shot',num2str(shot_SXR,'%03i'),'.tif');
     [EE_high,EE_low] = plot_SXR_at_t(grid2D,data2D,date,shot_SXR,t,show_xpoint,show_localmax,start,interval,save,SXRfilename,filter,NL);
     Brec = clc_Breconnection(grid2D,data2D);
 end
