@@ -1,7 +1,9 @@
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %ショット番号、撮影パラメータなどを実験ログから自動取得して
-%ドップラープローブによるイオン温度、フローとその瞬間の磁気面をプロット
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%ドップラープローブによるイオン速度分布関数、温度、フローとその瞬間の磁気面をプロット
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+clear all
 
 %%%%%ここが各PCのパス
 %【※コードを使用する前に】環境変数を設定しておくか、matlab内のコマンドからsetenv('パス名','アドレス')で指定してから動かす
@@ -19,10 +21,10 @@ pathname.rawdata=[pathname.mat,'/pcb'];%dtacqのrawdataの保管場所
 pathname.flowdata=[pathname.mat,'/ionflow'];%流速データの保管場所
 pathname.vdistdata=[pathname.mat,'/ionvdist'];%速度分布データの保管場所
 
-%------【input】-------
-date = 230314;%【input】実験日
-begin_cal = 57;%【input】磁気面&フロー計算始めshot番号(実験ログD列)
-end_cal = 57;%【input】磁気面&フロー計算終わりshot番号(実験ログD列)(0にするとbegin_cal以降の同日の全shot計算)
+%------【input】---------------------------------------------------
+date = 230310;%【input】実験日
+begin_cal = 1;%【input】磁気面&フロー計算始めshot番号(実験ログD列)
+end_cal = 0;%【input】磁気面&フロー計算終わりshot番号(実験ログD列)(0にするとbegin_cal以降の同日の全shot計算)
 min_r = 12.5;%【input】ドップラープローブ計測点最小r座標[mm]
 int_r = 2.5;%【input】ドップラープローブ計測点r方向間隔[mm]
 min_z = 2.1;%【input】ドップラープローブ計測点最小z座標[mm](-2.1,2.1)
@@ -30,25 +32,32 @@ int_z = 4.2;%【input】ドップラープローブ計測点z方向間隔[mm](4.2)
 ICCD.line = 'Ar';%【input】ドップラー発光ライン('Ar')
 n_CH = 28;%【input】ドップラープローブファイバーCH数(28)
 n_z = 1;%【input】ドップラープローブz方向データ数(数値)(1)
-%------詳細設定【input】-------
-cal_flow = true;%【input】流速を計算(true,false)
-
-plot_fit = true;%【input】ガウスフィッティングを表示(true,false)
+%-----------------------詳細設定【input】----------------------------
+cal_vdist = true;%【input】速度分布を計算(true,false)
+plot_spectra = false;%【input】スペクトルをプロット(true,false)
+plot_analisis = false;%【input】逆変換解析をプロット(true,false)
+plot_vdist = false;%【input】速度分布をプロット(true,false)
+plot_compare = false;%【input】再構成比較をプロット(true,false)
 plot_flow = true;%【input】流速をプロット(true,false)
-plot_psi = true;%【input】磁気面をプロット(true,false)
-overlay_plot = true;%【input】流速と磁気面を重ねる(true,false)
+plot_psi = false;%【input】磁気面をプロット(true,false)
+overlay_plot = false;%【input】流速と磁気面を重ねる(true,false)
 
-save_fit = true;%【input】ガウスフィッティングpngを保存(true,false)
-save_fig = true;%【input】流速pngを保存(true,false)
+save_fit = false;%【input】ガウスフィッティングpngを保存(true,false)
+save_fig = true;%【input】速度分布、フローpngを保存(true,false)
 
-save_flow = true;%【input】流速データを保存(true,false)
-load_flow = false;%【input】流速データを読み込む(true,false)
+save_vdist = true;%【input】速度分布データを保存(true,false)
+load_vdist = false;%【input】速度分布データを読み込む(true,false)
+
+plot_type = 'contour';%【input】速度分布プロット種類('contour','surf')
+Ti_type = 'dispersion';%【input】イオン温度計算法('dispersion')
 
 show_offset = false;%【input】分光offsetを表示(true,false)
+inversion_method = 5;%【input】速度分布逆変換手法(1~6)
 factor = 0.1;%【input】イオンフロー矢印サイズ(数値:0.1など)
 dtacq.num = 39;%【input】磁気プローブdtacq番号(39)
 mesh_rz = 50;%【input】磁気プローブrz方向のメッシュ数(50)
 trange = 430:590;%【input】磁気プローブ計算時間範囲(430:590)
+%------------------------------------------------------------------
 
 %ドップラープローブ計測点配列を生成
 mpoints = make_mpoints(n_CH,min_r,int_r,n_z,min_z,int_z);
@@ -87,12 +96,23 @@ if start_i <= end_row
             dtacq.shot = a039shot;
             dtacq.tfshot = a039tfshot;
         end
-        if cal_flow
-            %イオン温度、フローを計算
-            [V_i,absV,T_i] = cal_ionflow(date,ICCD,mpoints,pathname,show_offset,plot_fit,save_fit,save_flow);
-        elseif load_flow
+        if cal_vdist
+            %イオン速度分布を計算
+            [V_i,absV,T_i] = cal_ionvdist(date,expval,ICCD,mpoints,pathname,show_offset,plot_spectra, ...
+                inversion_method,plot_analisis,plot_vdist,plot_type,save_fig,plot_compare,save_vdist,Ti_type);
+        elseif load_vdist
             %保存済みイオン温度、フローを読み取り
-            [V_i,absV,T_i] = load_ionflow(date,ICCD,pathname);
+            [V_i,absV,T_i,F,W,P,Lambda,Vx,Vy,ppoints,Angle] = load_ionvdist(date,ICCD,pathname);
+            if plot_vdist
+                plot_ionvdist(Vx,Vy,F,date,expval,ICCD,pathname,mpoints,ppoints,plot_type,save_fig)
+            end
+            if plot_compare
+                plot_inversion_compare(F,W,P,Lambda,mpoints,Angle,ICCD)
+            end
+        else
+            V_i = char.empty;
+            absV = char.empty;
+            T_i = char.empty;
         end
         %磁気面をプロット
         if plot_psi
@@ -102,9 +122,9 @@ if start_i <= end_row
         if plot_flow
             if not(isempty(V_i))
                 if plot_psi
-                    plot_ionflow(V_i,absV,T_i,date,expval,ICCD,pathname,factor,mpoints,overlay_plot,save_fig,'ionflow')
+                    plot_ionflow(V_i,absV,T_i,date,expval,ICCD,pathname,factor,mpoints,overlay_plot,save_fig,'ionvdist')
                 else
-                    plot_ionflow(V_i,absV,T_i,date,expval,ICCD,pathname,factor,mpoints,false,save_fig,'ionflow')
+                    plot_ionflow(V_i,absV,T_i,date,expval,ICCD,pathname,factor,mpoints,false,save_fig,'ionvdist')
                 end
             end
         end

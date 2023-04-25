@@ -1,5 +1,5 @@
-function [] = plot_ionflow(V_i,absV,T_i,date,ICCD,factor,mpoints,overlay_plot,save_fig)
-%V_i/absV/T_i/実験日/ICCD変数/矢印サイズ(数値:0.05など)/計測点配列/磁気面に重ねる/figを保存
+function [] = plot_ionflow(V_i,absV,T_i,date,expval,ICCD,pathname,factor,mpoints,overlay_plot,save_fig,cal_type)
+%V_i/absV/T_i/実験日/実験条件/ICCD変数/pathname/矢印サイズ(数値:0.05など)/計測点配列/磁気面に重ねる/figを保存/流速計算方法
 
 time = round(ICCD.trg+ICCD.exp_w/2);%計測時刻
 if overlay_plot%磁気面と重ねる
@@ -19,6 +19,7 @@ s.FaceColor = 'interp';
 s.EdgeAlpha = 0;
 colormap('jet')
 colorbar
+clim([0 150])
 hold on
 plot(mpoints.z,mpoints.r,'xr');%ドップラープローブ計測点を表示
 hold on
@@ -46,22 +47,40 @@ if overlay_plot
     xlim([-0.17 0.17])
     ylim([0.06 0.33])
     ax = gca;
-    ax.FontSize = 14;
+    ax.FontSize = 18;
+    title(['shot', num2str(ICCD.shot),'-',num2str(time),' [us] Ion Flow [km/s]',newline,'PF1 = ',num2str(expval.PF1), ...
+        ' [kV], PF2 = ',num2str(expval.PF2),' [kV], TF = ',num2str(expval.TF),' [kV], EF = ',num2str(expval.EF),' [A]'] ...
+        ,'Color','black','FontWeight','bold')
+    if save_fig
+        if not(exist([pathname.fig,'/',cal_type,'_psi/',num2str(date)],'dir'))
+            mkdir(sprintf("%s/%s_psi",pathname.fig,cal_type), sprintf("%s", num2str(date)));
+        end
+        saveas(gcf,[pathname.fig,'/',cal_type,'_psi/',num2str(date),'/','shot', num2str(ICCD.shot),'_',num2str(time),'us_PF1_',num2str(expval.PF1), ...
+        'kV_PF2_',num2str(expval.PF2),'kV_TF_',num2str(expval.TF),'kV_EF_',num2str(expval.EF),'A.png'])
+        hold off
+        close
+    else
+        hold off
+    end
 else
     xlim([min(mpoints.z,[],'all')-2.5 max(mpoints.z,[],'all')+2.5])
     ylim([min(mpoints.r,[],'all')-2.5 max(mpoints.r,[],'all')+2.5])
-    title([num2str(time) '[us] - shot' num2str(ICCD.shot) newline 'Ion Flow [km/s]'],'Color','black','FontWeight','bold')
+    % title(['shot', num2str(ICCD.shot),'-',num2str(time),' [us]', newline, 'Ion Flow [km/s]'],'Color','black','FontWeight','bold')
+    title(['shot', num2str(ICCD.shot),'-',num2str(time),' [us] Ion Flow [km/s]',newline,'PF1 = ',num2str(expval.PF1), ...
+    ' [kV], PF2 = ',num2str(expval.PF2),' [kV]',newline,'TF = ',num2str(expval.TF),' [kV], EF = ',num2str(expval.EF),' [A]'] ...
+    ,'Color','black','FontWeight','bold')
     xlabel('Z [cm]')
     ylabel('R [cm]')
     ax = gca;
-    ax.FontSize = 14;
+    ax.FontSize = 10;
     grid on
     daspect([1 1 1])
     if save_fig
-        if not(exist(['ionflow_fig/',num2str(date)],'dir'))
-            mkdir(sprintf("ionflow_fig/%s", num2str(date)));
+        if not(exist([pathname.fig,'/',cal_type,'/',num2str(date)],'dir'))
+            mkdir(sprintf("%s/%s", pathname.fig,cal_type), sprintf("%s", num2str(date)));
         end
-        saveas(gcf,['ionflow_fig/',num2str(date),'/',num2str(time),'us_shot',num2str(ICCD.shot),'.png'])
+        saveas(gcf,[pathname.fig,'/',cal_type,'/',num2str(date),'/','shot', num2str(ICCD.shot),'_',num2str(time),'us_PF1_',num2str(expval.PF1), ...
+        'kV_PF2_',num2str(expval.PF2),'kV_TF_',num2str(expval.TF),'kV_EF_',num2str(expval.EF),'A.png'])
         hold off
         close
     else

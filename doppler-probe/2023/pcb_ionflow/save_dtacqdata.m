@@ -7,7 +7,7 @@
 clear all
 setenv('MDSPLUS_DIR','/usr/local/mdsplus');
 addpath(fullfile(getenv('MDSPLUS_DIR'), 'matlab'));
-pathname.rawdata=[getenv("rsGdrive") '/pcb']; %保存先
+pathname.rawdata=[getenv("rsGdrive") '/mat/pcb']; %保存先
 dtacq_num=39;
 
 date = 230315;%【input】計測日

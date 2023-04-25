@@ -2,10 +2,10 @@
 %プロット時間を指定して磁気面を1枚プロット
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function [] = plot_psi200ch_at_t(time,date,dtacq_num,dtacq_shot,dtacq_tfshot,pathname,mesh_rz,i_EF,trange,cmap)
+function [] = plot_psi200ch_at_t(time,date,dtacq,pathname,mesh_rz,expval,trange,cmap)
 %プロット時刻/実験日/dtacq番号(39)/dtacqshot番号/dtacqtfshot番号/pathname/rz方向メッシュ数/EF電流/計算時間範囲/カラーマップ(TorF)
 
-filename=strcat(pathname.rawdata,'/',num2str(date),'/rawdata_dtacq',num2str(dtacq_num),'_shot',num2str(dtacq_shot),'_tfshot',num2str(dtacq_tfshot),'.mat');
+filename=strcat(pathname.rawdata,'/',num2str(date),'/rawdata_dtacq',num2str(dtacq.num),'_shot',num2str(dtacq.shot),'_tfshot',num2str(dtacq.tfshot),'.mat');
 if exist(filename,"file")==0
     warning(strcat(filename,' does not exist.'));
     return
@@ -88,8 +88,8 @@ else
     z1_EF   = 0.78;
     z2_EF   = -0.78;
 end
-[Bz_EF,~] = B_EF(z1_EF,z2_EF,r_EF,i_EF,n_EF,grid2D.rq,grid2D.zq,false);
-clear EF r_EF n_EF i_EF z_EF
+[Bz_EF,~] = B_EF(z1_EF,z2_EF,r_EF,expval.EF,n_EF,grid2D.rq,grid2D.zq,false);
+clear EF r_EF n_EF expval.EF z_EF
 
 data2D=struct('psi',zeros(size(grid2D.rq,1),size(grid2D.rq,2),size(trange,2)),...
     'Bz',zeros(size(grid2D.rq,1),size(grid2D.rq,2),size(trange,2)),...
@@ -157,7 +157,7 @@ end
 %     plot(grid2D.zq(1,squeeze(mid(:,:,i))),grid2D.rq(:,1))
 %     contour(grid2D.zq(1,:),grid2D.rq(:,1),squeeze(data2D.psi(:,:,i)),20,'black')
 %     contour(grid2D.zq(1,:),grid2D.rq(:,1),squeeze(data2D.psi(:,:,i)),20,'black')
-contour(grid2D.zq(1,:),grid2D.rq(:,1),squeeze(data2D.psi(:,:,i)),[-20e-3:0.2e-3:40e-3],'black','LineWidth',1)
+contour(grid2D.zq(1,:),grid2D.rq(:,1),squeeze(data2D.psi(:,:,i)),-20e-3:0.2e-3:40e-3,'black','LineWidth',1)
 %     plot(grid2D.zq(1,squeeze(mid(opoint(:,:,i),:,i))),grid2D.rq(opoint(:,:,i),1),"bo")
 %     plot(grid2D.zq(1,squeeze(mid(xpoint(:,:,i),:,i))),grid2D.rq(xpoint(:,:,i),1),"bx")
 hold on

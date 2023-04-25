@@ -2,9 +2,9 @@
 %プロット枚数、プロット開始時間、
 %プロット時間間隔を指定して磁気面をプロット
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function plot_psi200ch_multi(Nplot,t_start,dt,date,dtacq_num,dtac_qshot,dtacq_tfshot,pathname,mesh_rz,i_EF,trange,cmap,cbar)
+function plot_psi200ch_multi(Nplot,t_start,dt,date,dtacq,pathname,mesh_rz,i_EF,trange,cmap,cbar)
 
-filename=strcat(pathname.rawdata,'/',num2str(date),'/rawdata_dtacq',num2str(dtacq_num),'_shot',num2str(dtac_qshot),'_tfshot',num2str(dtacq_tfshot),'.mat');
+filename=strcat(pathname.rawdata,'/',num2str(date),'/rawdata_dtacq',num2str(dtacq.num),'_shot',num2str(dtacq.shot),'_tfshot',num2str(dtacq.tfshot),'.mat');
 if exist(filename,"file")==0
     warning(strcat(filename,' does not exist.'));
     return
@@ -204,7 +204,7 @@ for m=1:Nplot %図示する時間
     %     plot(grid2D.zq(1,squeeze(mid(:,:,i))),grid2D.rq(:,1))
     %     contour(grid2D.zq(1,:),grid2D.rq(:,1),squeeze(data2D.psi(:,:,i)),20,'black')
     %     contour(grid2D.zq(1,:),grid2D.rq(:,1),squeeze(data2D.psi(:,:,i)),20,'black')
-    contour(grid2D.zq(1,:),grid2D.rq(:,1),squeeze(data2D.psi(:,:,i)),[-20e-3:0.2e-3:40e-3],'black','LineWidth',1)
+    contour(grid2D.zq(1,:),grid2D.rq(:,1),squeeze(data2D.psi(:,:,i)),-20e-3:0.2e-3:40e-3,'black','LineWidth',1)
     %     plot(grid2D.zq(1,squeeze(mid(opoint(:,:,i),:,i))),grid2D.rq(opoint(:,:,i),1),"bo")
     %     plot(grid2D.zq(1,squeeze(mid(xpoint(:,:,i),:,i))),grid2D.rq(xpoint(:,:,i),1),"bx")
     hold on

@@ -1,9 +1,13 @@
-function [V_i,absV,T_i] = cal_ionflow(date,ICCD,mpoints,pathname,show_offset,plot_fit,save_flow)
+function [V_i,absV,T_i] = cal_ionflow(date,ICCD,mpoints,pathname,show_offset,plot_fit,save_fit,save_flow)
 %実験日/ICCD変数/計測点配列/pathname/offsetを表示/ガウスフィッティングをプロット/流速を保存
 
 %------フィッティング調整用【input】-------
-width = 3;%【input】チャンネル方向(Y方向)足し合わせ幅
-l = 7;%【input】波長方向移動平均長さ
+w_CH = 3;%【input】チャンネル方向(Y方向)足し合わせ幅
+l_mov = 7;%【input】波長方向移動平均長さ
+th_ratio = 0.8;%【input】フィッティング時閾値
+l_L1 = 41;%【input】波長軸の切り取り長さ
+d_L1 = 25;%【input】波長方向位置ずれ調整
+d_CH = -1;%【input】CH方向位置ずれ調整
 
 %物理定数
 Vc = 299792.458;%光速(km/s)
@@ -26,12 +30,14 @@ switch ICCD.line
         return;
 end
 
-time = ICCD.trg + round(ICCD.exp_w/2);%計測時刻
 dir1 = [pathname.NIFS '/Doppler/Andor/IDSP/' num2str(date)];%ディレクトリ1
 if mpoints.n_z == 1
     filename1 = [dir1 '/shot' num2str(ICCD.shot) '_' num2str(ICCD.trg) 'us_w=' num2str(ICCD.exp_w) '_gain=' num2str(ICCD.gain) '.asc'];%ICCDファイル名
     if not(exist(filename1,"file"))
-        warning(strcat(filename1,' does not exist.'));
+        warning([filename1,' does not exist.']);
+        V_i = char.empty;
+        absV = char.empty;
+        T_i = char.empty;
         return
     end
     %data1からスペクトル群を取得
@@ -51,10 +57,9 @@ switch mpoints.n_z
 end
 
 X1 = data1(:,1);%X1(ピクセル)軸を定義
-[LofX1,~]=size(data1);%X1軸の長さを取得
-L1 = zeros(LofX1,mpoints.n_CH);%L1(波長)軸を定義
-LofL1 = 101;%波長軸の切り取り長さ
-L1_shaped = zeros(LofL1,mpoints.n_CH);%切り取った波長軸
+[l_X1,~]=size(data1);%X1軸の長さを取得
+L1 = zeros(l_X1,mpoints.n_CH);%L1(波長)軸を定義
+L1_shaped = zeros(l_L1,mpoints.n_CH);%切り取った波長軸
 px2nm = zeros(mpoints.n_CH,1);%nm/pixel
 switch ICCD.line
     case 'Ar'%アルゴンの時
@@ -66,7 +71,7 @@ switch ICCD.line
             %         L1(:,i) = polyval(p,X1);
             px2nm(i,1) = center(i,4);
             L1(:,i) = lambda1 - px2nm(i,1)*(X1(:,1)-center(i,3));
-            L1_shaped(:,i) = L1(round(center(i,3))-50:round(center(i,3))+50,i);
+            L1_shaped(:,i) = L1(round(center(i,3))-(l_L1-1)/2+d_L1:round(center(i,3))+(l_L1-1)/2+d_L1,i);
         end
     case 'H'%水素の時
         for i = 1:mpoints.n_CH
@@ -74,45 +79,45 @@ switch ICCD.line
             L1(:,i) = px2nm(i,1)*(X1-center(i,3))+lambda0;
         end
 end
-spectrum1 = zeros(LofL1,mpoints.n_CH);%data1の分光結果を入れる
+spectrum1 = zeros(l_L1,mpoints.n_CH);%data1の分光結果を入れる
 for i = 1:mpoints.n_CH
     spectrum1(:,i) = ...
-        sum(data1(round(center(i,3))-50:round(center(i,3))+50,round(centerY(i,1)-width):round(centerY(i,1)+width)),2);
+        sum(data1(round(center(i,3))-(l_L1-1)/2+d_L1:round(center(i,3))+(l_L1-1)/2+d_L1,round(centerY(i,1)+d_CH-w_CH):round(centerY(i,1)+d_CH+w_CH)),2);
 end
 
-%data2からスペクトル群を取得
-if mpoints.n_z > 1
-    data2 = importdata(filename2);
-    X2 = data2(:,1);%X2(ピクセル)軸を定義
-    [LofX2,~]=size(data2);%X2軸の長さを取得
-    spectrum2=zeros(LofX2,mpoints.n_CH);%data2の分光結果を入れる
-    for i = 1:mpoints.n_CH
-        spectrum2(:,i) = ...
-            sum(data2(:,round(centerY(i,2)-width):round(centerY(i,2)+width)),2);
-    end
-end
+% %data2からスペクトル群を取得
+% if mpoints.n_z > 1
+%     data2 = importdata(filename2);
+%     X2 = data2(:,1);%X2(ピクセル)軸を定義
+%     [LofX2,~]=size(data2);%X2軸の長さを取得
+%     spectrum2=zeros(LofX2,mpoints.n_CH);%data2の分光結果を入れる
+%     for i = 1:mpoints.n_CH
+%         spectrum2(:,i) = ...
+%             sum(data2(:,round(centerY(i,2)-width):round(centerY(i,2)+width)),2);
+%     end
+% end
 
 %波長方向の移動平均から離れた外れ値を移動平均に変更(ノイズ除去)
-M1 = movmean(spectrum1,l);
+M1 = movmean(spectrum1,l_mov);
 % M1 = (M1*l - spectrum1) / (l-1);
-if mpoints.n_z == 2
-    M2 = movmean(spectrum2,l);
-    % M2 = (M2*l - spectrum2) / (l-1);
-end
+% if mpoints.n_z == 2
+%     M2 = movmean(spectrum2,mov_l);
+%     % M2 = (M2*l - spectrum2) / (l-1);
+% end
 for i = 1:mpoints.n_CH
-    for j = 1:LofL1
+    for j = 1:l_L1
         if spectrum1(j,i) > M1(j,i)*1.1
             spectrum1(j,i) = M1(j,i);
         elseif spectrum1(j,i) < M1(j,i)*0.9
             spectrum1(j,i) = M1(j,i);
         end
-        if mpoints.n_z == 2
-            if spectrum2(j,i) > M2(j,i)*1.1
-                spectrum2(j,i) = M2(j,i);
-            elseif spectrum2(j,i) < M2(j,i)*0.9
-                spectrum2(j,i) = M2(j,i);
-            end
-        end
+        % if mpoints.n_z == 2
+        %     if spectrum2(j,i) > M2(j,i)*1.1
+        %         spectrum2(j,i) = M2(j,i);
+        %     elseif spectrum2(j,i) < M2(j,i)*0.9
+        %         spectrum2(j,i) = M2(j,i);
+        %     end
+        % end
     end
 end
 
@@ -125,70 +130,116 @@ absV = zeros(mpoints.n_r,mpoints.n_z);%1列目data1・V(km/s)、2列目data2・V(km/s)
 T_CH = zeros(mpoints.n_CH,mpoints.n_z);%1列目data1・温度(eV)、2列目data1・温度(eV)
 T_i = zeros(mpoints.n_r,mpoints.n_z);%1列目data1・温度(eV)、2列目data1・平均温度(eV)
 offset = zeros(mpoints.n_r,mpoints.n_z);
+error_CH = zeros(mpoints.n_CH,1);
 
-%data1のガウスフィッティング
-if plot_fit
-    figure('Position',[300 50 1000 1000])
-end
 for k = 1:mpoints.n_r
     %0度ペアスペクトルからオフセットを検出
     for i = 1:2
-        S1 = [L1_shaped(:,(k-1)*4+i) spectrum1(:,(k-1)*4+i)]; %(k-1)*4+i番目のチャンネルの[波長,強度]
+        i_CH = (k-1)*4+i;%CH番号
+        S1 = [L1_shaped(:,i_CH) spectrum1(:,i_CH)]; %[波長,強度]
         s1 = size(S1);%S1の[行数,列数]
-        MAX1 = max(spectrum1(:,(k-1)*4+i)); %スペクトルの最大値
+        MAX1 = max(spectrum1(:,i_CH)); %スペクトルの最大値
         j = 1;
         while j < s1(1)+1 %SNの悪いデータを除く
-            if S1(j,2) < MAX1*0.7
+            if S1(j,2) < MAX1*th_ratio
                 S1(j,:) = [];
             else
                 j = j+1;
             end
             s1 = size(S1);
         end
-        f = fit(S1(:,1),S1(:,2),'gauss1');
+        try
+            f = fit(S1(:,1),S1(:,2),'gauss1');
+        catch ME
+            warning(['Fitting failed in CH ',num2str(i_CH),'.']);
+            error_CH(i_CH,1) = 1;
+            break
+        end
         coef=coeffvalues(f);
-        amp((k-1)*4+i,1) = coef(1);
-        shift((k-1)*4+i,1) = coef(2)-lambda0;
-        sigma((k-1)*4+i,1) = sqrt(coef(3)^2-(center((k-1)*4+i,5)*px2nm((k-1)*4+i,1))^2);
-        T_CH((k-1)*4+i,1) = 1.69e8*A*(2*sigma((k-1)*4+i,1)*sqrt(2*log(2))/lambda0)^2;
+        shift(i_CH,1) = coef(2)-lambda0;
     end
     offset(k,1) = (shift((k-1)*4+1,1) + shift((k-1)*4+2,1))/2;%対向視線から得られたオフセット[nm]
-    if show_offset
-        disp(offset(k,1))
-    end
-    %オフセットを引いてガウスフィッティング
-    for i = 1:4
-        S1 = [L1_shaped(:,(k-1)*4+i)-offset(k,1) spectrum1(:,(k-1)*4+i)]; %(k-1)*4+i番目のチャンネルの[波長,強度]
-        s1 = size(S1);%S1の[行数,列数]
-        MAX1 = max(spectrum1(:,(k-1)*4+i)); %スペクトルの最大値
-        j = 1;
-        while j < s1(1)+1 %SNの悪いデータを除く
-            if S1(j,2) < MAX1*0.5
-                S1(j,:) = [];
-            else
-                j = j+1;
-            end
-            s1 = size(S1);
-        end
-        f = fit(S1(:,1),S1(:,2),'gauss1');
-        coef=coeffvalues(f);
-        amp((k-1)*4+i,1) = coef(1);
-        shift((k-1)*4+i,1) = coef(2)-lambda0;
-        sigma((k-1)*4+i,1) = sqrt(coef(3)^2-(center((k-1)*4+i,5)*px2nm((k-1)*4+i,1))^2);
-        T_CH((k-1)*4+i,1) = 1.69e8*A*(2*sigma((k-1)*4+i,1)*sqrt(2*log(2))/lambda0)^2;
-        if plot_fit
-            subplot(mpoints.n_r,4,(k-1)*4+i);
-            plot(f,S1(:,1),S1(:,2));
-            xline(lambda0);
-            title([num2str(T_CH((k-1)*4+i,1)),' eV'])
-            legend('off')
-            xlabel('Wavelength [nm]')
-            ylabel('Intensity [cnt]')
-        end
+end
+
+%異常値を持つoffsetを内挿して置き換え
+ori_offset = offset;%変更前を保管
+buf = offset(:,1);%offsetをコピー
+ind_0 = find(buf == 0);%0を検出
+ind_non0 = find(buf ~= 0);%non0を検出
+buf(ind_0) = [];%0を削除
+buf = filloutliers(buf,"linear");%外れ値を線型内挿で置き換え
+offset(ind_non0,1) = buf;%offsetを更新
+offset(ind_0,1) = mean(offset(ind_non0,1));%offsetを更新
+for k = 1:mpoints.n_r
+    if offset(k,1) ~= ori_offset(k,1)
+        disp(['Offset in Row ',num2str(k),' is replaced from ',num2str(ori_offset(k,1)),' to ',num2str(offset(k,1))'.'])
     end
 end
+
+%data1のガウスフィッティング
 if plot_fit
-    sgtitle('Fitting data1 (Horizontal：Channel Vertical：Position)')
+    figure('Position',[300 50 1000 1000],'visible','on')
+    sgtitle(['Fitting data (Horizontal：View Line, Vertical：Measured Position)',newline, ...
+        'shot',num2str(ICCD.shot),'-',num2str(ICCD.trg),'us-w=',num2str(ICCD.exp_w),'-gain=',num2str(ICCD.gain),'.asc'])
+end
+for k = 1:mpoints.n_r
+    % if (error_CH((k-1)*4+1,1) == 0) && (error_CH((k-1)*4+2,1) == 0)%対抗視線のフィッティングに成功
+        if show_offset
+            disp(['Offset = ',num2str(offset(k,1)),' in Row ',num2str(k),'.'])
+        end
+        %オフセットを引いてガウスフィッティング
+        for i = 1:4
+            i_CH = (k-1)*4+i;%CH番号
+            S1 = [L1_shaped(:,i_CH)-offset(k,1) spectrum1(:,i_CH)]; %[波長,強度]
+            s1 = size(S1);%S1の[行数,列数]
+            MAX1 = max(spectrum1(:,i_CH)); %スペクトルの最大値
+            j = 1;
+            while j < s1(1)+1 %SNの悪いデータを除く
+                if S1(j,2) < MAX1*0.5
+                    S1(j,:) = [];
+                else
+                    j = j+1;
+                end
+                s1 = size(S1);
+            end
+            try
+                f = fit(S1(:,1),S1(:,2),'gauss1');
+                coef=coeffvalues(f);
+                amp(i_CH,1) = coef(1);
+                shift(i_CH,1) = coef(2)-lambda0;
+                sigma(i_CH,1) = sqrt(coef(3)^2-(center(i_CH,5)*px2nm(i_CH,1))^2);
+                T_CH(i_CH,1) = 1.69e8*A*(2*sigma(i_CH,1)*sqrt(2*log(2))/lambda0)^2;
+                if plot_fit
+                    subplot(mpoints.n_r,4,i_CH);
+                    plot(f,S1(:,1),S1(:,2));
+                    % plot(S1(:,1),S1(:,2));
+                    xline(lambda0);
+                    title([num2str(T_CH(i_CH,1)),' eV'])
+                    legend('off')
+                    xlabel('Wavelength [nm]')
+                    ylabel('Intensity [cnt]')
+                end
+            catch ME
+                warning(['Fitting failed in CH ',num2str(i_CH),'.']);
+                break
+            end
+        end
+    % else
+    %     warning(['Offset failed in Row ',num2str(k),'.']);
+    % end
+end
+if plot_fit
+    if save_fit
+        time = round(ICCD.trg+ICCD.exp_w/2);%計測時刻
+        if not(exist([pathname.save,'/fit/',num2str(date)],'dir'))
+            mkdir(sprintf("%s/fit", pathname.save), sprintf("%s", num2str(date)));
+        end
+        saveas(gcf,[pathname.save,'/fit/',num2str(date),'/','shot', num2str(ICCD.shot),'_',num2str(time),'us_fit.png'])
+        hold off
+        close
+    else
+        hold off
+    end
 end
 
 %data1の流速、温度を計算
@@ -216,9 +267,10 @@ end
 %     for k = 1:mpoints.n_r
 %         %0度ペアスペクトルからオフセットを検出
 %         for i = 1:2
-%             S2 = [L1_shaped(:,(k-1)*4+i) spectrum2(:,(k-1)*4+i)]; %(k-1)*4+i番目のチャンネルの[波長,強度]
+%             i_CH = (k-1)*4+i;%CH番号
+%             S2 = [L1_shaped(:,i_CH) spectrum2(:,i_CH)]; %[波長,強度]
 %             s2 = size(S1);%S1の[行数,列数]
-%             MAX2 = max(spectrum2(:,(k-1)*4+i)); %スペクトルの最大値
+%             MAX2 = max(spectrum2(:,i_CH)); %スペクトルの最大値
 %             j = 1;
 %             while j < s2(1)+1 %SNの悪いデータを除く
 %                 if S2(j,2) < MAX2*0.5
@@ -230,10 +282,10 @@ end
 %             end
 %             f = fit(S2(:,1),S2(:,2),'gauss1');
 %             coef=coeffvalues(f);
-%             amp((k-1)*4+i,2) = coef(1);
-%             shift((k-1)*4+i,2) = coef(2)-lambda0;
-%             sigma((k-1)*4+i,2) = sqrt(coef(3)^2-(center((k-1)*4+i,5)*px2nm((k-1)*4+i,1))^2);
-%             T_CH((k-1)*4+i,2) = 1.69e8*A*(2*sigma((k-1)*4+i,2)*sqrt(2*log(2))/lambda0)^2;
+%             amp(i_CH,2) = coef(1);
+%             shift(i_CH,2) = coef(2)-lambda0;
+%             sigma(i_CH,2) = sqrt(coef(3)^2-(center(i_CH,5)*px2nm(i_CH,1))^2);
+%             T_CH(i_CH,2) = 1.69e8*A*(2*sigma(i_CH,2)*sqrt(2*log(2))/lambda0)^2;
 %         end
 %         offset(k,2) = (shift((k-1)*4+1,2) + shift((k-1)*4+2,2))/2;%対向視線から得られたオフセット[nm]
 %         if show_offset
@@ -241,9 +293,10 @@ end
 %         end
 %         %オフセットを引いてガウスフィッティング
 %         for i = 1:4
-%             S2 = [L1_shaped(:,(k-1)*4+i) spectrum2(:,(k-1)*4+i)]; %(k-1)*4+i番目のチャンネルの[波長,強度]
+%             i_CH = (k-1)*4+i;%CH番号
+%             S2 = [L1_shaped(:,i_CH) spectrum2(:,i_CH)]; %[波長,強度]
 %             s2 = size(S1);%S1の[行数,列数]
-%             MAX2 = max(spectrum2(:,(k-1)*4+i)); %スペクトルの最大値
+%             MAX2 = max(spectrum2(:,i_CH)); %スペクトルの最大値
 %             j = 1;
 %             while j < s2(1)+1 %SNの悪いデータを除く
 %                 if S2(j,2) < MAX2*0.5
@@ -255,15 +308,15 @@ end
 %             end
 %             f = fit(S2(:,1),S2(:,2),'gauss1');
 %             coef=coeffvalues(f);
-%             amp((k-1)*4+i,2) = coef(1);
-%             shift((k-1)*4+i,2) = coef(2)-lambda0;
-%             sigma((k-1)*4+i,2) = sqrt(coef(3)^2-(center((k-1)*4+i,5)*px2nm((k-1)*4+i,1))^2);
-%             T_CH((k-1)*4+i,2) = 1.69e8*A*(2*sigma((k-1)*4+i,2)*sqrt(2*log(2))/lambda0)^2;
+%             amp(i_CH,2) = coef(1);
+%             shift(i_CH,2) = coef(2)-lambda0;
+%             sigma(i_CH,2) = sqrt(coef(3)^2-(center(i_CH,5)*px2nm(i_CH,1))^2);
+%             T_CH(i_CH,2) = 1.69e8*A*(2*sigma(i_CH,2)*sqrt(2*log(2))/lambda0)^2;
 %             if plot_fit
-%                 subplot(mpoints.n_r,4,(k-1)*4+i);
+%                 subplot(mpoints.n_r,4,i_CH);
 %                 plot(f,S2(:,1),S2(:,2));
 %                 xline(lambda0);
-%                 title([num2str(T_CH((k-1)*4+i,2)),' eV'])
+%                 title([num2str(T_CH(i_CH,2)),' eV'])
 %                 legend('off')
 %                 xlabel('Wavelength [nm]')
 %                 ylabel('Intensity [cnt]')
@@ -273,7 +326,7 @@ end
 %     if plot_fit
 %         sgtitle('Fitting data1 (Horizontal：Channel Vertical：Position)')
 %     end
-% 
+%
 %     %data2の流速、温度を計算
 %     for i = 1:mpoints.n_r
 %         set = (i-1)*4;
