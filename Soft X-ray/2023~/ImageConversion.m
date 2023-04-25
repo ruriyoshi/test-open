@@ -1,6 +1,7 @@
 function [] = ImageConversion(foldername)
 % path = '/Users/shinjirotakeda/OneDrive - The University of Tokyo/Documents/SXR_Images/';
 % path = strcat(path,foldername);
+% お試し編集
 path = foldername;% 軟X線画像の保存されているフォルダのパス
 if exist(path,'dir') == 0
     disp('Inadequate path')
