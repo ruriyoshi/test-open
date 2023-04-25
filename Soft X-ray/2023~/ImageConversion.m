@@ -24,6 +24,7 @@ for i = 1:numel(FolderInfo)
         continue
     end
     figure(1);
+    % figure;
     IM = imread(string(FolderInfo(i)));
     imagesc(IM,[50,80]);
     imagesc(IM);

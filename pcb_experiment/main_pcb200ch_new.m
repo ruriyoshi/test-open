@@ -11,16 +11,30 @@ pathname.NIFS=getenv('NIFS_path');%resultsまでのpath（ドップラー、SXR�
 pathname.save=getenv('savedata_path');%outputデータ保存先
 pathname.rawdata38=getenv('rawdata038_path');%dtacq a038のrawdataの保管場所
 pathname.woTFdata=getenv('woTFdata_path');%rawdata（TFoffset引いた）の保管場所
-pathname.rawdata='/Users/yunhancai/Google Drive/Data/pcb/raw';%dtacqのrawdataの保管場所
+pathname.rawdata=getenv('rawdata_path');%dtacqのrawdataの保管場所
 
-% %直接入力の場合
-dtacqlist=39;
-shotlist=889;%240;%【input】dtacqの保存番号
-tfshotlist=0;%0;
-date = 230203;%【input】計測日
-n_data=numel(shotlist);%計測データ数
-EFlist = 0;%150;%【input】EF電流
-TFlist = 0;
+%%%%実験オペレーションの取得
+DOCID='1wG5fBaiQ7-jOzOI-2pkPAeV6SDiHc_LrOdcbWlvhHBw';%スプレッドシートのID
+T=getTS6log(DOCID);
+node='date';
+date=230315;
+T=searchlog(T,node,date);
+IDXlist= 20; %[5:50 52:55 58:59];%[4:6 8:11 13 15:19 21:23 24:30 33:37 39:40 42:51 53:59 61:63 65:69 71:74];
+n_data=numel(IDXlist);%計測データ数
+shotlist=T.a039(IDXlist);
+tfshotlist=T.a039_TF(IDXlist);
+EFlist=T.EF_A_(IDXlist);
+TFlist=T.TF_kV_(IDXlist);
+dtacqlist=39.*ones(n_data,1);
+
+% % %直接入力の場合
+% dtacqlist=39;
+% shotlist=889;%240;%【input】dtacqの保存番号
+% tfshotlist=0;%0;
+% date = 230203;%【input】計測日
+% n_data=numel(shotlist);%計測データ数
+% EFlist = 0;%150;%【input】EF電流
+% TFlist = 0;
 
 trange=400:600;%【input】計算時間範囲
 n=10; %【input】rz方向のメッシュ数
@@ -143,7 +157,7 @@ for i=1:size(trange,2)
             B_t(ir_bt,iz_bt) = NaN;
         end
     end
-    B_t = inpaint_nans(B_t,0);
+    % B_t = inpaint_nans(B_t,0);
 
     %%PSI計算
     data2D.psi(:,:,i) = cumtrapz(grid2D.rq(:,1),2*pi*B_z.*grid2D.rq(:,1),1);
@@ -165,7 +179,46 @@ if isstruct(grid2D)==0 %もしdtacqデータがない場合次のloopへ(デー�
     return
 end
 
+figure('Position', [0 0 1500 1500],'visible','on');
+start=20;
+dt = 4;
+%  t_start=470+start;
+ for m=1:16 %図示する時間
+     i=start+m.*dt; %end
+     t=trange(i);
+     subplot(4,4,m)
+%     contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.Bz(:,:,i),30,'LineStyle','none')
+    contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.psi(:,:,i),40,'LineStyle','none')
+    % contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.Bt(:,:,i),-100e-3:0.5e-3:100e-3,'LineStyle','none')
+%     contourf(grid2D.zq(1,:),grid2D.rq(:,1),-1.*data2D.Jt(:,:,i),30,'LineStyle','none')
+%     contourf(grid2D.zq(1,:),grid2D.rq(:,1),-1.*data2D.Et(:,:,i),20,'LineStyle','none')
+    colormap(jet)
+    axis image
+    axis tight manual
+%     caxis([-0.8*1e+6,0.8*1e+6]) %jt%カラーバーの軸の範囲
+%     caxis([-0.01,0.01])%Bz
+     % clim([-0.1,0.1])%Bt
+    clim([-5e-3,5e-3])%psi
+%     caxis([-500,400])%Et
+%     colorbar('Location','eastoutside')
+    %カラーバーのラベル付け
+%     c = colorbar;
+%     c.Label.String = 'Jt [A/m^{2}]';
+    hold on
+%     plot(grid2D.zq(1,squeeze(mid(:,:,i))),grid2D.rq(:,1))
+%     contour(grid2D.zq(1,:),grid2D.rq(:,1),squeeze(data2D.psi(:,:,i)),20,'black')
+%     contour(grid2D.zq(1,:),grid2D.rq(:,1),squeeze(data2D.psi(:,:,i)),20,'black')
+    contour(grid2D.zq(1,:),grid2D.rq(:,1),squeeze(data2D.psi(:,:,i)),[-20e-3:0.2e-3:40e-3],'black','LineWidth',1)
+%     plot(grid2D.zq(1,squeeze(mid(opoint(:,:,i),:,i))),grid2D.rq(opoint(:,:,i),1),"bo")
+%     plot(grid2D.zq(1,squeeze(mid(xpoint(:,:,i),:,i))),grid2D.rq(xpoint(:,:,i),1),"bx")
+     % plot(ok_z,ok_r,"k.",'MarkerSize', 6)%測定位置
+    hold off
+    title(string(t)+' us')
+%     xlabel('z [m]')
+%     ylabel('r [m]')
+ end
+
 clearvars -except data2D grid2D shot;
-filename = strcat('/Users/yunhancai/Google Drive/Data/pcb/pre_processed/a039_',num2str(shot),'.mat');
+filename = strcat('/Users/shinjirotakeda/Library/CloudStorage/OneDrive-TheUniversityofTokyo/Documents/probedata/processed/a039_',num2str(shot),'.mat');
 save(filename)
 end
