@@ -1,3 +1,6 @@
+⓪ define_path.m
+pathを自分のものに設定する
+
 ① save_dtacqdata.m
 指定実験日の磁気プローブデータをmat形式で
 pathname.rawdata/date/に保存(一度やればok)

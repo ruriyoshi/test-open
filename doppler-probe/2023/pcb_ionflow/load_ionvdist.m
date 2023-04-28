@@ -4,6 +4,17 @@ if exist(filename,"file")
     load(filename,'V_i','absV','T_i','F','W','P','Lambda','Vx','Vy','ppoints','Angle')
 else
     warning(strcat(filename,' does not exist.'));
+    V_i = char.empty;
+    absV = char.empty;
+    T_i = char.empty;
+    F = char.empty;
+    W = char.empty;
+    P = char.empty;
+    Lambda = char.empty;
+    Vx = char.empty;
+    Vy = char.empty;
+    ppoints = char.empty;
+    Angle = char.empty;
     return
 end
 end

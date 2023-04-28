@@ -1,36 +1,31 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %dtacqショット番号を実験ログから
-%自動取得して磁気面をプロット
+%自動取得して磁気面などをプロット
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%%%%%ここが各PCのパス
-%【※コードを使用する前に】環境変数を設定しておくか、matlab内のコマンドからsetenv('パス名','アドレス')で指定してから動かす
-setenv("NIFS_path","/Volumes/experiment/results")
-setenv("rsGdrive","/Users/rsomeya/Library/CloudStorage/GoogleDrive-rsomeya2016@g.ecc.u-tokyo.ac.jp/マイドライブ/lab")
-pathname.ts3u=getenv('ts3u_path');%old-koalaのts-3uまでのパス（mrdなど）
-pathname.fourier=getenv('fourier_path');%fourierのmd0（データックのショットが入ってる）までのpath
-pathname.NIFS=getenv('NIFS_path');%resultsまでのpath（ドップラー、SXR）
-pathname.save=[getenv('rsGdrive') '/save'];%outputデータ保存先
-pathname.rawdata38=getenv('rawdata038_path');%dtacq a038のrawdataの保管場所
-pathname.woTFdata=getenv('woTFdata_path');%rawdata（TFoffset引いた）の保管場所
-pathname.fig=[getenv('rsGdrive') '/figure'];%figure保存先
-pathname.mat=[getenv('rsGdrive') '/mat'];%figure保存先
-pathname.rawdata=[pathname.mat,'/pcb'];%dtacqのrawdataの保管場所
-pathname.flowdata=[pathname.mat,'/ionflow'];%流速データの保管場所
-pathname.vdistdata=[pathname.mat,'/ionvdist'];%速度分布データの保管場所
+%各PCのパスを定義
+run define_path.m
 
 %------【input】-------
 date = 230313;%【input】実験日(yymmdd)
-begin_cal = 5;%【input】計算始めshot番号(実験ログD列)
-end_cal = 5;%【input】計算終わりshot番号(実験ログD列)(0にするとbegin_cal以降同日の全shot計算)
-Nplot = 1;%【input】磁気面subplot枚数(16以下の4の倍数or3以下)
-t_start = 460;%【input】磁気面subplot開始時間(us)
+begin_cal = 2;%【input】計算始めshot番号(実験ログD列)
+end_cal = 2;%【input】計算終わりshot番号(実験ログD列)(0にするとbegin_cal以降同日の全shot計算)
+n_plot = 1;%【input】磁気面subplot枚数(16以下の4の倍数or3以下)
+t_start = 481;%【input】磁気面subplot開始時間(us)
 dt = 2;%【input】磁気面subplot時間間隔(us)
-cmap = false;%【input】磁気面カラーマップ('psi','Bz','Bt','Jt','Et',false)
+cmap = 'Br';%【input】磁気面カラーマップ('psi','Bz','Br','Bt','Jt','Et',false)
 cbar = true;%【input】カラーバー(true,false)
 %------詳細設定【input】-------
+cal_pcb = true;%【input】磁場を計算(true,false)
+save_pcb = true;%【input】磁場データを保存(true,false)
+load_pcb = false;%【input】磁場データを読み込む(true,false)
+
+plot_psi = false;%【input】磁気面をプロット(true,false)
+plot_Br = false;%【input】Brをプロット(true,false)
+cut_z_Br = -2.1;
+
 dtacq.num = 39;%【input】磁気プローブdtacq番号(ほぼ固定)
-mesh_rz = 50;%【input】磁気プローブrz方向のメッシュ数(ほぼ固定)
+mesh_rz = 100;%【input】磁気プローブrz方向のメッシュ数(ほぼ固定)
 trange = 430:590;%【input】磁気プローブ計算時間範囲(ほぼ固定)
 
 %実験ログ読み取り
@@ -54,18 +49,33 @@ if start_i <= end_row
         return
     end
     for i = start_i:end_i
-        % shot = exp_log(i,4);%ショット番号
+        ICCD.shot = exp_log(i,4);%ショット番号
         a039shot = exp_log(i,8);%a039ショット番号
         a039tfshot = exp_log(i,9);%a039TFショット番号
-        i_EF = exp_log(i,23);%EF電流
-        % ICCD.trg = exp_log(i,42);%ICCDトリガ時間
-        % ICCD.exp_w = exp_log(i,43);%ICCD露光時間
-        % ICCD.gain = exp_log(i,44);%Andor gain
+        expval.PF1 = exp_log(i,11);%PF1電圧(kv)
+        expval.PF2 = exp_log(i,14);%PF2電圧(kv)
+        expval.TF = exp_log(i,18);%PF2電圧(kv)
+        expval.EF = exp_log(i,23);%EF電流
+        ICCD.trg = exp_log(i,42);%ICCDトリガ時間
+        ICCD.exp_w = exp_log(i,43);%ICCD露光時間
+        ICCD.gain = exp_log(i,44);%Andor gain
         if dtacq.num == 39
             dtacq.shot = a039shot;
             dtacq.tfshot = a039tfshot;
         end
-        plot_psi200ch_multi(Nplot,t_start,dt,date,dtacq,pathname,mesh_rz,i_EF,trange,cmap,cbar);
+        if cal_pcb
+            [grid2D,data2D,ok_z,ok_r] = cal_pcb200ch(date,dtacq,pathname,mesh_rz,expval,trange,save_pcb);
+        elseif load_pcb
+            [grid2D,data2D,ok_z,ok_r] = load_pcb200ch(date,dtacq,pathname);
+        end
+        if not(isempty(data2D))
+            if plot_psi
+                plot_psi200ch_multi(n_plot,t_start,dt,trange,cmap,cbar,grid2D,data2D,ok_z,ok_r);
+            end
+            if plot_Br
+                plot_Br200ch(cut_z_Br,n_plot,t_start,dt,trange,grid2D,data2D);
+            end
+        end
     end
 else
     warning('begin_cal must <= %d.', exp_log(end_row,4))

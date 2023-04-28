@@ -3,21 +3,8 @@
 %ドップラープローブによるイオン温度、フローとその瞬間の磁気面をプロット
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%%%%%ここが各PCのパス
-%【※コードを使用する前に】環境変数を設定しておくか、matlab内のコマンドからsetenv('パス名','アドレス')で指定してから動かす
-setenv("NIFS_path","/Volumes/experiment/results")
-setenv("rsGdrive","/Users/rsomeya/Library/CloudStorage/GoogleDrive-rsomeya2016@g.ecc.u-tokyo.ac.jp/マイドライブ/lab")
-pathname.ts3u=getenv('ts3u_path');%old-koalaのts-3uまでのパス（mrdなど）
-pathname.fourier=getenv('fourier_path');%fourierのmd0（データックのショットが入ってる）までのpath
-pathname.NIFS=getenv('NIFS_path');%resultsまでのpath（ドップラー、SXR）
-pathname.save=[getenv('rsGdrive') '/save'];%outputデータ保存先
-pathname.rawdata38=getenv('rawdata038_path');%dtacq a038のrawdataの保管場所
-pathname.woTFdata=getenv('woTFdata_path');%rawdata（TFoffset引いた）の保管場所
-pathname.fig=[getenv('rsGdrive') '/figure'];%figure保存先
-pathname.mat=[getenv('rsGdrive') '/mat'];%figure保存先
-pathname.rawdata=[pathname.mat,'/pcb'];%dtacqのrawdataの保管場所
-pathname.flowdata=[pathname.mat,'/ionflow'];%流速データの保管場所
-pathname.vdistdata=[pathname.mat,'/ionvdist'];%速度分布データの保管場所
+%各PCのパスを定義
+run define_path.m
 
 %------【input】-------
 date = 230314;%【input】実験日
@@ -25,29 +12,29 @@ begin_cal = 57;%【input】磁気面&フロー計算始めshot番号(実験ログD列)
 end_cal = 57;%【input】磁気面&フロー計算終わりshot番号(実験ログD列)(0にするとbegin_cal以降の同日の全shot計算)
 min_r = 12.5;%【input】ドップラープローブ計測点最小r座標[mm]
 int_r = 2.5;%【input】ドップラープローブ計測点r方向間隔[mm]
-min_z = 2.1;%【input】ドップラープローブ計測点最小z座標[mm](-2.1,2.1)
+min_z = -2.1;%【input】ドップラープローブ計測点最小z座標[mm](-2.1,2.1)
 int_z = 4.2;%【input】ドップラープローブ計測点z方向間隔[mm](4.2)
 ICCD.line = 'Ar';%【input】ドップラー発光ライン('Ar')
 n_CH = 28;%【input】ドップラープローブファイバーCH数(28)
 n_z = 1;%【input】ドップラープローブz方向データ数(数値)(1)
 %------詳細設定【input】-------
-cal_flow = true;%【input】流速を計算(true,false)
+cal_flow = false;%【input】流速を計算(true,false)
 
-plot_fit = true;%【input】ガウスフィッティングを表示(true,false)
+plot_fit = false;%【input】ガウスフィッティングを表示(true,false)
 plot_flow = true;%【input】流速をプロット(true,false)
 plot_psi = true;%【input】磁気面をプロット(true,false)
 overlay_plot = true;%【input】流速と磁気面を重ねる(true,false)
 
-save_fit = true;%【input】ガウスフィッティングpngを保存(true,false)
-save_fig = true;%【input】流速pngを保存(true,false)
+save_fit = false;%【input】ガウスフィッティングpngを保存(true,false)
+save_fig = false;%【input】流速pngを保存(true,false)
 
-save_flow = true;%【input】流速データを保存(true,false)
-load_flow = false;%【input】流速データを読み込む(true,false)
+save_flow = false;%【input】流速データを保存(true,false)
+load_flow = true;%【input】流速データを読み込む(true,false)
 
 show_offset = false;%【input】分光offsetを表示(true,false)
 factor = 0.1;%【input】イオンフロー矢印サイズ(数値:0.1など)
 dtacq.num = 39;%【input】磁気プローブdtacq番号(39)
-mesh_rz = 50;%【input】磁気プローブrz方向のメッシュ数(50)
+mesh_rz = 100;%【input】磁気プローブrz方向のメッシュ数(50)
 trange = 430:590;%【input】磁気プローブ計算時間範囲(430:590)
 
 %ドップラープローブ計測点配列を生成
@@ -96,7 +83,8 @@ if start_i <= end_row
         end
         %磁気面をプロット
         if plot_psi
-            plot_psi200ch_at_t(time,date,dtacq,pathname,mesh_rz,expval,trange,false);
+            [grid2D,data2D,ok_z,ok_r] = cal_pcb200ch(date,dtacq,pathname,mesh_rz,expval,trange);
+            plot_psi200ch_at_t(time,trange,grid2D,data2D,ok_z,ok_r);
         end
         %イオン温度、フローをプロット
         if plot_flow

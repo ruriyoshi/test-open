@@ -5,48 +5,40 @@
 
 clear all
 
-%%%%%ここが各PCのパス
-%【※コードを使用する前に】環境変数を設定しておくか、matlab内のコマンドからsetenv('パス名','アドレス')で指定してから動かす
-setenv("NIFS_path","/Volumes/experiment/results")
-setenv("rsGdrive","/Users/rsomeya/Library/CloudStorage/GoogleDrive-rsomeya2016@g.ecc.u-tokyo.ac.jp/マイドライブ/lab")
-pathname.ts3u=getenv('ts3u_path');%old-koalaのts-3uまでのパス（mrdなど）
-pathname.fourier=getenv('fourier_path');%fourierのmd0（データックのショットが入ってる）までのpath
-pathname.NIFS=getenv('NIFS_path');%resultsまでのpath（ドップラー、SXR）
-pathname.save=[getenv('rsGdrive') '/save'];%outputデータ保存先
-pathname.rawdata38=getenv('rawdata038_path');%dtacq a038のrawdataの保管場所
-pathname.woTFdata=getenv('woTFdata_path');%rawdata（TFoffset引いた）の保管場所
-pathname.fig=[getenv('rsGdrive') '/figure'];%figure保存先
-pathname.mat=[getenv('rsGdrive') '/mat'];%figure保存先
-pathname.rawdata=[pathname.mat,'/pcb'];%dtacqのrawdataの保管場所
-pathname.flowdata=[pathname.mat,'/ionflow'];%流速データの保管場所
-pathname.vdistdata=[pathname.mat,'/ionvdist'];%速度分布データの保管場所
+%各PCのパスを定義
+run define_path.m
 
 %------【input】---------------------------------------------------
-date = 230310;%【input】実験日
-begin_cal = 1;%【input】磁気面&フロー計算始めshot番号(実験ログD列)
-end_cal = 0;%【input】磁気面&フロー計算終わりshot番号(実験ログD列)(0にするとbegin_cal以降の同日の全shot計算)
+date = 230314;%【input】実験日
+begin_cal = 33;%【input】磁気面&フロー計算始めshot番号(実験ログD列)
+end_cal = 42;%【input】磁気面&フロー計算終わりshot番号(実験ログD列)(0にするとbegin_cal以降の同日の全shot計算)
 min_r = 12.5;%【input】ドップラープローブ計測点最小r座標[mm]
 int_r = 2.5;%【input】ドップラープローブ計測点r方向間隔[mm]
-min_z = 2.1;%【input】ドップラープローブ計測点最小z座標[mm](-2.1,2.1)
+min_z = -2.1;%【input】ドップラープローブ計測点最小z座標[mm](-2.1,2.1)
 int_z = 4.2;%【input】ドップラープローブ計測点z方向間隔[mm](4.2)
 ICCD.line = 'Ar';%【input】ドップラー発光ライン('Ar')
 n_CH = 28;%【input】ドップラープローブファイバーCH数(28)
 n_z = 1;%【input】ドップラープローブz方向データ数(数値)(1)
 %-----------------------詳細設定【input】----------------------------
-cal_vdist = true;%【input】速度分布を計算(true,false)
+cal_vdist = false;%【input】速度分布を計算(true,false)
+save_vdist = false;%【input】速度分布データを保存(true,false)
+load_vdist = true;%【input】速度分布データを読み込む(true,false)
+
+cal_pcb = false;%【input】磁場を計算(true,false)
+save_pcb = false;%【input】磁場データを保存(true,false)
+load_pcb = true;%【input】磁場データを読み込む(true,false)
+
 plot_spectra = false;%【input】スペクトルをプロット(true,false)
 plot_analisis = false;%【input】逆変換解析をプロット(true,false)
 plot_vdist = false;%【input】速度分布をプロット(true,false)
 plot_compare = false;%【input】再構成比較をプロット(true,false)
-plot_flow = true;%【input】流速をプロット(true,false)
+plot_flow = false;%【input】流速をプロット(true,false)
 plot_psi = false;%【input】磁気面をプロット(true,false)
 overlay_plot = false;%【input】流速と磁気面を重ねる(true,false)
+plot_Br = false;
 
 save_fit = false;%【input】ガウスフィッティングpngを保存(true,false)
-save_fig = true;%【input】速度分布、フローpngを保存(true,false)
-
-save_vdist = true;%【input】速度分布データを保存(true,false)
-load_vdist = false;%【input】速度分布データを読み込む(true,false)
+save_fig = false;%【input】速度分布、フローpngを保存(true,false)
 
 plot_type = 'contour';%【input】速度分布プロット種類('contour','surf')
 Ti_type = 'dispersion';%【input】イオン温度計算法('dispersion')
@@ -55,7 +47,7 @@ show_offset = false;%【input】分光offsetを表示(true,false)
 inversion_method = 5;%【input】速度分布逆変換手法(1~6)
 factor = 0.1;%【input】イオンフロー矢印サイズ(数値:0.1など)
 dtacq.num = 39;%【input】磁気プローブdtacq番号(39)
-mesh_rz = 50;%【input】磁気プローブrz方向のメッシュ数(50)
+mesh_rz = 100;%【input】磁気プローブrz方向のメッシュ数(50)
 trange = 430:590;%【input】磁気プローブ計算時間範囲(430:590)
 %------------------------------------------------------------------
 
@@ -69,6 +61,7 @@ if isempty(begin_row)
 end
 
 %--------磁気面&フローを計算------
+figure('Position',[600 150 600 600])
 start_i = begin_row + begin_cal - 1;
 if start_i <= end_row
     if end_cal == 0
@@ -114,9 +107,20 @@ if start_i <= end_row
             absV = char.empty;
             T_i = char.empty;
         end
-        %磁気面をプロット
-        if plot_psi
-            plot_psi200ch_at_t(time,date,dtacq,pathname,mesh_rz,expval,trange,false);
+        %磁場を計算
+        if cal_pcb
+            [grid2D,data2D,ok_z,ok_r] = cal_pcb200ch(date,dtacq,pathname,mesh_rz,expval,trange,save_pcb);
+        elseif load_pcb
+            [grid2D,data2D,ok_z,ok_r] = load_pcb200ch(date,dtacq,pathname);
+        end
+        if not(isempty(data2D))
+            %磁気面をプロット
+            if plot_psi
+                plot_psi200ch_at_t(time,trange,grid2D,data2D,ok_z,ok_r);
+            end
+            if plot_Br
+                plot_Br200ch(cut_z_Br,n_plot,t_start,dt,trange,grid2D,data2D);
+            end
         end
         %イオン温度、フローをプロット
         if plot_flow

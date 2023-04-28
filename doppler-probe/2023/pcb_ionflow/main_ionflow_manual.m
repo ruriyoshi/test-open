@@ -3,21 +3,8 @@
 %ドップラープローブによるイオン温度、フローをプロット
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%%%%%ここが各PCのパス
-%【※コードを使用する前に】環境変数を設定しておくか、matlab内のコマンドからsetenv('パス名','アドレス')で指定してから動かす
-setenv("NIFS_path","/Volumes/experiment/results")
-setenv("rsGdrive","/Users/rsomeya/Library/CloudStorage/GoogleDrive-rsomeya2016@g.ecc.u-tokyo.ac.jp/マイドライブ/lab")
-pathname.ts3u=getenv('ts3u_path');%old-koalaのts-3uまでのパス（mrdなど）
-pathname.fourier=getenv('fourier_path');%fourierのmd0（データックのショットが入ってる）までのpath
-pathname.NIFS=getenv('NIFS_path');%resultsまでのpath（ドップラー、SXR）
-pathname.save=[getenv('rsGdrive') '/save'];%outputデータ保存先
-pathname.rawdata38=getenv('rawdata038_path');%dtacq a038のrawdataの保管場所
-pathname.woTFdata=getenv('woTFdata_path');%rawdata（TFoffset引いた）の保管場所
-pathname.fig=[getenv('rsGdrive') '/figure'];%figure保存先
-pathname.mat=[getenv('rsGdrive') '/mat'];%figure保存先
-pathname.rawdata=[pathname.mat,'/pcb'];%dtacqのrawdataの保管場所
-pathname.flowdata=[pathname.mat,'/ionflow'];%流速データの保管場所
-pathname.vdistdata=[pathname.mat,'/ionvdist'];%速度分布データの保管場所
+%各PCのパスを定義
+run define_path.m
 
 %------【input】-------
 date = 230315;%【input】実験日

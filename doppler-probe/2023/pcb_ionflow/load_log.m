@@ -25,11 +25,13 @@ end
 %実験ログ中の実験日に対応する範囲を特定
 exp_log = readmatrix('exp_log.xlsx','Sheet','log','Range', ['A' num2str(load_s) ':AR' num2str(load_f)]);
 [n_row,~] = size(exp_log);
-begin_row = find(exp_log(:,3) == date);%実験日の最初のshotの行番号を取得
+begin_row = find(exp_log(:,3) == date,1,"first");%実験日の最初のshotの行番号を取得
 if isempty(begin_row)
     error('実験日が実験ログ中に存在しません。')
 end
 end_row = begin_row;
-while end_row<n_row && isnan(exp_log(end_row+1,3)) && exp_log(end_row+1,4)%日付がNaN&&shot番号が記入済=実験日のshot
+while end_row<n_row && exp_log(end_row+1,4) && isnan(exp_log(end_row+1,3))... 
+        || (exp_log(end_row+1,3) == date)%日付がNaN or date&&shot番号が記入済=実験日のshot
     end_row = end_row+1;
 end%実験日の最後のshotの行番号を取得
+end
