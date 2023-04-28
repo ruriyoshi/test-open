@@ -5,9 +5,9 @@
 run define_path.m
 
 %------【input】---------------------------------------------------
-date = 230315;%【input】実験日
-begin_cal = 4;%【input】磁気面&フロー計算始めshot番号(実験ログD列)
-end_cal = 35;%【input】磁気面&フロー計算終わりshot番号(実験ログD列)(0にするとbegin_cal以降の同日の全shot計算)
+date = 230315;%【input】実験日%230315
+begin_cal = 4;%【input】磁気面&フロー計算始めshot番号(実験ログD列)%4
+end_cal = 35;%【input】磁気面&フロー計算終わりshot番号(実験ログD列)(0にするとbegin_cal以降の同日の全shot計算)%35
 min_r = 12.5;%【input】ドップラープローブ計測点最小r座標[mm]
 int_r = 2.5;%【input】ドップラープローブ計測点r方向間隔[mm]
 min_z = -2.1;%【input】ドップラープローブ計測点最小z座標[mm](-2.1,2.1)
@@ -18,11 +18,11 @@ n_z = 1;%【input】ドップラープローブz方向データ数(数値)(1)
 dtacq.num = 39;%【input】磁気プローブdtacq番号(39)
 trange = 430:590;%【input】磁気プローブ計算時間範囲(430:590)
 t_range = [477 483];%【input】計測時刻範囲(us)
-r_range = [17.5 25];%【input】計測点範囲(cm)
-ng_shotlist = [6 10 26 33 34];%【input】磁場失敗ショット番号
-x_type = '|Br|';%【input】x軸の変数('Vz','Vr','|Vz|','|Vr|','Bz','Br','z','r','time')
-y1_type = '|Vr|';%【input】y1軸の変数('Vz','Vr','|Vz|','|Vr|','Bz','Br','z','r','time')
-y2_type = '|Vz|';%【input】y2軸の変数('Vz','Vr','|Vz|','|Vr|','Bz','Br','z','r','time',false)
+r_range = [17.5 22.5];%【input】計測点範囲(cm)
+ng_shotlist = [6 10 26 33 34];%【input】磁場失敗ショット番号%[6 10 26 33 34]
+x_type = '|Br|';%【input】x軸の変数('Vz','Vr','|Vz|','|Vr|','Bz','Br','|Bz|','|Br|','z','r','time')
+y1_type = '|Vr|';%【input】y1軸の変数('Vz','Vr','|Vz|','|Vr|','Bz','Br','|Bz|','|Br|','z','r','time')
+y2_type = false;%【input】y2軸の変数('Vz','Vr','|Vz|','|Vr|','Bz','Br','z','r','time',false)
 g_type = 'time';%【input】グループ化基準('time','r')
 
 %ドップラープローブ計測点配列を生成
@@ -35,8 +35,8 @@ if isempty(begin_row)
 end
 
 figure('Position',[600 150 600 600])
+start_i = begin_row + begin_cal - 1;
 if start_i <= end_row
-    start_i = begin_row + begin_cal - 1;
     if end_cal == 0
         end_i = end_row;%begin_cal以降全部計算
     elseif end_cal < begin_cal
