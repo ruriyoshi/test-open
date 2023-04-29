@@ -10,9 +10,10 @@ pathname.rawdata=getenv('rawdata_path');%dtacqのrawdataの保管場所
 DOCID='1wG5fBaiQ7-jOzOI-2pkPAeV6SDiHc_LrOdcbWlvhHBw';%スプレッドシートのID
 T=getTS6log(DOCID);
 node='date';
-pat=230119;
+pat=230127;
 T=searchlog(T,node,pat);
-IDXlist=[4:6 8:11 13 15:19 21:23 24:30 33:37 39:40 42:51 53:59 61:63 65:69 71:74];
+%IDXlist=[4:6 8:11 13 15:19 21:23 24:30 33:37 39:40 42:51 53:59 61:63 65:69 71:74];
+IDXlist = 63; 
 date=pat;
 n_data=numel(IDXlist);%計測データ数
 shotlist=T.a039(IDXlist);
@@ -57,13 +58,14 @@ load(filename,'rawdata');%1000×192
 if numel(rawdata)< 500
     return
 end
-
 %較正係数のバージョンを日付で判別
-sheets = sheetnames('C:\Users\kuru1\OneDrive - g.ecc.u-tokyo.ac.jp\labo\experiment\coeff200ch.xlsx');
+sheets = sheetnames('C:\Users\uswk0\OneDrive\デスクトップ\Github\test-open\pcb_experiment\coeff200ch.xlsx');
 sheets = str2double(sheets);
 sheet_date=max(sheets(sheets<=date));
 
-C = readmatrix('C:\Users\kuru1\OneDrive - g.ecc.u-tokyo.ac.jp\labo\experiment\coeff200ch.xlsx','Sheet',num2str(sheet_date));
+C = readmatrix('C:\Users\uswk0\OneDrive\デスクトップ\Github\test-open\pcb_experiment\coeff200ch.xlsx','Sheet',num2str(sheet_date));
+
+
 ok = logical(C(:,14));
 P=C(:,13);
 coeff=C(:,12);

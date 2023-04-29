@@ -4,9 +4,9 @@
 pathname.rawdata=getenv('rawdata_path'); %保存先
 
 dtacqlist=39;
-shotlist=9:231;%【input】dtacqの保存番号
+shotlist=1256;%【input】dtacqの保存番号
 tfshotlist=zeros(1,223);
-date = 221220;%【input】計測日
+date = 230409;%【input】計測日
 n=numel(shotlist);%計測データ数
 
 %RC係数読み込み

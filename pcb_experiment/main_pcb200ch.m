@@ -2,7 +2,7 @@
 %200ch用新規pcbプローブのみでの磁気面（Bz）
 %dtacqのshot番号を直接指定する場合
 %%%%%%%%%%%%%%%%%%%%%%%%
-
+clear all
 %%%%%ここが各PCのパス
 %【※コードを使用する前に】環境変数を設定しておくか、matlab内のコマンドからsetenv('パス名','アドレス')で指定してから動かす
 pathname.ts3u=getenv('ts3u_path');%old-koalaのts-3uまでのパス（mrdなど）
@@ -16,6 +16,7 @@ pathname.rawdata=getenv('rawdata_path');%dtacqのrawdataの保管場所
 
 
 %%%%実験オペレーションの取得
+%{
 DOCID='1wG5fBaiQ7-jOzOI-2pkPAeV6SDiHc_LrOdcbWlvhHBw';%スプレッドシートのID
 T=getTS6log(DOCID);
 node='date';
@@ -29,17 +30,18 @@ tfshotlist=T.a039_TF(IDXlist);
 EFlist=T.EF_A_(IDXlist);
 TFlist=T.TF_kV_(IDXlist);
 dtacqlist=39.*ones(n_data,1);
+%}
 
 % % %直接入力の場合
-% dtacqlist=39;
-% shotlist=650;%240;%【input】dtacqの保存番号
-% tfshotlist=584;%0;
-% date = 230128;%【input】計測日
-% n_data=numel(shotlist);%計測データ数
-% EFlist = 150;%150;%【input】EF電流
-% TFlist=4;
+ dtacqlist=39;
+ shotlist=1323;%240;%【input】dtacqの保存番号
+ tfshotlist=1321;%0;
+ date = 230416;%【input】計測日
+ n_data=numel(shotlist);%計測データ数
+ EFlist = 150;%150;%【input】EF電流
+ TFlist=4;
 
-trange=430:500;%【input】計算時間範囲
+trange=400:550;%【input】計算時間範囲
 n=100; %【input】rz方向のメッシュ数
 
 for i=1:n_data
@@ -114,12 +116,14 @@ end
 % ok_bz([9 10 96 17])=false;
 % ok_bz([52 54 43])=false;
 % ok_bz(57)=true;
-[bz, ok_bz, ok_bz_plot] = ng_replace(bz, ok_bz, sheet_date);
+%[bz, ok_bz, ok_bz_plot] = ng_replace(bz, ok_bz, sheet_date);
 % ok_bz_plot=ok_bz;
 % ok_bz([48 58 49 59])=false;
 
 % ok_bz([44 45])=false;
+ok_bt([4 5 6 7 8 9 10 15 21 27 30 42 43 49 53 69 84 87 92 94 95 96 97 98 99 100]) = false;
 
+%{
 %中心領域4+2本のみ
 prange=21:80;%31:70;
 bz=bz(:,prange);%time1000×ch225
@@ -127,6 +131,7 @@ zpos_bz=zpos_bz(prange);
 rpos_bz=rpos_bz(prange);
 ok_bz=ok_bz(prange);
 ok_bz_plot=ok_bz_plot(prange);
+%}
 
 
 [zq,rq]=meshgrid(linspace(min(zpos_bz),max(zpos_bz),n),linspace(min(rpos_bz),max(rpos_bz),n));
@@ -194,28 +199,30 @@ end
 h=figure;
 h.WindowState = 'maximized';
 
-start=30;
+start=70;
 %  t_start=470+start;
- for m=1:16 %図示する時間
+ for m=1:10 %図示する時間
      i=start+m.*2; %end
      t=trange(i);
-     subplot(4,4,m)
+     subplot(2,5,m)
 %     contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.Bz(:,:,i),30,'LineStyle','none')
-%     contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.psi(:,:,i),50,'LineStyle','none')
-    contourf(grid2D.zq(1,:),grid2D.rq(:,1),-1.*data2D.Jt(:,:,i),20,'LineStyle','none')
+     contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.psi(:,:,i),50,'LineStyle','none')
+%    contourf(grid2D.zq(1,:),grid2D.rq(:,1),-1.*data2D.Jt(:,:,i),20,'LineStyle','none')
 %     contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.Bt(:,:,i),-80e-3:0.4e-3:80e-3,'LineStyle','none')
 %     contourf(grid2D.zq(1,:),grid2D.rq(:,1),-1.*data2D.Et(:,:,i),20,'LineStyle','none')
     colormap(jet)
     axis image
     axis tight manual
-   caxis([-1.6*1e+6,1.3*1e+6])%caxis([-1.4*1e+6,1.4*1e+6])%%caxis([-1.9*1e+6,1.3*1e+6])%%jt%カラーバーの軸の範囲
+  % caxis([-0.03,0.03])
+   %caxis([-1.4*1e+6,1.4*1e+6])
+   caxis([-1.9*1e+6,1.3*1e+6])%%jt%カラーバーの軸の範囲
 %     caxis([-0.05,0.05])%Bz
 %     caxis([-8e-3,8e-3])%psi
 %     caxis([-500,400])%Et
-%     colorbar('Location','eastoutside')
+     colorbar('Location','eastoutside')
     %カラーバーのラベル付け
 %     c = colorbar;
-%     c.Label.String = 'Jt [A/m^{2}]';
+     c.Label.String = 'Jt [A/m^{2}]';
     hold on
 
 % plot(grid2D.zq(1,squeeze(mid(:,:,i))),grid2D.rq(:,1))
@@ -223,7 +230,7 @@ start=30;
 % contour(grid2D.zq(1,:),grid2D.rq(:,1),-1.*data2D.Jt(:,:,i),15,'w-','LineWidth',0.01)
 % contour(grid2D.zq(1,:),grid2D.rq(:,1),squeeze(data2D.psi(:,:,i)),65,'black')
 % contour(grid2D.zq(1,:),grid2D.rq(:,1),squeeze(data2D.psi(:,:,i)),[-20e-3:0.1e-3:40e-3],'black')
-    contour(grid2D.zq(1,:),grid2D.rq(:,1),squeeze(data2D.psi(:,:,i)),[-20e-3:0.2e-3:40e-3],'black')
+    contour(grid2D.zq(1,:),grid2D.rq(:,1),squeeze(data2D.psi(:,:,i)),[-20e-3:0.1e-3:60e-3],'black')
 %     contour(grid2D.zq(1,:),grid2D.rq(:,1),squeeze(data2D.psi(:,:,i)),[0.36e-3 1.09e-3],'black')
 % contour(grid2D.zq(1,:),grid2D.rq(:,1),-1.*data2D.Jt(:,:,i),[0.7e6 0.64e6 0.53e6],'w-','LineWidth',0.01)
 
@@ -231,12 +238,12 @@ start=30;
 
 %     plot(grid2D.zq(1,squeeze(mid(opoint(:,:,i),:,i))),grid2D.rq(opoint(:,:,i),1),"bo")
 %     plot(grid2D.zq(1,squeeze(mid(xpoint(:,:,i),:,i))),grid2D.rq(xpoint(:,:,i),1),"bx")
-    plot(ok_z,ok_r,"k.",'MarkerSize', 6)%測定位置
+%    plot(ok_z,ok_r,"k.",'MarkerSize', 6)%測定位置
     hold off
     title(string(t)+' us')
      xlabel('z [m]')
      ylabel('r [m]')
  end
-%  saveas(gcf,strcat(''))
+  saveas(gcf,strcat('C:\Users\uswk0\OneDrive\デスクトップ\Github\test-open\道家\修論\data\picture\a039_',num2str(i),'.png'));
 %  close
 end

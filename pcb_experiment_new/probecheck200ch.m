@@ -9,18 +9,16 @@ pathname.ts3u=getenv('ts3u_path');%old-koalaのts-3uまでのパス（mrdなど�
 pathname.fourier=getenv('fourier_path');%fourierのmd0（データックのショットが入ってる）までのpath
 pathname.NIFS=getenv('NIFS_path');%resultsまでのpath（ドップラー、SXR）
 pathname.save=getenv('savedata_path');%outputデータ保存先
-
 pathname.rawdata38=getenv('rawdata038_path');%dtacq a038のrawdataの保管場所
 pathname.woTFdata=getenv('woTFdata_path');%rawdata（TFoffset引いた）の保管場所
-
 pathname.rawdata=getenv('rawdata_path');%dtacqのrawdataの保管場所
 
 %%%%実験オペレーションの取得
 %直接入力の場合
 dtacqlist=39;
-shotlist=685;%【input】dtacqの保存番号
-tfshotlist=584;
-date = 230127;%【input】計測日
+shotlist=1333;%【input】dtacqの保存番号
+tfshotlist=0;
+date = 230429;%【input】計測日
 n=numel(shotlist);%計測データ数
 
 % %磁気面出す場合は適切な値を入力、磁場信号のみプロットする場合は変更不要
@@ -41,7 +39,7 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%
 
 function check_signal(date, dtacq_num, shot, tfshot, pathname)
-filename=strcat(pathname.rawdata,'rawdata_dtacq',num2str(dtacq_num),'_shot',num2str(shot),'_tfshot',num2str(tfshot),'.mat');
+filename=strcat(pathname.rawdata,'/rawdata_dtacq',num2str(dtacq_num),'_shot',num2str(shot),'_tfshot',num2str(tfshot),'.mat');
 % filename=strcat(pathname.rawdata,'rawdata_noTF_dtacq',num2str(d_tacq),'.mat');
 load(filename,'rawdata');%1000×192
 
@@ -51,11 +49,11 @@ if numel(rawdata)< 500
 end
 
 %較正係数のバージョンを日付で判別
-sheets = sheetnames('C:\Users\uswk0\OneDrive\デスクトップ\Github\test-open\pcb_experiment\coeff200ch.xlsx');
+sheets = sheetnames('coeff200ch.xlsx');
 sheets = str2double(sheets);
 sheet_date=max(sheets(sheets<=date));
 
-C = readmatrix('C:\Users\uswk0\OneDrive\デスクトップ\Github\test-open\pcb_experiment\coeff200ch.xlsx','Sheet',num2str(sheet_date));
+C = readmatrix('coeff200ch.xlsx','Sheet',num2str(sheet_date));
 ok = logical(C(:,14));
 P=C(:,13);
 coeff=C(:,12);
@@ -75,48 +73,43 @@ b=smoothdata(b,1);
 %デジタイザchからプローブ通し番号順への変換
 bz=zeros(1000,100);
 bt=bz;
-ok_bz=true(1,100);
+ok_bz=false(100,1);
 ok_bt=ok_bz;
+zpos_bz=zeros(100,1);
+rpos_bz=zpos_bz;
+zpos_bt=zpos_bz;
+rpos_bt=zpos_bz;
 
 for i=1:192
     if rem(ch(i),2)==1
         bz(:,ceil(ch(i)/2))=b(:,i);
         ok_bz(ceil(ch(i)/2))=ok(i);
+        zpos_bz(ceil(ch(i)/2))=zpos(i);
+        rpos_bz(ceil(ch(i)/2))=rpos(i);
     elseif rem(ch(i),2)==0
         bt(:,ch(i)/2)=b(:,i);
         ok_bt(ceil(ch(i)/2))=ok(i);
+        zpos_bt(ceil(ch(i)/2))=zpos(i);
+        rpos_bt(ceil(ch(i)/2))=rpos(i);
     end
 end
+ok_bz_plot=ok_bz;
+% ok_bt([4 5 6 7 8 9 10 15 21 27 30 42 43 49 53 69 84 87 92 94 95 96 97 98 99 100]) = false;
+ok_bt([4 5 6 7 8 9 10 15 21 27 30 37 41 42 49 53 56 69 84 87 92 94 95 96 97 98 99 100]) = false;
 
-% bz(:,[57 67 68 77 87])=-bz(:,[57 67 68 77 87]);
-% ok_bz(28)=false;
-
-[bz, ok_bz, ok_bz_plot] = ng_replace(bz, ok_bz, sheet_date);
-%ok_bz_plot=ok_bz;
-% ok_bz(68)=false;
-
-% 221219ver
-% Pcheck=[1	-1	1	1	-1	-1	-1	1	1	1	1	1	1	-1	-1	0	-1	-1	1	-1	1	0	1	-1	-1	1	-1	-1	1	-1	-1	1	-1	1	-1	1	-1	-1	-1	1	-1	-1	1	1	-1	-1	-1	-1	-1	-1	1	-1	-1	-1	-1	-1	-1	-1	-1	-1	1	1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	1	-1	1	-1	-1	-1	-1	1	-1	-1	1	-1	-1	1	-1	-1	1	1	1	-1	1	-1	-1	1	1	1	-1];
-% bz=bz.*Pcheck;
-% bz(:,[37 47 57])=-bz(:,[37 47 57]);
-% bz(:,70)=-bz(:,70);
-% for i=0:9
-%     bz(:,[7 8 9 10]+10.*i)=-bz(:,[7 8 9 10]+10.*i);
-% end
-% ok_bz([5 6 11 16 20 22 31 33 39 49 63 66 71 72 79 80 95 100])=false;
-% ok_bz(49)=true;
-% bz(:,49)=-bz(:,49);
+[zq,rq]=meshgrid(linspace(min(zpos_bz),max(zpos_bz),10),linspace(min(rpos_bz),max(rpos_bz),10));
+grid2D=struct('zq',zq,'rq',rq);
 
 %生信号描画用パラメータ
 r = 5;%プローブ本数＝グラフ出力時の縦に並べる個数
 col = 10;%グラフ出力時の横に並べる個数
-y_upper_lim = 0.12;%3e-3;%0.1;%縦軸プロット領域（b_z上限）
-y_lower_lim = -0.12;%3e-3;%-0.1;%縦軸プロット領域（b_z下限）
+y_upper_lim = 0.1;%3e-3;%0.1;%縦軸プロット領域（b_z上限）
+y_lower_lim = -0.1;%3e-3;%-0.1;%縦軸プロット領域（b_z下限）
 t_start=350;%430;%455;%横軸プロット領域（開始時間）
-t_end=600;%550;%横軸プロット領域（終了時間）
+t_end=650;%550;%横軸プロット領域（終了時間）
 % r_ch=col1+col2;%r方向から挿入した各プローブのチャンネル数
 
-f1=figure;
+f1=figure(Visible="off");
 f1.WindowState = 'maximized';
 for i=1:r
     for j=1:col
@@ -133,7 +126,7 @@ for i=1:r
 end
 sgtitle('Bz signal probe1-5')
 
-f2=figure;
+f2=figure(Visible="off");
 f2.WindowState = 'maximized';
 for i=1:r
     for j=1:col
@@ -150,80 +143,85 @@ for i=1:r
 end
 sgtitle('Bz signal probe6-10')
 
-% f3=figure;
-% f3.WindowState = 'maximized';
-% for i=1:r
-%     for j=1:col
-%         subplot(r,col,(i-1)*col+j)
-%         if ok_bt(col*(i-1)+j)==1 %okなチャンネルはそのままプロット
-%             plot(t_start:t_end,bt(t_start:t_end,col*(i-1)+j))
-%         else %NGなチャンネルは赤色点線でプロット
-%             plot(t_start:t_end,bt(t_start:t_end,col*(i-1)+j),'r:')
-%         end   
-%         title(num2str(2.*(col*(i-1)+j)));
-%         xticks([t_start t_end]);
-%         ylim([y_lower_lim y_upper_lim]);
-%     end
-% end
-% sgtitle('Bt signal probe1-5')
-% 
-% f4=figure;
-% f4.WindowState = 'maximized';
-% for i=1:r
-%     for j=1:col
-%         subplot(r,col,(i-1)*col+j)
-%         if ok_bt(col*(i+r-1)+j)==1 %okなチャンネルはそのままプロット
-%             plot(t_start:t_end,bt(t_start:t_end,col*(i+r-1)+j))
-%         else %NGなチャンネルは赤色点線でプロット
-%             plot(t_start:t_end,bt(t_start:t_end,col*(i+r-1)+j),'r:')
-%         end   
-%         title(num2str(2.*(col*(i+r-1)+j)));
-%         xticks([t_start t_end]);
-%         ylim([y_lower_lim y_upper_lim]);
-%     end
-% end
-% sgtitle('Bt signal probe6-10')
+f3=figure(Visible="off");
+f3.WindowState = 'maximized';
+for i=1:r
+    for j=1:col
+        subplot(r,col,(i-1)*col+j)
+        if ok_bt(col*(i-1)+j)==1 %okなチャンネルはそのままプロット
+            plot(t_start:t_end,bt(t_start:t_end,col*(i-1)+j))
+        else %NGなチャンネルは赤色点線でプロット
+            plot(t_start:t_end,bt(t_start:t_end,col*(i-1)+j),'r:')
+        end   
+        title(num2str(2.*(col*(i-1)+j)));
+        xticks([t_start t_end]);
+        %ylim([-0.2 0.2]);
+        ylim([y_lower_lim y_upper_lim]);
+    end
+end
+sgtitle('Bt signal probe1-5')
+
+f4=figure(Visible="off");
+f4.WindowState = 'maximized';
+for i=1:r
+    for j=1:col
+        subplot(r,col,(i-1)*col+j)
+        if ok_bt(col*(i+r-1)+j)==1 %okなチャンネルはそのままプロット
+            plot(t_start:t_end,bt(t_start:t_end,col*(i+r-1)+j))
+        else %NGなチャンネルは赤色点線でプロット
+            plot(t_start:t_end,bt(t_start:t_end,col*(i+r-1)+j),'r:')
+        end   
+        title(num2str(2.*(col*(i+r-1)+j)));
+        xticks([t_start t_end]);
+        %ylim([-0.2 0.2]);
+        ylim([y_lower_lim y_upper_lim]);
+    end
+end
+sgtitle('Bt signal probe6-10')
 
 % saveas(gcf,strcat(pathname.save,'\date',num2str(date),'_dtacq',num2str(d_tacq),'_02','.png'))
 % close
 
-%横軸z, 縦軸Bzのプロット
-f5=figure;
+% 横軸z, 縦軸Bzのプロット
+f5=figure(Visible="on");
 f5.WindowState = 'maximized';
-t=444;
+t=462;
+styles = ["-*","-x","-^","-<","->","-o","-square","-diamond","-pentagram","-hexagram"];
+tiles = tiledlayout(2,1);
+sgtitle(strcat('t=',num2str(t),' us'))
+nexttile
+hold on
 for i=1:10
     zline=(1:10:91)+(i-1);
     bz_zline=bz(t,zline);
     bz_zline(ok_bz(zline)==false)=NaN;
-    plot([-0.17 -0.1275 -0.0850 -0.0315 -0.0105 0.0105 0.0315 0.0850 0.1275 0.17],bz_zline,'-*')
+    plot([-0.17 -0.1275 -0.0850 -0.0315 -0.0105 0.0105 0.0315 0.0850 0.1275 0.17],bz_zline,styles(i),'Color','k','MarkerSize',12)
     clear bz_zline
-    hold on
+end
+hold off
+yline(0,'k--')
+xline([-0.17 -0.1275 -0.0850 -0.0315 -0.0105 0.0105 0.0315 0.0850 0.1275 0.17],':','LineWidth',1.5)
+legend('r1','r2','r3','r4','r5','r6','r7','r8','r9','r10',Location='eastoutside')
+title('Before interpolation')
+
+Bz_interped = bz_rbfinterp(rpos_bz, zpos_bz, grid2D, bz, ok_bz, t);
+nexttile
+hold on
+for i=1:10
+    zline=(1:10:91)+(i-1);
+    bz_zline=Bz_interped(zline);
+    plot(linspace(min(zpos_bz),max(zpos_bz),10),bz_zline,styles(i),'Color','k','MarkerSize',12)
+    clear bz_zline
 end
 hold off
 xlabel('z [m]')
 ylabel('Bz')
 yline(0,'k--')
-title(strcat('t=',num2str(t),' us'))
+xline([-0.17 -0.1275 -0.0850 -0.0315 -0.0105 0.0105 0.0315 0.0850 0.1275 0.17],':','LineWidth',1.5)
 legend('r1','r2','r3','r4','r5','r6','r7','r8','r9','r10',Location='eastoutside')
-
-% %横軸z, 縦軸Bzのプロット, 一本のみ
-% f6=figure;
-% f6.WindowState = 'maximized';
-% t=444;
-% for i=9
-%     zline=(1:10:91)+(i-1);
-%     bz_zline=bz(t,zline);
-%     bz_zline(ok_bz(zline)==false)=NaN;
-%     plot([-0.17 -0.1275 -0.0850 -0.0315 -0.0105 0.0105 0.0315 0.0850 0.1275 0.17],bz_zline,'-*')
-%     clear bz_zline
-%     hold on
-% end
-% hold off
-% xlabel('z [m]')
-% ylabel('Bz')
-% yline(0,'k--')
-% title(strcat('t=',num2str(t),' us'))
-% %legend('r1','r2','r3','r4','r5','r6','r7','r8','r9','r10',Location='eastoutside')
+title('After interpolation')
+tiles.TileSpacing = 'compact';
+tiles.Padding = 'compact';
 
 % bz1=[bz(t,1) bz(t,11) bz(t,21) bz(t,31) bz(t,41) bz(t,51) bz(t,61) bz(t,71) bz(t,81) bz(t,91)];
 % bz2=[bz(t,2) bz(t,12) bz(t,22) bz(t,32) bz(t,42) bz(t,52) bz(t,62) bz(t,72) bz(t,82) bz(t,92)];

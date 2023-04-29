@@ -1,18 +1,19 @@
 %%%%%%%%%%%%%%%%%%%%%%%%
 %200ch用新規pcbプローブの合体率, X点Jt, X点Et, 抵抗計算
 %%%%%%%%%%%%%%%%%%%%%%%%
-
+clear all
 %%%%%ここが各PCのパス
 %【※コードを使用する前に】環境変数を設定しておくか、matlab内のコマンドからsetenv('パス名','アドレス')で指定してから動かす
 pathname.rawdata=getenv('rawdata_path');%dtacqのrawdataの保管場所
 
 %%%%実験オペレーションの取得
+%{
 DOCID='1wG5fBaiQ7-jOzOI-2pkPAeV6SDiHc_LrOdcbWlvhHBw';%スプレッドシートのID
 T=getTS6log(DOCID);
 node='date';
-pat=230127;
+pat=230416;
 T=searchlog(T,node,pat);
-IDXlist=63;%[4:6 8:11 13 15:19 21:23 24:30 33:37 39:40 42:51 53:59 61:63 65:69 71:74];
+IDXlist=21;%[4:6 8:11 13 15:19 21:23 24:30 33:37 39:40 42:51 53:59 61:63 65:69 71:74];
 date=pat;
 n_data=numel(IDXlist);%計測データ数
 shotlist=T.a039(IDXlist);
@@ -20,15 +21,16 @@ tfshotlist=T.a039_TF(IDXlist);
 EFlist=T.EF_A_(IDXlist);
 TFlist=T.TF_kV_(IDXlist);
 dtacqlist=39.*ones(n_data,1);
+%}
 
 % % %直接入力の場合
-% dtacqlist=39;
-% shotlist=413;%240;%【input】dtacqの保存番号
-% tfshotlist=411;%0;
-% date = 230119;%【input】計測日
-% n_data=numel(shotlist);%計測データ数
-% EFlist = 150;%150;%【input】EF電流
-% TFlist=4;
+ dtacqlist=39;
+ shotlist=1323;%240;%【input】dtacqの保存番号
+ tfshotlist=1321;%0;
+ date = 230416;%【input】計測日
+ n_data=numel(shotlist);%計測データ数
+ EFlist = 150;%150;%【input】EF電流
+ TFlist=4;
 
 trange=437:510;%【input】計算時間範囲
 n=50; %【input】rz方向のメッシュ数
@@ -59,11 +61,11 @@ if numel(rawdata)< 500
 end
 
 %較正係数のバージョンを日付で判別
-sheets = sheetnames('C:\Users\kuru1\OneDrive - g.ecc.u-tokyo.ac.jp\labo\experiment\coeff200ch.xlsx');
+sheets = sheetnames('C:\Users\uswk0\OneDrive\デスクトップ\Github\test-open\pcb_experiment_new\coeff200ch.xlsx');
 sheets = str2double(sheets);
 sheet_date=max(sheets(sheets<=date));
 
-C = readmatrix('C:\Users\kuru1\OneDrive - g.ecc.u-tokyo.ac.jp\labo\experiment\coeff200ch.xlsx','Sheet',num2str(sheet_date));
+C = readmatrix('C:\Users\uswk0\OneDrive\デスクトップ\Github\test-open\pcb_experiment_new\coeff200ch.xlsx','Sheet',num2str(sheet_date));
 ok = logical(C(:,14));
 P=C(:,13);
 coeff=C(:,12);
@@ -103,7 +105,7 @@ for i=1:192
         rpos_bt(ceil(ch(i)/2))=rpos(i);
     end
 end
-[bz, ok_bz, ok_bz_plot] = ng_replace(bz, ok_bz, sheet_date);
+%[bz, ok_bz, ok_bz_plot] = ng_replace(bz, ok_bz, sheet_date);
 % ok_bz_plot=ok_bz;
 
 % %中心領域4+2本のみ
@@ -152,8 +154,8 @@ data2D.Et=diff(data2D.psi,1,3).*1e+6;
 %diffは単なる差分なので時間方向のsizeが1小さくなる %ステップサイズは1us
 data2D.Et=-1.*data2D.Et./(2.*pi.*grid2D.rq);
 
-% ok_z = zpos_bz(ok_bz_plot); %z方向の生きているチャンネル
-% ok_r = rpos_bz(ok_bz_plot); %r方向の生きているチャンネル
+ ok_z = zpos_bz(ok_bz); %z方向の生きているチャンネル
+ ok_r = rpos_bz(ok_bz); %r方向の生きているチャンネル
 
 if isstruct(grid2D)==0 %もしdtacqデータがない場合次のloopへ(データがない場合NaNを返しているため)
     return
@@ -282,12 +284,12 @@ plot(trange,-1.*xJt,'b-+','LineWidth',1)
 ylabel('Jt [A/m^{2}]')
 xlabel('Time [us]')
 xlim([437 477])%xlim([463 490])
-ylim([0 8e5])
+%ylim([0 8e5])
 yyaxis right
 plot(trange,-1.*xEt,'r-+','LineWidth',1)
 ylabel('Et [V/m]')
 xlim([437 477])%xlim([463 490])
-ylim([0 500])%ylim([0 200])
+%ylim([0 500])%ylim([0 200])
 ha2 = gca;
 ha2.LineWidth = 1;
 ha2.FontSize=10;
@@ -297,7 +299,7 @@ plot(trange,xeta,'k-+','LineWidth',1)
 ylabel('η [Ω m]')
 xlabel('Time [us]')
 xlim([437 477])%xlim([463 490])
-ylim([0 0.001])
+%ylim([0 0.002])
 ha1 = gca;
 ha1.LineWidth = 1;
 ha1.FontSize=10;
@@ -307,42 +309,43 @@ ha1.FontSize=10;
 % close
 
 % %%X点と磁気面の重ね合わせ
-% figure('Position', [0 0 1500 1500],'visible','on');
-% start=0;
-%  %t_start=470+start;
-%  for m=1:10 %図示する時間
-%      i=start+m; %end
-%      t=trange(i);
-%      subplot(2,5,m)
+ figure('Position', [0 0 1500 1500],'visible','on');
+ start=30;
+ %t_start=470+start;
+  for m=1:10 %図示する時間
+      i=start+m; %end
+      t=trange(i);
+      subplot(2,5,m)
 %     %contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.Bz(:,:,i),30,'LineStyle','none')
 %     %contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.psi(:,:,i),40,'LineStyle','none')
-%     contourf(grid2D.zq(1,:),grid2D.rq(:,1),-1.*data2D.Jt(:,:,i),30,'LineStyle','none')
+     contourf(grid2D.zq(1,:),grid2D.rq(:,1),-1.*data2D.Jt(:,:,i),30,'LineStyle','none')
 %     %contourf(grid2D.zq(1,:),grid2D.rq(:,1),-1.*data2D.Et(:,:,i),20,'LineStyle','none')
-%     colormap(jet)
-%     axis image
-%     axis tight manual
-%     caxis([-1.6*1e+6,1.3*1e+6]) %jt%カラーバーの軸の範囲
+     colormap(jet)
+     axis image
+     axis tight manual
+     caxis([-1.9*1e+6,1.3*1e+6]) %jt%カラーバーの軸の範囲
 %     %caxis([-0.07,0.07])%Bz
 %     %caxis([-5e-3,5e-3])%psi
 %     %caxis([-500,400])%Et
-%     %colorbar('Location','eastoutside')
-% %     %カラーバーのラベル付け
-% %     c = colorbar;
-% %     c.Label.String = 'Jt [A/m^{2}]';
-%     hold on
+     colorbar('Location','eastoutside')
+ %     %カラーバーのラベル付け
+      c = colorbar;
+      c.Label.String = 'Jt [A/m^{2}]';
+    hold on
 %     %plot(grid2D.zq(1,squeeze(mid(:,:,i))),grid2D.rq(:,1))
 % %contour(grid2D.zq(1,:),grid2D.rq(:,1),squeeze(data2D.psi(:,:,i)),20,'black')
 % %contour(grid2D.zq(1,:),grid2D.rq(:,1),squeeze(data2D.psi(:,:,i)),40,'black')
-%     contour(grid2D.zq(1,:),grid2D.rq(:,1),squeeze(data2D.psi(:,:,i)),[-20e-3:0.2e-3:40e-3],'black')
+     contour(grid2D.zq(1,:),grid2D.rq(:,1),squeeze(data2D.psi(:,:,i)),[-20e-3:0.2e-3:40e-3],'black')
 % %     plot(grid2D.zq(1,squeeze(mid(opoint(:,:,i),:,i))),grid2D.rq(opoint(:,:,i),1),"bo")
 % %     plot(grid2D.zq(1,squeeze(mid(xpoint(:,:,i),:,i))),grid2D.rq(xpoint(:,:,i),1),"bx")
 %     %plot(ok_z,ok_r,"k.",'MarkerSize', 6)%測定位置
-%     plot(xpos(1,i),xpos(2,i),'bx')%X点
-%     hold off
-%     title(string(t)+' us')
-%     xlabel('z [m]')
-%     ylabel('r [m]')
-%  end
+     plot(xpos(1,i),xpos(2,i),'bx')%X点
+     hold off
+     title(string(t)+' us')
+     xlim([-0.06,0.06])
+     xlabel('z [m]')
+     ylabel('r [m]')
+  end
 % % %  saveas(gcf,strcat('C:\Users\kuru1\OneDrive - g.ecc.u-tokyo.ac.jp\labo\experiment\230123\psi-jt\',num2str(shot),'_jt_TF',num2str(TF),'kV_t466us.png'))
 % % %  close
 end

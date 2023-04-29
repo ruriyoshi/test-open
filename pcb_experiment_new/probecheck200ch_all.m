@@ -18,9 +18,9 @@ pathname.rawdata=getenv('rawdata_path');%dtacqのrawdataの保管場所
 %%%%実験オペレーションの取得
 %直接入力の場合
 dtacqlist=39;
-shotlist=685;%【input】dtacqの保存番号
-tfshotlist=584;
-date = 230127;%【input】計測日
+shotlist=1330;%【input】dtacqの保存番号
+tfshotlist=0;
+date = 230428;%【input】計測日
 n=numel(shotlist);%計測データ数
 
 % %磁気面出す場合は適切な値を入力、磁場信号のみプロットする場合は変更不要
@@ -51,11 +51,11 @@ if numel(rawdata)< 500
 end
 
 %較正係数のバージョンを日付で判別
-sheets = sheetnames('C:\Users\uswk0\OneDrive\デスクトップ\Github\test-open\pcb_experiment\coeff200ch.xlsx');
+sheets = sheetnames('coeff200ch.xlsx');
 sheets = str2double(sheets);
 sheet_date=max(sheets(sheets<=date));
 
-C = readmatrix('C:\Users\uswk0\OneDrive\デスクトップ\Github\test-open\pcb_experiment\coeff200ch.xlsx','Sheet',num2str(sheet_date));
+C = readmatrix('coeff200ch.xlsx','Sheet',num2str(sheet_date));
 ok = logical(C(:,14));
 P=C(:,13);
 coeff=C(:,12);
@@ -92,7 +92,7 @@ end
 % ok_bz(28)=false;
 
 [bz, ok_bz, ok_bz_plot] = ng_replace(bz, ok_bz, sheet_date);
-%ok_bz_plot=ok_bz;
+% ok_bz_plot=ok_bz;
 % ok_bz(68)=false;
 
 % 221219ver

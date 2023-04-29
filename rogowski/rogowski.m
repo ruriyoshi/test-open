@@ -12,8 +12,9 @@ folder_directory_rogo = getenv('rogo_path');
 % folder_directory_rogo = 'C:\Users\denjo\OneDrive - The University of Tokyo\data\mag_probe\';
 
 % channels to display
-channels = [1,5,7]; %TF＋FC1PF＋FC2PF
+%channels = [1,5,7]; %TF＋FC1PF＋FC2PF
 % channels = [1,9,8]; %TF＋SEP2PF＋SEP1PF 
+channels = [5,7,8,9]; %FC1PF + FC2PF + FC1TF + FC2TF 
 
 t_start = 1; % us
 t_end = 1000; % us
@@ -43,7 +44,7 @@ plot_rows = fix(length(channels)/plot_columns)+(rem(length(channels),plot_column
 
 % transfer all rgw file to txt file; do nothing if there is no rgw file in the folder
 % 初めてデータを取得する場合テキスト形式に変換
-% rgw2txt(date_str);
+ rgw2txt(date_str);
 
 if ~isfile(path)
     disp(strcat('No such file: ',path));
@@ -120,9 +121,12 @@ plot(x/aquisition_rate+offset,data(x,channels(1)+2)*calibration(channels(1)),'Li
 hold on
 plot(x/aquisition_rate+offset,data(x,channels(2)+2)*calibration(channels(2)),'LineWidth',2);
 plot(x/aquisition_rate+offset,data(x,channels(3)+2)*calibration(channels(3)),'LineWidth',2);
-legend('TF coil','PF coil 1','PF coil 2');
+plot(x/aquisition_rate+offset,data(x,channels(4)+2)*calibration(channels(4)),'LineWidth',2);
+% legend('TF coil ','PF coil 1','PF coil 2');
+legend('PF coil 1','PF coil 2','TF coil 1','TF coil 2');
 ylim([lower upper]);
-xlim([0 t_end+offset]);
+%xlim([0 t_end+offset]);
+xlim([300 800]);
 xlabel('time [us]','FontSize',18);
 ylabel('I [kA・turn]','FontSize',18);
 ax = gca;
