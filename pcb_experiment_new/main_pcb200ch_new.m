@@ -15,12 +15,12 @@ pathname.rawdata=getenv('rawdata_path');%dtacqのrawdataの保管場所
 
 % %直接入力の場合
 dtacqlist=39;
-shotlist=1375;%[935:983];%240;%【input】dtacqの保存番号
+shotlist=1397;%[935:983];%240;%【input】dtacqの保存番号
 tfshotlist=zeros(size(shotlist));
 %tfshotlist=0;%0;
 date = 230429;%【input】計測日
 n_data=numel(shotlist);%計測データ数
-EFlist = 150;%150;%【input】EF電流
+EFlist = 120;%150;%【input】EF電流
 TFlist = 4;
 
 
@@ -30,7 +30,7 @@ n=50; %【input】rz方向のメッシュ数
 for i=1:n_data
     dtacq_num=dtacqlist;
     shot=shotlist(i);
-    tfshot=tfshotlist;
+    tfshot=tfshotlist(i);
     i_EF=EFlist;
     TF=TFlist;
     plot_psi200ch(date, dtacq_num, shot, tfshot, pathname,n,i_EF,trange,TF); 

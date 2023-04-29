@@ -5,8 +5,8 @@ clear all
 %addpath(fullfile(getenv('MDSPLUS_DIR'), 'matlab'));
 pathname.rawdata=getenv('rawdata_path');%保存先
 
-dtacqlist=39;
-shotlist=1376;%【input】dtacqの保存番号
+dtacqlist=38;
+shotlist=11433;%【input】dtacqの保存番号
  tfshotlist=zeros(size(shotlist));
 %tfshotlist = 0;
 date = 230429;%【input】計測日

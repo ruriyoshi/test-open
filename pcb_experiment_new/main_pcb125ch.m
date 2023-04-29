@@ -18,9 +18,9 @@ pathname.rawdata=getenv('rawdata_path');%dtacqのrawdataの保管場所
 %%%%実験オペレーションの取得
 %直接入力の場合
 dtacqlist=38;
-shotlist=10636;%【input】dtacqの保存番号
-tfshotlist=10631;
-date = 230126;%【input】計測日
+shotlist=11433;%【input】dtacqの保存番号
+tfshotlist=0;
+date = 230429;%【input】計測日
 n_data=numel(shotlist);%計測データ数
 
 i_EF = 120;%【input】EF電流
@@ -157,7 +157,7 @@ start=15;
     colormap(jet)
     axis image
     axis tight manual
-    caxis([-2*1e+6,1.0*1e+6]) %カラーバーの軸の範囲
+    caxis([-3*1e+6,3.0*1e+6]) %カラーバーの軸の範囲
 %     caxis([-0.1,0.1])
     colorbar('Location','eastoutside')
     %カラーバーのラベル付け

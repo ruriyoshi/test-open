@@ -3,7 +3,7 @@ clear all
 n = 50;
 trange = 400:600;
 
-for i = 1375%[938,940,941,952,953,955]
+for i = 1394%[938,940,941,952,953,955]
     load(strcat('C:\Users\uswk0\OneDrive\デスクトップ\Github\test-open\道家\修論\data\before_picture\a039_',num2str(i),'.mat'));
    
     %磁気面のみ
