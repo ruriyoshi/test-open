@@ -8,9 +8,9 @@ pathname.rawdata=getenv('rawdata_path'); %保存先
 DOCID='1wG5fBaiQ7-jOzOI-2pkPAeV6SDiHc_LrOdcbWlvhHBw';%スプレッドシートのID
 T=getTS6log(DOCID);
 node='date';
-pat=230315;
+pat=230429;
 T=searchlog(T,node,pat);
-IDXlist=[5:50 52:55 58:59];%[4:6 8:11 13 15:19 21:23 24:30 33:37 39:40 42:51 53:59 61:63 65:69 71:74];
+IDXlist=[9:26];%[4:6 8:11 13 15:19 21:23 24:30 33:37 39:40 42:51 53:59 61:63 65:69 71:74];
 n_data=numel(IDXlist);%計測データ数
 shotlist=T.a039(IDXlist);
 tfshotlist=T.a039_TF(IDXlist);
@@ -23,7 +23,7 @@ dtacqlist=39.*ones(n_data,1);
 % % tfshotlist=zeros(size(shotlist));
 % tfshotlist = 1106;
 
-date = 230315;%【input】計測日
+date = 230428;%【input】計測日
 n=numel(shotlist);%計測データ数
 
 %RC係数読み込み
