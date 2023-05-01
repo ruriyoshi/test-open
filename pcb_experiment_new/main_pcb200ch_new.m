@@ -15,12 +15,12 @@ pathname.rawdata=getenv('rawdata_path');%dtacqのrawdataの保管場所
 
 % %直接入力の場合
 dtacqlist=39;
-shotlist=1397;%[935:983];%240;%【input】dtacqの保存番号
-tfshotlist=zeros(size(shotlist));
-%tfshotlist=0;%0;
-date = 230429;%【input】計測日
+shotlist=[1346:1348,1350,1352];%[935:983];%240;%【input】dtacqの保存番号
+%tfshotlist=zeros(size(shotlist));
+tfshotlist=1330*ones(size(shotlist));%0;
+date = 230428;%【input】計測日
 n_data=numel(shotlist);%計測データ数
-EFlist = 120;%150;%【input】EF電流
+EFlist = 160;%150;%【input】EF電流
 TFlist = 4;
 
 
@@ -186,7 +186,7 @@ if isstruct(grid2D)==0 %もしdtacqデータがない場合次のloopへ(デー�
 end
 
 clearvars -except data2D grid2D shot;
-filename = strcat('C:\Users\uswk0\OneDrive\デスクトップ\Github\test-open\道家\修論\data\before_picture\a039_',num2str(shot),'.mat');
+filename = strcat('C:\Users\uswk0\OneDrive - g.ecc.u-tokyo.ac.jp\data\before_picture\a039_',num2str(shot),'.mat');
 save(filename)
 end
 

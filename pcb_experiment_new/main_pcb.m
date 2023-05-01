@@ -3,22 +3,22 @@ clear all
 n = 50;
 trange = 400:600;
 
-for i = 1394%[938,940,941,952,953,955]
-    load(strcat('C:\Users\uswk0\OneDrive\デスクトップ\Github\test-open\道家\修論\data\before_picture\a039_',num2str(i),'.mat'));
+for i = [1333,1336:1340,1342:1345,1346:1348,1350,1352]%[938,940,941,952,953,955]
+    load(strcat('C:\Users\uswk0\OneDrive - g.ecc.u-tokyo.ac.jp\data\before_picture\a039_',num2str(i),'.mat'));
    
     %磁気面のみ
-    plot_psi_multi_pcb(data2D,grid2D,false,true,i);
+    %plot_psi_multi_pcb(data2D,grid2D,false,true,i);
    
     %fitrate_200ch:x点もろもろ&磁気軸のデータ計算コード
-    %plot_psi_multi_pcb_for_axis:磁気面 & x点 & 磁気軸
-    %[psi_pr, fitrate, xJt, xEt, xeta, xpos,max_psi_left_pos, max_psi_right_pos] = fitrate_200ch(data2D,grid2D,shot,n,trange);
-    %plot_psi_multi_pcb_for_axis(data2D,grid2D,false,true,i,n,trange,xpos,max_psi_left_pos, max_psi_right_pos);
-    %saveas(gcf,strcat('C:\Users\uswk0\OneDrive\デスクトップ\Github\test-open\道家\修論\data\picture\a039_',num2str(i),'.png'))
+    %plot_psi_multi_pcb_for_axis:磁気面 & x点 & 磁気軸描画コード
+    [psi_pr, fitrate, xJt, xEt, xeta, xpos,max_psi_left_pos, max_psi_right_pos] = fitrate_200ch(data2D,grid2D,shot,n,trange);
+    plot_psi_multi_pcb_for_axis(data2D,grid2D,false,true,i,n,trange,xpos,max_psi_left_pos, max_psi_right_pos);
+    saveas(gcf,strcat('C:\Users\uswk0\OneDrive - g.ecc.u-tokyo.ac.jp\data\picture\a039_',num2str(i),'.png'))
    
-    %磁気面
+   
     %plot_merging_rate:合体率抵抗率時間発展描画コード
-    %plot_merging_rate(psi_pr, fitrate, xJt, xEt, xeta,trange);
-    %saveas(gcf,strcat('C:\Users\uswk0\OneDrive\デスクトップ\Github\test-open\道家\修論\data\picture\a039_',num2str(i),'_fitrate.png'))%
+    plot_merging_rate(psi_pr, fitrate, xJt, xEt, xeta,trange);
+    saveas(gcf,strcat('C:\Users\uswk0\OneDrive - g.ecc.u-tokyo.ac.jp\data\picture\a039_',num2str(i),'_fitrate.png'))%
    %}
 %%%%
 
@@ -29,7 +29,7 @@ for i = 1394%[938,940,941,952,953,955]
 %     saveas(gcf,strcat('/Users/yunhancai/Downloads/rogo_230225_',num2str(i),'.png'))%,
 %    close
 %     disp(i)
-    clearvars -except i 
+    clearvars -except i n trange
 end
 
 %plot_B_z_in_time(B_z,ch_dist,350,600)

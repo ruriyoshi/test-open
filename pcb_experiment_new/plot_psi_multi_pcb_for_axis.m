@@ -53,8 +53,8 @@ psi_mesh_r = grid2D.rq;
 
 % jt
 
-min_color = -1.3*1e+6;
-max_color = 1.3*1e+6;
+min_color = -1.5*1e+6;
+max_color = 1.5*1e+6;
 contour_layer_color =  min_color:(max_color-min_color)/50:max_color;
 
 
