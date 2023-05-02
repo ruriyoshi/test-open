@@ -2,9 +2,9 @@ function [grid2D,data2D] = process_PCBdata(date, dtacq_num, shot, tfshot, pathna
 
 pathname.rawdata=getenv('rawdata_path');%dtacqのrawdataの保管場所
 
-filename=strcat(pathname.rawdata,'rawdata_dtacq',num2str(dtacq_num),'_shot',num2str(shot),'_tfshot',num2str(tfshot),'.mat');
+filename=strcat(pathname.rawdata,'/rawdata_dtacq',num2str(dtacq_num),'_shot',num2str(shot),'_tfshot',num2str(tfshot),'.mat');
 if exist(filename,"file")==0
-    disp('File does not exit!');
+    disp('File does not exist!');
     return
 end
 load(filename,'rawdata');%1000×192

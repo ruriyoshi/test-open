@@ -11,10 +11,12 @@ path2 = strcat(path,'/converted');
 if exist(path2,'dir') == 0
     mkdir(path2);
     NumData = numel(MyFolderInfo);
+    MyFolderInfo = MyFolderInfo(3:NumData);
 else
     NumData = numel(MyFolderInfo)-1;
+    MyFolderInfo = MyFolderInfo(4:NumData);
 end
-MyFolderInfo = MyFolderInfo(4:NumData);
+% MyFolderInfo = MyFolderInfo(4:NumData);
 MyFolderDir = MyFolderInfo.folder;
 MyFolderName = {MyFolderInfo.name};
 FolderInfo = strcat(MyFolderDir,'/',MyFolderName);

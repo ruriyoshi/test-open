@@ -37,7 +37,7 @@ dtacqlist=39.*ones(n_data,1);
 % TFlist = 0;
 
 trange=400:600;%【input】計算時間範囲
-n=10; %【input】rz方向のメッシュ数
+n=50; %【input】rz方向のメッシュ数
 
 for i=1:n_data
     dtacq_num=dtacqlist;
@@ -188,9 +188,9 @@ dt = 4;
      t=trange(i);
      subplot(4,4,m)
 %     contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.Bz(:,:,i),30,'LineStyle','none')
-    % contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.psi(:,:,i),40,'LineStyle','none')
+    contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.psi(:,:,i),40,'LineStyle','none')
     % contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.Bt(:,:,i),-100e-3:0.5e-3:100e-3,'LineStyle','none')
-    contourf(grid2D.zq(1,:),grid2D.rq(:,1),-1.*data2D.Jt(:,:,i),30,'LineStyle','none')
+    % contourf(grid2D.zq(1,:),grid2D.rq(:,1),-1.*data2D.Jt(:,:,i),30,'LineStyle','none')
 %     contourf(grid2D.zq(1,:),grid2D.rq(:,1),-1.*data2D.Et(:,:,i),20,'LineStyle','none')
     colormap(jet)
     axis image

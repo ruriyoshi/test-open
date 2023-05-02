@@ -34,7 +34,7 @@ end
 PositionPath = strcat('/Users/shinjirotakeda/OneDrive - The University of Tokyo/Documents/SXR_Images/',num2str(date),'/PositionCheck.tif');
 CalibrationImage = imread(PositionPath);
 [centers,radii]=FindFibers(CalibrationImage);
-IW = round(mean(radii));
+% IW = round(mean(radii));
 centers = round(centers);
 IW = 80;
 
@@ -133,9 +133,9 @@ for i=1:8
         subplot(4,4,2*(i-1)+2);imagesc(RoughCalibrated2);title(title2);
     end
     
-%     figure;imagesc(RoughImage1);
-%     RoughImage1(k) = RoughImage1(k).*squeeze(CalibrationFactor(1,i,:));
-%     figure;imagesc(RoughImage1);
+    % figure;imagesc(RoughImage1);
+    % RoughImage1(k) = RoughImage1(k).*squeeze(CalibrationFactor(1,i,:));
+    % figure;imagesc(RoughImage1);
 
     VectorImages(1,i,:) = RoughImage1(k);
     VectorImages(2,i,:) = RoughImage2(k);
