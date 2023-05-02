@@ -59,6 +59,7 @@ max_color = 1.5*1e+6;
 contour_layer_color =  min_color:(max_color-min_color)/50:max_color;
 
 
+
 %min_color = -0.03;
 %max_color = 0.03;
 %contour_layer_color =  min_color:(max_color-min_color)/50:max_color;
@@ -110,10 +111,9 @@ for i = time
     else
         if (show_jt || show_Et || show_Bz || show_Bt)
             contourf(psi_mesh_z,psi_mesh_r,color_store(:,:,i),contour_layer_color,'LineStyle','none');
-            caxis([min_color max_color])
-            contourf(psi_mesh_z,psi_mesh_r,color_store(:,:,i),contour_layer,'Fill','off','LineWidth',0.6,'LineColor','white');
+            caxis([min_color max_color]);
         end
-        contour(psi_mesh_z,psi_mesh_r,psi_store(:,:,i),contour_layer,'Fill','off','LineWidth',0.6);
+        contour(psi_mesh_z,psi_mesh_r,psi_store(:,:,i),contour_layer,'Fill','off','k-','LineWidth',0.6);
     end
     
     if show_probe

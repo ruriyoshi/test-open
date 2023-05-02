@@ -15,15 +15,15 @@ function h = plot_psi_multi_pcb_for_axis(data2D,grid2D,fill,fixed_Clayer,shot,n,
 % Number of plots in a row and in a column
 % It is required that row * column = length(time)
 
-h = figure('Position', [0 0 800 1500],'visible','off');
-%h = figure('Position', [0 0 800 1500],'visible','on');
-row = 4;
+%h = figure('Position', [0 0 800 1500],'visible','off');
+h = figure('Position', [0 0 800 1500],'visible','on');
+row = 3;
 column = 4;
 time_offset = 399;
 %time = (482:3:527)-time_offset;
-time = (450:3:495)-time_offset;
+%time = (450:3:495)-time_offset;
 %time = (420:3:465) - time_offset;
-%time = (464:1:473)-time_offset;
+time = (464:1:475)-time_offset;
 %time = 420:4:480;
 %time = 450:4:562;
 %time = 450:4:470;
@@ -57,6 +57,7 @@ psi_mesh_r = grid2D.rq;
 min_color = -1.5*1e+6;
 max_color = 1.5*1e+6;
 contour_layer_color =  min_color:(max_color-min_color)/50:max_color;
+
 
 
 %min_color = -0.03;
@@ -110,10 +111,10 @@ for i = time
     else
         if (show_jt || show_Et || show_Bz || show_Bt)
             contourf(psi_mesh_z,psi_mesh_r,color_store(:,:,i),contour_layer_color,'LineStyle','none');
-            caxis([min_color max_color])
-            contourf(psi_mesh_z,psi_mesh_r,color_store(:,:,i),contour_layer,'Fill','off','LineWidth',0.6,'LineColor','white');
+            caxis([min_color max_color]);
         end
-        contour(psi_mesh_z,psi_mesh_r,psi_store(:,:,i),contour_layer,'Fill','off','LineWidth',0.6);
+        contourf(psi_mesh_z,psi_mesh_r,psi_store(:,:,i),contour_layer,'Fill','off','LineWidth',0.6);
+        contour(psi_mesh_z,psi_mesh_r,color_store(:,:,i),[1.0e6 0.8e6 0.5e6],'r-','LineWidth',0.01);
     end
     
     if show_probe
@@ -140,8 +141,8 @@ for i = time
     xlabel('z (m)');
     ylabel('r (m)');
     n = n+1;
-    %xlim([-0.1 0.1]);
-    %ylim([0.15 0.33]);
+    xlim([-0.1 0.1]);
+    ylim([0.15 0.33]);
     daspect([1 1 1])
     hold off
     
@@ -150,7 +151,7 @@ tiles.TileSpacing = 'tight';
 tiles.Padding = 'tight';
 cb = colorbar;
 cb.Layout.Tile = 'east';
-colormap(jet)
+colormap(whitejet)
 axis image
 axis tight manual
 

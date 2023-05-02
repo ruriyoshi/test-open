@@ -30,7 +30,7 @@ ha1.FontSize=10;
 
 
 %合体率とX点Jt,Et,etaのplot
-figure('Position',[0,0,300,700],'visible','off')
+figure('Position',[0,0,300,700],'visible','on')
 subplot(3,1,1)
 plot(trange,fitrate,'k-+','LineWidth',1)
 ylabel('Fitrate')
