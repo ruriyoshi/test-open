@@ -6,7 +6,7 @@
 function [psi_pr, fitrate, xJt, xEt, xeta, xpos,max_psi_left_pos, max_psi_right_pos] = fitrate_200ch(data2D,grid2D,shot,n,trange)
 
 %
-frame=numel(trange)
+frame=numel(trange);
 
 %max_psi:各時間、各列(z)ごとのpsiの最大値を要素とするvector(dim 1 = z方向(列))。size(1,z,t)
 %max_psi_r:各時間、各列の最大値のrのindexを要素とするvector。size(1,z,t)
@@ -126,6 +126,10 @@ for i=1:frame
 end
 
 fitrate=psi_pr(3,:)./min(psi_pr(1:2,:),[],1);
+
+%trange=400:600のときt=430のオフセット引いて合体率を0初めにする
+%fitrate=(psi_pr(3,:)-mean(psi_pr(3,1:10),"omitnan"))./min(psi_pr(1:2,:),[],1);
+%fitrate = fitrate - fitrate(:,30);
 xeta=xEt(1,:)./xJt(1,:);
 
 % %23012763 %456us

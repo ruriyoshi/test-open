@@ -4,7 +4,7 @@ function plot_merging_rate(psi_pr, fitrate, xJt, xEt, xeta,trange)
 %
 
 %合体率のplot
-figure('Position',[700,350,500,300])
+figure('Position',[700,350,500,300],'visible','off')
 yyaxis left
 plot(trange,psi_pr(1,:),'k--+','LineWidth',1)
 hold on
@@ -14,13 +14,13 @@ hold off
 ylabel('Psi [Wb]')
 xlabel('Time [us]')
 ylim([0 inf])
-xlim([430 473])
+xlim([437 473])
 yyaxis right
 plot(trange,fitrate,'r-+','LineWidth',1)
 ylabel('Fitrate')
 legend('Psi_{private1}','Psi_{private2}','Psi_{common}','Fitrate','Location','eastoutside')
 ylim([0 1])
-xlim([430 473])
+xlim([437 473])
 ha1 = gca;
 ha1.LineWidth = 1;
 ha1.FontSize=10;
@@ -30,13 +30,13 @@ ha1.FontSize=10;
 
 
 %合体率とX点Jt,Et,etaのplot
-figure('Position',[0,0,300,700])
+figure('Position',[0,0,300,700],'visible','off')
 subplot(3,1,1)
 plot(trange,fitrate,'k-+','LineWidth',1)
 ylabel('Fitrate')
 xlabel('Time [us]')
 ylim([0 1])
-xlim([430 472])
+xlim([437 472])
 ha1 = gca;
 ha1.LineWidth = 1;
 ha1.FontSize=10;
@@ -51,7 +51,7 @@ ylim([0 inf])
 yyaxis right
 plot(trange,-1.*xEt,'r-+','LineWidth',1)
 ylabel('Et [V/m]')
-xlim([430 472])
+xlim([437 472])
 ylim([0 inf])
 ha2 = gca;
 ha2.LineWidth = 1;
@@ -61,7 +61,7 @@ subplot(3,1,3)
 plot(trange,xeta,'k-+','LineWidth',1)
 ylabel('η [Ω m]')
 xlabel('Time [us]')
-xlim([430 472])
+xlim([437 472])
 ylim([0 inf])
 ha1 = gca;
 ha1.LineWidth = 1;
