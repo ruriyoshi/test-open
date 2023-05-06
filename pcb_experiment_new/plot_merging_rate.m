@@ -20,7 +20,7 @@ plot(trange,fitrate,'r-+','LineWidth',1)
 ylabel('Fitrate')
 legend('Psi_{private1}','Psi_{private2}','Psi_{common}','Fitrate','Location','eastoutside')
 ylim([0 1])
-xlim([437 473])
+xlim([445 473])
 ha1 = gca;
 ha1.LineWidth = 1;
 ha1.FontSize=10;
@@ -46,12 +46,12 @@ yyaxis left
 plot(trange,-1.*xJt,'b-+','LineWidth',1)
 ylabel('Jt [A/m^{2}]')
 xlabel('Time [us]')
-xlim([430 472])
+xlim([445 472])
 ylim([0 inf])
 yyaxis right
 plot(trange,-1.*xEt,'r-+','LineWidth',1)
 ylabel('Et [V/m]')
-xlim([437 472])
+xlim([445 472])
 ylim([0 inf])
 ha2 = gca;
 ha2.LineWidth = 1;
@@ -61,8 +61,8 @@ subplot(3,1,3)
 plot(trange,xeta,'k-+','LineWidth',1)
 ylabel('η [Ω m]')
 xlabel('Time [us]')
-xlim([437 472])
-ylim([0 inf])
+xlim([445 472])
+ylim([0 6e-3])
 ha1 = gca;
 ha1.LineWidth = 1;
 ha1.FontSize=10;

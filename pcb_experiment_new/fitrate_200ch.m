@@ -41,6 +41,11 @@ for i=1:frame
     %disp(max_psi_ind_left);
     max_psi_ind_right=max(max_psi_ind);
     %disp(max_psi_ind_right);
+    
+    if i == 80
+        disp(max_psi(min(max_psi_ind),i));
+        disp(max_psi(max(max_psi_ind),i));
+    end
 
 %   min(max_psi_ind):複数max_psi点があった場合小さい方のz座標(左側)
 %   max(max_psi_ind):複数max_psi点があった場合大きい方のz座標(右側)
@@ -70,12 +75,13 @@ for i=1:frame
     max_psi_right_pos(2,i) = grid2D.rq(max_psi_r(1,n,i),1);
     else
     psi_pr(2,i)=max_psi(max(max_psi_ind),i);
+  
     %磁気軸座標の保存
     max_psi_right_pos(1,i) = grid2D.zq(1,max_psi_ind_right);
     max_psi_right_pos(2,i) = grid2D.rq(max_psi_r(1,max_psi_ind_right,i),1);
     end
     
-
+  
 
     if numel(find(islocalmin(smooth(max_psi(:,i)),'MaxNumExtrema', 1)))==0
         psi_pr(3,i)=NaN;
@@ -127,10 +133,15 @@ end
 
 fitrate=psi_pr(3,:)./min(psi_pr(1:2,:),[],1);
 
-%trange=400:600のときt=430のオフセット引いて合体率を0初めにする
-%fitrate=(psi_pr(3,:)-mean(psi_pr(3,1:10),"omitnan"))./min(psi_pr(1:2,:),[],1);
-%fitrate = fitrate - fitrate(:,30);
+
 xeta=xEt(1,:)./xJt(1,:);
+
+%抵抗率が負になったらNaN
+for l = 1:size(xeta)
+    if xeta(l)<0
+        xeta(l) = NaN;
+    end
+end
 
 % %23012763 %456us
 % psi_pr(:,20)=NaN;

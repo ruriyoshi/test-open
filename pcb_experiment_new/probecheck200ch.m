@@ -186,7 +186,7 @@ sgtitle('Bt signal probe6-10')
 f5=figure(Visible="on");
 f5.WindowState = 'maximized';
 t=462;
-styles = ["-*","-x","-^","-<","->","-o","-square","-diamond","-pentagram","-hexagram"];
+styles = ["r-*","b-x","g-^","k-<","r->","b-o","g-square","k-diamond","r-pentagram","b-hexagram"];
 tiles = tiledlayout(2,1);
 sgtitle(strcat('t=',num2str(t),' us'))
 nexttile
@@ -195,7 +195,9 @@ for i=1:10
     zline=(1:10:91)+(i-1);
     bz_zline=bz(t,zline);
     bz_zline(ok_bz(zline)==false)=NaN;
-    plot([-0.17 -0.1275 -0.0850 -0.0315 -0.0105 0.0105 0.0315 0.0850 0.1275 0.17],bz_zline,styles(i),'Color','k','MarkerSize',12)
+    %figure;
+    %plot([-0.17 -0.1275 -0.0850 -0.0315 -0.0105 0.0105 0.0315 0.0850 0.1275 0.17],bz_zline,styles(i),'Color','k','MarkerSize',12)
+    plot([-0.17 -0.1275 -0.0850 -0.0315 -0.0105 0.0105 0.0315 0.0850 0.1275 0.17],bz_zline,styles(i),'MarkerSize',12)
     clear bz_zline
 end
 hold off
@@ -210,7 +212,9 @@ hold on
 for i=1:10
     zline=(1:10:91)+(i-1);
     bz_zline=Bz_interped(zline);
-    plot(linspace(min(zpos_bz),max(zpos_bz),10),bz_zline,styles(i),'Color','k','MarkerSize',12)
+    %figure;
+   % plot(linspace(min(zpos_bz),max(zpos_bz),10),bz_zline,styles(i),'Color','k','MarkerSize',12)
+     plot(linspace(min(zpos_bz),max(zpos_bz),10),bz_zline,styles(i),'MarkerSize',12)
     clear bz_zline
 end
 hold off
