@@ -32,7 +32,7 @@ time_offset = 399;
 %time = 450:4:470;
 %time = 450:32:482;
 %time = 480;
-time = 473;
+time = 462-time_offset;
 %time = 440:3:485;
 %time = 440:4:500;
 %time = 430:4:490;
@@ -56,8 +56,8 @@ psi_mesh_r = grid2D.rq;
 
 % jt
 
-min_color = -1.4*1e+6;
-max_color = 1.4*1e+6;
+min_color = -1.5*1e+6;
+max_color = 1.5*1e+6;
 contour_layer_color =  min_color:(max_color-min_color)/50:max_color;
 
 
@@ -142,7 +142,7 @@ for i = time
     ylabel('r (m)');
     j = j+1;
     xlim([-0.08 0.08]);
-    %ylim([0.15 0.33]);
+    ylim([0.15 0.33]);
 
     daspect([1 1 1])
     hold off
@@ -152,7 +152,6 @@ tiles.TileSpacing = 'tight';
 tiles.Padding = 'tight';
 cb = colorbar;
 cb.Layout.Tile = 'east';
-cb.TickLabels.FontSize = 11;
 cb.Label.String = 'Jt (A/m^2)';
 %caxis([-8e-3,8e-3])%psi
 colormap(jet)

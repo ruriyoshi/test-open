@@ -3,7 +3,7 @@ clear all
 n = 50;
 trange = 400:600;
 
-for i =330%[1336,1337,1338,1344, 1345, 1352]%[1333,1336:1340,1342:1345,1346:1348,1350,1352]%[938,940,941,952,953,955]
+for i =1337%[1336,1337,1338,1344, 1345, 1352]%[1333,1336:1340,1342:1345,1346:1348,1350,1352]%[938,940,941,952,953,955]
     load(strcat('C:\Users\uswk0\OneDrive - g.ecc.u-tokyo.ac.jp\data\before_picture\a039_',num2str(i),'.mat'));
    
     %磁気面のみ
@@ -17,8 +17,8 @@ for i =330%[1336,1337,1338,1344, 1345, 1352]%[1333,1336:1340,1342:1345,1346:1348
    
    
     %plot_merging_rate:合体率抵抗率時間発展描画コード
-    %plot_merging_rate(psi_pr, fitrate, xJt, xEt, xeta,trange);
-    %saveas(gcf,strcat('C:\Users\uswk0\OneDrive - g.ecc.u-tokyo.ac.jp\data\picture\a039_',num2str(i),'_fitrate.png'))%
+    plot_merging_rate(psi_pr, fitrate, xJt, xEt, xeta,trange);
+    saveas(gcf,strcat('C:\Users\uswk0\OneDrive - g.ecc.u-tokyo.ac.jp\data\picture\a039_',num2str(i),'_fitrate.png'))%
    %}
 %%%%
 

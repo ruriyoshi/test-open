@@ -33,10 +33,10 @@ ha1.FontSize=10;
 figure('Position',[0,0,300,700],'visible','on')
 subplot(3,1,1)
 plot(trange,fitrate,'k-+','LineWidth',1)
-ylabel('Fitrate')
+ylabel('Merging Ratio')
 xlabel('Time [us]')
 ylim([0 1])
-xlim([437 472])
+xlim([445 472])
 ha1 = gca;
 ha1.LineWidth = 1;
 ha1.FontSize=10;
