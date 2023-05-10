@@ -1,6 +1,6 @@
 function [] = clc_parameters(N_projection,N_grid,filepath)
 
-% filepath = '/Users/shinjirotakeda/Documents/GitHub/test-open/Soft X-ray/parameters.mat';
+% filepath = '/Users/shinjirotakeda/Documents/GitHub/test-open/Soft X-ray/Four-View_Simulation/parameters.mat';
 
 % 視線の分布、重み行列の作成
 zhole1=40;zhole2=-40;
@@ -8,13 +8,13 @@ zmin1=-240;zmax1=320;zmin2=-320;zmax2=240;
 rmin=55;rmax=375;
 range = [zmin1,zmax1,zmin2,zmax2,rmin,rmax];
 l1 = MCPLine_up(N_projection,zhole1,false);
-gm2d1 = LineProjection(l1,N_grid,zmin1,zmax1,rmin,rmax,true);
+gm2d1 = LineProjection(l1,N_grid,zmin1,zmax1,rmin,rmax,false);
 l2 = MCPLine_up(N_projection,zhole2,false);
-gm2d2 = LineProjection(l2,N_grid,zmin2,zmax2,rmin,rmax,true);
+gm2d2 = LineProjection(l2,N_grid,zmin2,zmax2,rmin,rmax,false);
 l3 = MCPLine_down(N_projection,zhole1,false);
-gm2d3 = LineProjection(l3,N_grid,zmin1,zmax1,rmin,rmax,true);
+gm2d3 = LineProjection(l3,N_grid,zmin1,zmax1,rmin,rmax,false);
 l4 = MCPLine_down(N_projection,zhole2,false);
-gm2d4 = LineProjection(l4,N_grid,zmin2,zmax2,rmin,rmax,true);
+gm2d4 = LineProjection(l4,N_grid,zmin2,zmax2,rmin,rmax,false);
 
 % ラプラシアン行列の計算と特異値分解
 C = Laplacian(N_grid);
@@ -45,9 +45,9 @@ if M>K
     s4 = [s4 zeros(1,M-K)];
 end
 
-% save(filepath,'gm2d1','gm2d2','gm2d3','gm2d4', ...
-%     'U1','U2','U3','U4','s1','s2','s3','s4', ...
-%     'v1','v2','v3','v4','M','K','range','N_projection','N_grid');
+save(filepath,'gm2d1','gm2d2','gm2d3','gm2d4', ...
+    'U1','U2','U3','U4','s1','s2','s3','s4', ...
+    'v1','v2','v3','v4','M','K','range','N_projection','N_grid');
 
 end
 
@@ -134,8 +134,9 @@ d_hole =24.4; % distance between the hole and the MCP
 r_mcp=10;  %radius of the MCP plate
 % Y_hole=425.24;  X_hole=195.13;          % position of the hole
 Y_hole = 427.85+12; 
-X_hole = 209.62; 
+% X_hole = 209.62; 
 % X_hole_new_down = X_hole_new_up - 64;
+X_hole = 145.62;
 Y_initial=Y_hole+d_hole;  X_initial=X_hole-r_mcp;  Z_initial=Z_hole+r_mcp;    %CCD position
 X_end=X_hole+r_mcp;      Z_end=Z_hole-r_mcp;
 

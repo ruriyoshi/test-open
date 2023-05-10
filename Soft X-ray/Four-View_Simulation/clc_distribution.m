@@ -13,6 +13,7 @@ Vgamma = zeros(1,21);
 
 for n=1:l_g
     rho = M*gamma(n)./(s.^2+M*gamma(n));
+
     V11 = rho.*(Z.');
     V1(n)=M*sum(V11.^2);
     V2(n)=(sum(rho))^2;
@@ -60,44 +61,7 @@ if NL
     W(W==Inf) = -1;
     W(W<0) = max(W, [], 'all');
     EE = (H' * H + (M * gamma) .* (C'* W * C))^(-1) * H' * G'; 
-    
-%     for j = 1:2
-% %         tic
-% %         disp(j);
-%         % 二次Fisher情報量
-% %         whos H
-% %         whos M
-% %         whos gamma
-% %         whos C
-% %         whos W
-% %         whos G
-% %         20回呼び出されて3340秒消費（特にmpower?）mpower
-%         EE = (H' * H + (M * gamma) .* (C'* W * C))^(-1) * H' * G'; 
-% %         最初の計算だけは特異値分解でどうにかならんか
-% %         disp('finished');
-% %         diag_W = diag(W);
-% %         index = 1:size(diag(W));
-%         %plot(index, diag_W);hold on;
-% %         行列形式でのパラメータ更新（合計710秒）
-%         W(diag_idx) = 1./EE;
-%         W(W==Inf) = -1;
-%         W(W<0) = max(W, [], 'all');
-% % % %         従来方式（合計1755秒）
-% % %         for i = 1:size(C, 1)
-% % %             if EE(i) > 0
-% % %                 W(i, i) = 1/EE(i);
-% % %             else
-% % %                 W(i, i) = -100;
-% % %             end
-% % %         end
-% % %         for i = 1:size(C, 1)
-% % %             if W(i, i) == -100
-% % % %                 10000回呼び出されて1000秒消費
-% % %                 W(i, i) = max(W, [], 'all');
-% % %             end
-% % %         end
-% % %         toc
-%     end
+
     EE = reshape(EE, sqrt(K), sqrt(K));
 else
     for i=1:K
