@@ -2,8 +2,8 @@ function plot_SXR_test()
 
 NL = false;
 
-N_projection_new = 10;
-N_grid_new = 10;
+N_projection_new = 30;
+N_grid_new = 40;
 
 % 再構成計算に必要なパラメータを計算するなら読み込む、しない場合も範囲に関しては読み込む
 filepath = '/Users/shinjirotakeda/Documents/GitHub/test-open/Soft X-ray/Four-View_Simulation/parameters.mat';
@@ -36,12 +36,12 @@ EE = clc_distribution(M,K,gm2d1,U1,s1,v1,Iwgn,plot_flag,NL);
 
 % 表示範囲の設定に使うパラメータを取得
 range = range./1000;
-zmin1 = range(1);
-zmax1 = range(2);
+zmin = range(1);
+zmax = range(2);
 rmin = range(5);
 rmax = range(6);
 r_space_SXR = linspace(rmin,rmax,size(EE,1));
-z_space_SXR = linspace(zmin1,zmax1,size(EE,2));
+z_space_SXR = linspace(zmin,zmax,size(EE,2));
 
 r_range = find(0.060<=r_space_SXR & r_space_SXR<=0.330);
 r_space_SXR = r_space_SXR(r_range);

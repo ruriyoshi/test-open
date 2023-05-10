@@ -18,13 +18,17 @@ gm2d4 = LineProjection(l4,N_grid,zmin2,zmax2,rmin,rmax,false);
 
 % ラプラシアン行列の計算と特異値分解
 C = Laplacian(N_grid);
-[U1,S1,V1]=svd(gm2d1*(C^(-1)),'econ');
+% [U1,S1,V1]=svd(gm2d1*(C^(-1)),'econ');
+% [U2,S2,V2]=svd(gm2d2*(C^(-1)),'econ');
+% [U3,S3,V3]=svd(gm2d3*(C^(-1)),'econ');
+% [U4,S4,V4]=svd(gm2d4*(C^(-1)),'econ');
+[U1,S1,V1]=svd(gm2d1*(C^(-1)));
+[U2,S2,V2]=svd(gm2d2*(C^(-1)));
+[U3,S3,V3]=svd(gm2d3*(C^(-1)));
+[U4,S4,V4]=svd(gm2d4*(C^(-1)));
 v1=(C^(-1)*V1);
-[U2,S2,V2]=svd(gm2d2*(C^(-1)),'econ');
 v2=(C^(-1)*V2);
-[U3,S3,V3]=svd(gm2d3*(C^(-1)),'econ');
 v3=(C^(-1)*V3);
-[U4,S4,V4]=svd(gm2d4*(C^(-1)),'econ');
 v4=(C^(-1)*V4);
 
 [M,K] = size(gm2d1);

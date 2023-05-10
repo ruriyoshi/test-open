@@ -10,7 +10,8 @@ r_0=-0.3;
 z=linspace(-1,1,m);
 r=linspace(-1,1,n);
 
-z_grid = linspace(200,-200,m);
+% z_grid = linspace(200,-200,m);
+z_grid = linspace(-200,200,m);
 r_grid = linspace(330,70,n);
 
 [r_space,z_space] = meshgrid(r,z); %rが横、zが縦の座標系（左上最小）
@@ -53,11 +54,15 @@ Iwgn = Iwgn.';
 % figure;plot(j,I_check);
 
 if plot_flag
-    figure;imagesc(z_grid,r_grid,EE);c=colorbar('Ticks',[0.1,0.5,1]);
-    c.Label.String='Assumed Intensity [a.u.]';xlabel('Z [mm]');ylabel('R [mm]');
-    axis xy
-    ax = gca;
-    ax.XDir = 'reverse';
+    [mesh_z,mesh_r] = meshgrid(z_grid,r_grid);
+    [~,h] = contourf(mesh_z,mesh_r,EE,20);
+    h.LineStyle = 'none';
+    c=colorbar;c.Label.String='Intensity [a.u.]';c.FontSize=18;
+    % figure;imagesc(z_grid,r_grid,EE);c=colorbar('Ticks',[0.1,0.5,1]);
+    % c.Label.String='Assumed Intensity [a.u.]';xlabel('Z [mm]');ylabel('R [mm]');
+    % axis xy
+    % ax = gca;
+    % ax.XDir = 'reverse';
     figure;imagesc(II);c=colorbar('Ticks',[0,20,40]);
     c.Label.String='Assumed Intensity [a.u.]';xlabel('Z Pixels');ylabel('R Pixels');
     figure;imagesc(IIwgn);c=colorbar('Ticks',[0,20,40]);

@@ -48,11 +48,12 @@ if NL
     W = eye(size(C, 1));
     diag_idx = find(W);
     for i=1:K
-        if M>K
-            v_1 = [v(i,:) zeros(1,M-K)];
-        else
-            v_1 = v(i,:);
-        end
+        v_1 = v(i,:);
+        % if M>K
+        %     v_1 = [v(i,:) zeros(1,M-K)];
+        % else
+        %     v_1 = v(i,:);
+        % end
         E1 = (s./(s.^2+M*10^(lg_gamma(gamma_index)))).*v_1.*(Z.');
         E(i)=sum(E1);
     end
