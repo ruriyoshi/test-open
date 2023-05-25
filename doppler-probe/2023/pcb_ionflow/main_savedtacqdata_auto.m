@@ -11,10 +11,12 @@ addpath(fullfile(getenv('MDSPLUS_DIR'), 'matlab'));
 run define_path.m
 dtacq_num=39;
 
-date = 230315;%【input】計測日
+cal_begin = 1;%計算開始shot番号
+
+date = 230523;%【input】計測日
 
 %実験ログ読み取り
-[exp_log,begin_row,end_row] = load_log(date);
+[exp_log,index,begin_row,end_row] = load_log(date);
 if isempty(begin_row)
     return
 end
@@ -24,9 +26,9 @@ if not(exist([pathname.rawdata,'/',num2str(date)],'dir'))
 end
 
 %dtacqdataをmat形式で保存
-for i = begin_row : end_row
-    a039shot = exp_log(i,8);%a039ショット番号
-    a039tfshot = exp_log(i,9);%a039TFショット番号
+for i = begin_row+(cal_begin-1) : end_row
+    a039shot = exp_log(i,index.a039);%a039ショット番号
+    a039tfshot = exp_log(i,index.a039_TF);%a039TFショット番号
     %RC係数読み込み
     if dtacq_num == 39
         shot = a039shot;

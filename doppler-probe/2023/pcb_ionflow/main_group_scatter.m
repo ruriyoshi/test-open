@@ -8,25 +8,20 @@ run define_path.m
 date = 230315;%【input】実験日%230315
 begin_cal = 4;%【input】磁気面&フロー計算始めshot番号(実験ログD列)%4
 end_cal = 35;%【input】磁気面&フロー計算終わりshot番号(実験ログD列)(0にするとbegin_cal以降の同日の全shot計算)%35
-min_r = 12.5;%【input】ドップラープローブ計測点最小r座標[mm]
-int_r = 2.5;%【input】ドップラープローブ計測点r方向間隔[mm]
-min_z = -2.1;%【input】ドップラープローブ計測点最小z座標[mm](-2.1,2.1)
-int_z = 4.2;%【input】ドップラープローブ計測点z方向間隔[mm](4.2)
-ICCD.line = 'Ar';%【input】ドップラー発光ライン('Ar')
+int_r = 2.5;%【input】ドップラープローブ計測点r方向間隔[cm](2.5)
+int_z = 4.2;%【input】ドップラープローブ計測点z方向間隔[cm](4.2)
+ICCD.line = "Ar";%【input】ドップラー発光ライン("Ar")
 n_CH = 28;%【input】ドップラープローブファイバーCH数(28)
 n_z = 1;%【input】ドップラープローブz方向データ数(数値)(1)
 dtacq.num = 39;%【input】磁気プローブdtacq番号(39)
 trange = 430:590;%【input】磁気プローブ計算時間範囲(430:590)
 t_range = [477 483];%【input】計測時刻範囲(us)
 r_range = [17.5 22.5];%【input】計測点範囲(cm)
-ng_shotlist = [6 10 26 33 34];%【input】磁場失敗ショット番号%[6 10 26 33 34]
-x_type = '|Br|';%【input】x軸の変数('Vz','Vr','|Vz|','|Vr|','Bz','Br','|Bz|','|Br|','z','r','time')
-y1_type = '|Vr|';%【input】y1軸の変数('Vz','Vr','|Vz|','|Vr|','Bz','Br','|Bz|','|Br|','z','r','time')
-y2_type = false;%【input】y2軸の変数('Vz','Vr','|Vz|','|Vr|','Bz','Br','z','r','time',false)
-g_type = 'time';%【input】グループ化基準('time','r')
-
-%ドップラープローブ計測点配列を生成
-mpoints = make_mpoints(n_CH,min_r,int_r,n_z,min_z,int_z);
+ng_shotlist = [6 9 10 26 33 34];%【input】磁場失敗ショット番号%[6 10 26 33 34]
+x_type = "|Br|";%【input】x軸の変数("Vz","Vr","|Vz|","|Vr|","Bz","Br","|Bz|","|Br|","z","r","time")
+y1_type = "|Vz|";%【input】y1軸の変数("Vz","Vr","|Vz|","|Vr|","Bz","Br","|Bz|","|Br|","z","r","time")
+y2_type = "none";%【input】y2軸の変数("Vz","Vr","|Vz|","|Vr|","Bz","Br","z","r","time","none")
+g_type = "time";%【input】グループ化基準("time","r")
 
 %実験ログ読み取り
 [exp_log,begin_row,end_row] = load_log(date);
@@ -34,17 +29,17 @@ if isempty(begin_row)
     return
 end
 
-figure('Position',[600 150 600 600])
+% figure("Position",[600 150 600 600])
 start_i = begin_row + begin_cal - 1;
 if start_i <= end_row
     if end_cal == 0
         end_i = end_row;%begin_cal以降全部計算
     elseif end_cal < begin_cal
-        error('end_cal must <= begin_cal.')
+        error("end_cal must <= begin_cal.")
     elseif begin_row + end_cal - 1 <= end_row
         end_i = begin_row + end_cal - 1;%begin_calからend_calまで計算
     else
-        error('end_cal must <= %d.', exp_log(end_row,4))
+        error("end_cal must <= %d.", exp_log(end_row,4))
     end
 
     %配列を作成
@@ -61,16 +56,21 @@ if start_i <= end_row
     for i = start_i:end_i
         step = i - start_i + 1;
         ICCD.shot = exp_log(i,4);%ショット番号
-        a039shot = exp_log(i,8);%a039ショット番号
-        a039tfshot = exp_log(i,9);%a039TFショット番号
-        expval.PF1 = exp_log(i,11);%PF1電圧(kV)
-        expval.PF2 = exp_log(i,14);%PF2電圧(kV)
-        expval.TF = exp_log(i,18);%PF2電圧(kV)
-        expval.EF = exp_log(i,23);%EF電流
-        ICCD.trg = exp_log(i,42);%ICCDトリガ時間
-        ICCD.exp_w = exp_log(i,43);%ICCD露光時間
-        ICCD.gain = exp_log(i,44);%Andor gain
+        a039shot = exp_log(i,index.a039);%a039ショット番号
+        a039tfshot = exp_log(i,index.a039_TF);%a039TFショット番号
+        expval.PF1 = exp_log(i,index.PF1);%PF1電圧(kv)
+        expval.PF2 = exp_log(i,index.PF2);%PF2電圧(kv)
+        expval.TF = exp_log(i,index.TF);%PF2電圧(kv)
+        expval.EF = exp_log(i,index.EF);%EF電流
+        ICCD.trg = exp_log(i,index.ICCD_trg);%ICCDトリガ時間
+        ICCD.exp_w = exp_log(i,index.ICCD_exp_w);%ICCD露光時間
+        ICCD.gain = exp_log(i,index.ICCD_gain);%Andor gain
         time = round(ICCD.trg+ICCD.exp_w/2);%磁気面プロット時間
+
+        min_r = exp_log(i,index.minR);%【input】ドップラープローブ計測点最小r座標
+        min_z = exp_log(i,index.minZ);%【input】ドップラープローブ計測点最小z座標
+        %ドップラープローブ計測点配列を生成
+        mpoints = make_mpoints(n_CH,min_r,int_r,n_z,min_z,int_z);
         if dtacq.num == 39
             dtacq.shot = a039shot;
             dtacq.tfshot = a039tfshot;
@@ -96,15 +96,6 @@ if start_i <= end_row
                     rp(mpoints.n_r*(step - 1) + k,1) = mpoints.r(k,1);%r座標[cm]
                 end
             end
-            % else
-            %     V_z(mpoints.n_r*(step - 1) + k,1) = NaN;
-            %     V_r(mpoints.n_r*(step - 1) + k,1) = NaN;
-            %     T(mpoints.n_r*(step - 1) + k,1) = NaN;
-            %     B_z(mpoints.n_r*(step - 1) + k,1) = NaN;
-            %     B_r(mpoints.n_r*(step - 1) + k,1) = NaN;
-            %     tp(mpoints.n_r*(step - 1) + k,1) = NaN;
-            %     zp(mpoints.n_r*(step - 1) + k,1) = NaN;
-            %     rp(mpoints.n_r*(step - 1) + k,1) = NaN;
         end
     end
     indices = find(sort==0);
@@ -116,167 +107,98 @@ if start_i <= end_row
     tp(indices) = [];
     zp(indices) = [];
     rp(indices) = [];
+    [n_data,~] = size(V_z);
 
     %グループ分けされた散布図を作成
-    switch x_type
-        case 'Vz'
-            x_val = V_z;
-            x_name = 'V_z [km/s]';
-        case 'Vr'
-            x_val = V_r;
-            x_name = 'V_r [km/s]';
-        case '|Vz|'
-            x_val = abs(V_z);
-            x_name = '|V_z| [km/s]';
-        case '|Vr|'
-            x_val = abs(V_r);
-            x_name = '|V_r| [km/s]';
-        case 'T'
-            x_val = T;
-            x_name = 'T [eV]';
-        case 'Bz'
-            x_val = B_z;
-            x_name = 'B_z [mT]';
-        case 'Br'
-            x_val = B_r;
-            x_name = 'B_r [mT]';
-        case '|Bz|'
-            x_val = abs(B_z);
-            x_name = '|B_z| [mT]';
-        case '|Br|'
-            x_val = abs(B_r);
-            x_name = '|B_r| [mT]';
-        case 'time'
-            x_val = tp;
-            x_name = 'time [us]';
-        case 'z'
-            x_val = zp;
-            x_name = 'z [cm]';
-        case 'r'
-            x_val = rp;
-            x_name = 'r [cm]';
-        otherwise
-            warning('Input error in x_type.')%x_typeの入力エラー
-            return;
+    if y2_type == "none"
+        ax_type = [x_type,y1_type];
+    else
+        ax_type = [x_type,y1_type,y2_type];
     end
-    switch y1_type
-        case 'Vz'
-            y1_val = V_z;
-            y1_name = 'V_z [km/s]';
-        case 'Vr'
-            y1_val = V_r;
-            y1_name = 'V_r [km/s]';
-        case '|Vz|'
-            y1_val = abs(V_z);
-            y1_name = '|V_z| [km/s]';
-        case '|Vr|'
-            y1_val = abs(V_r);
-            y1_name = '|V_r| [km/s]';
-        case 'T'
-            y1_val = T;
-            y1_name = 'T [eV]';
-        case 'Bz'
-            y1_val = B_z;
-            y1_name = 'B_z [mT]';
-        case 'Br'
-            y1_val = B_r;
-            y1_name = 'B_r [mT]';
-        case '|Bz|'
-            y1_val = abs(B_z);
-            y1_name = '|B_z| [mT]';
-        case '|Br|'
-            y1_val = abs(B_r);
-            y1_name = '|B_r| [mT]';
-        case 'time'
-            y1_val = tp;
-            y1_name = 'time [us]';
-        case 'z'
-            y1_val = zp;
-            y1_name = 'z [cm]';
-        case 'r'
-            y1_val = rp;
-            y1_name = 'r [cm]';
-        otherwise
-            warning('Input error in y1_type.')%y1_typeの入力エラー
-            return;
-    end
-    switch g_type
-        case 'time'
-            g_val = tp;
-            g_name = 'time [us]';
-        case 'z'
-            g_val = zp;
-            g_name = 'z [cm]';
-        case 'r'
-            g_val = rp;
-            g_name = 'r [cm]';
-        otherwise
-            warning('Input error in g_type.')%g_typeの入力エラー
-            return;
-    end
-    n_group = length(unique(g_val, 'rows'));
-    clr = hsv(n_group);
-    gs1 = gscatter(x_val,y1_val,g_val,clr,'o','filled');
-    hold on
-    if y2_type
-        switch y2_type
-            case 'Vz'
-                y2_val = V_z;
-                y2_name = 'V_z [km/s]';
-            case 'Vr'
-                y2_val = V_r;
-                y2_name = 'V_r [km/s]';
-            case '|Vz|'
-                y2_val = abs(V_z);
-                y2_name = '|V_z| [km/s]';
-            case '|Vr|'
-                y2_val = abs(V_r);
-                y2_name = '|V_r| [km/s]';
-            case 'T'
-                y2_val = T;
-                y2_name = 'T [eV]';
-            case 'Bz'
-                y2_val = B_z;
-                y2_name = 'B_z [mT]';
-            case 'Br'
-                y2_val = B_r;
-                y2_name = 'B_r [mT]';
-            case '|Bz|'
-                y2_val = abs(B_z);
-                y2_name = '|B_z| [mT]';
-            case '|Br|'
-                y2_val = abs(B_r);
-                y2_name = '|B_r| [mT]';
-            case 'time'
-                y2_val = tp;
-                y2_name = 'time [us]';
-            case 'z'
-                y2_val = zp;
-                y2_name = 'z [cm]';
-            case 'r'
-                y2_val = rp;
-                y2_name = 'r [cm]';
+    [~,n_ax] = size(ax_type);
+    ax_val = zeros(n_data,n_ax);
+    ax_name = strings(size(ax_type));
+    for i = 1:n_ax
+        switch ax_type(i)
+            case "Vz"
+                ax_val(:,i) = V_z;
+                ax_name(i) = "V_z [km/s]";
+            case "Vr"
+                ax_val(:,i) = V_r;
+                ax_name(i) = "V_r [km/s]";
+            case "|Vz|"
+                ax_val(:,i) = abs(V_z);
+                ax_name(i) = "|V_z| [km/s]";
+            case "|Vr|"
+                ax_val(:,i) = abs(V_r);
+                ax_name(i) = "|V_r| [km/s]";
+            case "T"
+                ax_val(:,i) = T;
+                ax_name(i) = "T [eV]";
+            case "Bz"
+                ax_val(:,i) = B_z;
+                ax_name(i) = "B_z [mT]";
+            case "Br"
+                ax_val(:,i) = B_r;
+                ax_name(i) = "B_r [mT]";
+            case "|Bz|"
+                ax_val(:,i) = abs(B_z);
+                ax_name(i) = "|B_z| [mT]";
+            case "|Br|"
+                ax_val(:,i) = abs(B_r);
+                ax_name(i) = "|B_r| [mT]";
+            case "time"
+                ax_val(:,i) = tp;
+                ax_name(i) = "time [us]";
+            case "z"
+                ax_val(:,i) = zp;
+                ax_name(i) = "z [cm]";
+            case "r"
+                ax_val(:,i) = rp;
+                ax_name(i) = "r [cm]";
             otherwise
-                warning('Input error in y2_type.')%y2_typeの入力エラー
+                warning("Input error in axis type.")%ax_typeの入力エラー
                 return;
         end
-        gs2 = gscatter(x_val,y2_val,g_val,clr,'^');
-        y_name = [y1_name,'  ',y2_name];
-        title_name = ['(',y1_name,', ',y2_name,') VS ',x_name,' grouped by ',g_name];
-    else
-        y_name = y1_name;
-        title_name = [y1_name,' VS ',x_name,' grouped by ',g_name];
     end
-    title(title_name)
+    switch g_type
+        case "time"
+            g_val = tp;
+            g_name = "time [us]";
+        case "z"
+            g_val = zp;
+            g_name = "z [cm]";
+        case "r"
+            g_val = rp;
+            g_name = "r [cm]";
+        otherwise
+            warning("Input error in group type.")%g_typeの入力エラー
+            return;
+    end
+    n_group = length(unique(g_val, "rows"));
+    % clr = hsv(n_group);
+    clr = [0 90/255 1; 3/255 175/255 122/255; 1 165/255 0];
+    gs1 = gscatter(ax_val(:,1),ax_val(:,2),g_val,clr,"o","filled");
+    hold on
+    if y2_type ~= "none"
+        gs2 = gscatter(ax_val(:,1),ax_val(:,3),g_val,clr,"^");
+        y_name = sprintf("%s  %s",ax_name(2),ax_name(3));
+        title_name = sprintf("(%s, %s) VS %s grouped by %s",ax_name(2),ax_name(3),ax_name(1),g_name);
+    else
+        y_name = ax_name(2);
+        title_name = sprintf("%s VS %s grouped by %s",ax_name(2),ax_name(1),g_name);
+    end
+    % title(title_name)
     % yline(0)%直線y = 0を挿入
-    xlabel(x_name)
+    xlabel(ax_name(1))
     ylabel(y_name)
-    lgd = legend('Location','eastoutside');
+    pbaspect([1 2 1])
+    lgd = legend("Location","northeastoutside");
     title(lgd,g_name)
     legend
     ax = gca;
-    ax.FontSize = 14;
+    ax.FontSize = 16;
     hold off
 else
-    error('begin_cal must <= %d.', exp_log(end_row,4))
+    error("begin_cal must <= %d.", exp_log(end_row,4))
 end

@@ -2,9 +2,9 @@
 %プロット枚数、プロット開始時間、
 %プロット時間間隔を指定して磁気面をプロット
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function [grid2D,data2D,ok_z,ok_r] = cal_pcb200ch(date,dtacq,pathname,mesh_rz,expval,trange,save_pcb)
+function [grid2D,data2D,ok_z,ok_r] = cal_pcb200ch_with_tfoffset(date,dtacq,pathname,mesh_rz,expval,trange,save_pcb)
 
-filename=strcat(pathname.rawdata,'/',num2str(date),'/rawdata_dtacq',num2str(dtacq.num),'_shot',num2str(dtacq.shot),'_tfshot',num2str(dtacq.tfshot),'.mat');
+filename=strcat(pathname.rawdata,'/',num2str(date),'/rawdata_dtacq',num2str(dtacq.num),'_shot',num2str(dtacq.shot),'_tfshot0.mat');
 if exist(filename,"file")==0
     warning(strcat(filename,' does not exist.'));
     grid2D = char.empty;
@@ -13,10 +13,10 @@ if exist(filename,"file")==0
     ok_r = char.empty;
     return
 end
-load(filename,'rawdata');%1000×192
+load(filename,'rawdata0');%1000×192
 
 %正しくデータ取得できていない場合はreturn
-if numel(rawdata)< 500
+if numel(rawdata0)< 500
     warning('data incomplete/corrupted')
     grid2D = char.empty;
     data2D = char.empty;
@@ -43,7 +43,7 @@ d2p=C(:,15);
 d2bz=C(:,16);
 d2bt=C(:,17);
 
-b=rawdata.*coeff';%較正係数RC/NS
+b=rawdata0.*coeff';%較正係数RC/NS
 b=b.*P';%極性揃え
 b=smoothdata(b,1);
 
@@ -143,7 +143,6 @@ if save_pcb
         mkdir(sprintf("%s", pathname.processeddata), sprintf("%s", num2str(date)));
     end
     save([pathname.processeddata,'/',num2str(date),'/processeddata_dtacq',num2str(dtacq.num), ...
-        '_shot',num2str(dtacq.shot),'_tfshot',num2str(dtacq.tfshot),'.mat'], ...
+        '_shot',num2str(dtacq.shot),'_tfshot0.mat'], ...
         'grid2D','data2D','ok_z','ok_r')
-
 end

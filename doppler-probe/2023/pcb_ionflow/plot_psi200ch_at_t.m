@@ -14,7 +14,7 @@ contour(grid2D.zq(1,:),grid2D.rq(:,1),squeeze(data2D.psi(:,:,i)),-20e-3:0.2e-3:4
 %     plot(grid2D.zq(1,squeeze(mid(opoint(:,:,i),:,i))),grid2D.rq(opoint(:,:,i),1),"bo")
 %     plot(grid2D.zq(1,squeeze(mid(xpoint(:,:,i),:,i))),grid2D.rq(xpoint(:,:,i),1),"bx")
 hold on
-plot(ok_z,ok_r,"k.",'MarkerSize', 6)%測定位置
+% plot(ok_z,ok_r,"k.",'MarkerSize', 6)%測定位置
 hold on
 title(string(t)+' us')
 xlabel('z [m]')

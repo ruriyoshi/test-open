@@ -3,19 +3,17 @@
 %ドップラープローブによるイオン速度分布関数、温度、フローとその瞬間の磁気面をプロット
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-clear all
+% clear all
 
 %各PCのパスを定義
 run define_path.m
 
 %------【input】---------------------------------------------------
-date = 230314;%【input】実験日
-begin_cal = 33;%【input】磁気面&フロー計算始めshot番号(実験ログD列)
-end_cal = 42;%【input】磁気面&フロー計算終わりshot番号(実験ログD列)(0にするとbegin_cal以降の同日の全shot計算)
-min_r = 12.5;%【input】ドップラープローブ計測点最小r座標[mm]
-int_r = 2.5;%【input】ドップラープローブ計測点r方向間隔[mm]
-min_z = -2.1;%【input】ドップラープローブ計測点最小z座標[mm](-2.1,2.1)
-int_z = 4.2;%【input】ドップラープローブ計測点z方向間隔[mm](4.2)
+date = 230523;%【input】実験日
+begin_cal = 13;%【input】磁気面&フロー計算始めshot番号(実験ログD列)
+end_cal = 13;%【input】磁気面&フロー計算終わりshot番号(実験ログD列)(0にするとbegin_cal以降の同日の全shot計算)
+int_r = 2.5;%【input】ドップラープローブ計測点r方向間隔[cm](2.5)
+int_z = 4.2;%【input】ドップラープローブ計測点z方向間隔[cm](4.2)
 ICCD.line = 'Ar';%【input】ドップラー発光ライン('Ar')
 n_CH = 28;%【input】ドップラープローブファイバーCH数(28)
 n_z = 1;%【input】ドップラープローブz方向データ数(数値)(1)
@@ -28,13 +26,13 @@ cal_pcb = false;%【input】磁場を計算(true,false)
 save_pcb = false;%【input】磁場データを保存(true,false)
 load_pcb = true;%【input】磁場データを読み込む(true,false)
 
-plot_spectra = false;%【input】スペクトルをプロット(true,false)
+plot_spectra = true;%【input】スペクトルをプロット(true,false)
 plot_analisis = false;%【input】逆変換解析をプロット(true,false)
 plot_vdist = false;%【input】速度分布をプロット(true,false)
 plot_compare = false;%【input】再構成比較をプロット(true,false)
-plot_flow = false;%【input】流速をプロット(true,false)
-plot_psi = false;%【input】磁気面をプロット(true,false)
-overlay_plot = false;%【input】流速と磁気面を重ねる(true,false)
+plot_flow = true;%【input】流速をプロット(true,false)
+plot_psi = true;%【input】磁気面をプロット(true,false)
+overlay_plot = true;%【input】流速と磁気面を重ねる(true,false)
 plot_Br = false;
 
 save_fit = false;%【input】ガウスフィッティングpngを保存(true,false)
@@ -51,17 +49,13 @@ mesh_rz = 100;%【input】磁気プローブrz方向のメッシュ数(50)
 trange = 430:590;%【input】磁気プローブ計算時間範囲(430:590)
 %------------------------------------------------------------------
 
-%ドップラープローブ計測点配列を生成
-mpoints = make_mpoints(n_CH,min_r,int_r,n_z,min_z,int_z);
-
 %実験ログ読み取り
-[exp_log,begin_row,end_row] = load_log(date);
+[exp_log,index,begin_row,end_row] = load_log(date);
 if isempty(begin_row)
     return
 end
 
 %--------磁気面&フローを計算------
-figure('Position',[600 150 600 600])
 start_i = begin_row + begin_cal - 1;
 if start_i <= end_row
     if end_cal == 0
@@ -75,16 +69,22 @@ if start_i <= end_row
     end
     for i = start_i:end_i
         ICCD.shot = exp_log(i,4);%ショット番号
-        a039shot = exp_log(i,8);%a039ショット番号
-        a039tfshot = exp_log(i,9);%a039TFショット番号
-        expval.PF1 = exp_log(i,11);%PF1電圧(kv)
-        expval.PF2 = exp_log(i,14);%PF2電圧(kv)
-        expval.TF = exp_log(i,18);%PF2電圧(kv)
-        expval.EF = exp_log(i,23);%EF電流
-        ICCD.trg = exp_log(i,42);%ICCDトリガ時間
-        ICCD.exp_w = exp_log(i,43);%ICCD露光時間
-        ICCD.gain = exp_log(i,44);%Andor gain
+        a039shot = exp_log(i,index.a039);%a039ショット番号
+        a039tfshot = exp_log(i,index.a039_TF);%a039TFショット番号
+        expval.PF1 = exp_log(i,index.PF1);%PF1電圧(kv)
+        expval.PF2 = exp_log(i,index.PF2);%PF2電圧(kv)
+        expval.TF = exp_log(i,index.TF);%PF2電圧(kv)
+        expval.EF = exp_log(i,index.EF);%EF電流
+        ICCD.trg = exp_log(i,index.ICCD_trg);%ICCDトリガ時間
+        ICCD.exp_w = exp_log(i,index.ICCD_exp_w);%ICCD露光時間
+        ICCD.gain = exp_log(i,index.ICCD_gain);%Andor gain
         time = round(ICCD.trg+ICCD.exp_w/2);%磁気面プロット時間
+
+        min_r = exp_log(i,index.minR);%【input】ドップラープローブ計測点最小r座標
+        min_z = exp_log(i,index.minZ);%【input】ドップラープローブ計測点最小z座標
+        %ドップラープローブ計測点配列を生成
+        mpoints = make_mpoints(n_CH,min_r,int_r,n_z,min_z,int_z);
+
         if dtacq.num == 39
             dtacq.shot = a039shot;
             dtacq.tfshot = a039tfshot;

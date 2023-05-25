@@ -18,17 +18,16 @@ switch ICCD.line
         lambda0 = 480.602;%使用スペクトル(nm)
         lambda1 = 480.7019;%校正ランプスペクトル(nm)
         lambda2 = 479.2619;%校正ランプスペクトル(nm)
-        center_file = '230303_Xe4834_calibation.txt';%中心データファイル名
     case 'H'%水素の時
         A = 1;%原子量
         lambda0 = 486.135;%使用スペクトル(nm)
-        % center_file = 'Hbeta_calibration.txt';%中心データファイル名
         warning('Sorry, not ready for H experiment.')%ICCD.lineの入力エラー
         return;
     otherwise
         warning('Input error in ICCD.line.')%ICCD.lineの入力エラー
         return;
 end
+center = load_calibration(date,ICCD);
 
 dir1 = [pathname.NIFS '/Doppler/Andor/IDSP/' num2str(date)];%ディレクトリ1
 if mpoints.n_z == 1
@@ -45,7 +44,6 @@ if mpoints.n_z == 1
 end
 
 %----------------------------------------------------------------------------
-center = importdata(center_file);%中心座標を取得
 % centerX = repmat(center(:,3),1,mpoints.n_z);%チャンネル対応中心相対X座標
 switch mpoints.n_z
     case 1
@@ -231,10 +229,10 @@ end
 if plot_fit
     if save_fit
         time = round(ICCD.trg+ICCD.exp_w/2);%計測時刻
-        if not(exist([pathname.save,'/fit/',num2str(date)],'dir'))
-            mkdir(sprintf("%s/fit", pathname.save), sprintf("%s", num2str(date)));
+        if not(exist([pathname.fig,'/fit/',num2str(date)],'dir'))
+            mkdir(sprintf("%s/fit", pathname.fig), sprintf("%s", num2str(date)));
         end
-        saveas(gcf,[pathname.save,'/fit/',num2str(date),'/','shot', num2str(ICCD.shot),'_',num2str(time),'us_fit.png'])
+        saveas(gcf,[pathname.fig,'/fit/',num2str(date),'/','shot', num2str(ICCD.shot),'_',num2str(time),'us_fit.png'])
         hold off
         close
     else

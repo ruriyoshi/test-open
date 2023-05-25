@@ -22,18 +22,16 @@ switch ICCD.line
         lambda0 = 480.602;%使用スペクトル(nm)
         lambda1 = 480.7019;%校正ランプスペクトル(nm)
         lambda2 = 479.2619;%校正ランプスペクトル(nm)
-        center_file = '230303_Xe4834_calibation.txt';%中心データファイル名
     case 'H'%水素の時
         A = 1;%原子量
         lambda0 = 486.135;%使用スペクトル(nm)
-        % center_file = 'Hbeta_calibration.txt';%中心データファイル名
         warning('Sorry, not ready for H experiment.')%ICCD.lineの入力エラー
         return;
     otherwise
         warning('Input error in ICCD.line.')%ICCD.lineの入力エラー
         return;
 end
-center = importdata(center_file);%校正中心座標を取得
+center = load_calibration(date,ICCD);
 
 dir = [pathname.NIFS,'/Doppler/Andor/IDSP/',num2str(date)];%ディレクトリ1
 filename = [dir,'/shot',num2str(ICCD.shot),'_',num2str(ICCD.trg),'us_w=',num2str(ICCD.exp_w),'_gain=',num2str(ICCD.gain),'.asc'];%ICCDファイル名
