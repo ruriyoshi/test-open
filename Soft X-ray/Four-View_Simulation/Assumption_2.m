@@ -34,14 +34,15 @@ r_grid = linspace(330,70,n);
 
 loadpath = '/Users/shinjirotakeda/Library/CloudStorage/OneDrive-TheUniversityofTokyo/Documents/result_matrix/LF_LR/210924/shot45/4_high.txt';
 EE = readmatrix(loadpath); %縦がr、横がzで左上が最小になる
-EE = rot90(EE,2); %rが縦、zが横、右下最小
+% EE = rot90(EE,2); %rが縦、zが横、右下最小
+EE = flipud(EE);
 
 % なぜか反転、おそらくファントムの生成に問題
 % 要検証
 
-%2D matrix is transformed to 1D transversal vector
-% E = reshape(EE,1,[]);
-E = fliplr(reshape(EE,1,[]));
+% 2D matrix is transformed to 1D transversal vector
+E = reshape(EE,1,[]);
+% E = fliplr(reshape(EE,1,[]));
 % whos gm2d
 % whos E
 I=gm2d*(E)';
@@ -64,7 +65,8 @@ Iwgn = Iwgn.';
 
 if plot_flag
     [mesh_z,mesh_r] = meshgrid(z_grid,r_grid);
-    [~,h] = contourf(mesh_z,mesh_r,fliplr(EE),20);
+    % [~,h] = contourf(mesh_z,mesh_r,fliplr(EE),20);
+    [~,h] = contourf(mesh_z,mesh_r,EE,20);
     h.LineStyle = 'none';
     c=colorbar;c.Label.String='Intensity [a.u.]';c.FontSize=18;
     % figure;imagesc(z_grid,r_grid,EE);c=colorbar('Ticks',[0.1,0.5,1]);
