@@ -25,7 +25,7 @@
 % plot_position(T, pathname, IDX); %計測位置、各位置での生信号も含めた確認用プロット
 % end
 
-load("1551.mat")
+load("3592.mat")
 figure%('Position', [0 0 1500 1500],'visible','on');
  start=5; %470+?
 %  t_start=470+start;

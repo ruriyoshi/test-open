@@ -51,7 +51,7 @@ ylim([0 inf])
 yyaxis right
 plot(trange,-1.*xEt,'r-+','LineWidth',1)
 ylabel('Et [V/m]')
-xlim([445 472])
+xlim([455 472])
 ylim([0 inf])
 ha2 = gca;
 ha2.LineWidth = 1;
@@ -61,8 +61,8 @@ subplot(3,1,3)
 plot(trange,xeta,'k-+','LineWidth',1)
 ylabel('η [Ω m]')
 xlabel('Time [us]')
-xlim([445 472])
-ylim([0 6e-3])
+xlim([455 472])
+%ylim([0 6e-3])
 ha1 = gca;
 ha1.LineWidth = 1;
 ha1.FontSize=10;

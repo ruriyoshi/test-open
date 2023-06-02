@@ -105,8 +105,8 @@ for i=1:192
         rpos_bt(ceil(ch(i)/2))=rpos(i);
     end
 end
-[bz, ok_bz, ok_bz_plot] = ng_replace(bz, ok_bz, sheet_date);
-% ok_bz_plot=ok_bz;
+%[bz, ok_bz, ok_bz_plot] = ng_replace(bz, ok_bz, sheet_date);
+ ok_bz_plot=ok_bz;
 
 %中心領域4+2本のみ
 prange=21:80;%31:70;
@@ -203,7 +203,7 @@ for i=1:frame
 % %         colorbar('Location','eastoutside')
 %         plot(tilt,grid2D.rq(r_s:r_n,1),'r-','LineWidth',2)
 %         plot(grid2D.zq(1,squeeze(mid(xpoint(:,:,i),:,i))),grid2D.rq(xpoint(:,:,i),1),"bx",'MarkerSize',8)
-%         plot(grid2D.zq(1,squeeze(mid(:,:,i))),grid2D.rq(:,1),'b-','LineWidth',1)
+         plot(grid2D.zq(1,squeeze(mid(:,:,i))),grid2D.rq(:,1),'b-','LineWidth',1)
 %         hold off
 %         alpha(0.3)
 %         ylim([0.1 grid2D.rq(end,1)])

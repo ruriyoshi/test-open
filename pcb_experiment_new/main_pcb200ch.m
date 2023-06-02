@@ -32,9 +32,9 @@ pathname.rawdata=getenv('rawdata_path');
 
 % %直接入力の場合
 dtacqlist=39;
-shotlist=1331;%240;%【input】dtacqの保存番号
+shotlist=1337;%240;%【input】dtacqの保存番号
 tfshotlist=1330;%0;
-date = 230416;%【input】計測日
+date = 230428;%【input】計測日
 n_data=numel(shotlist);%計測データ数
 EFlist = 150;%150;%【input】EF電流
 TFlist = 4;

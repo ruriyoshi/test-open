@@ -16,13 +16,13 @@ function h = plot_psi_multi_pcb(data2D,grid2D,fill,fixed_Clayer,shot)
 % It is required that row * column = length(time)
 
 %h = figure('Position', [0 0 1500 1500],'visible','off');
-h = figure('Position', [0 0 1500 800],'visible','on');
-row = 1;
-column = 1;
+h = figure('Position', [0 0 800 1000],'visible','on');
+row = 4;
+column = 4;
 time_offset = 399;
 %time = (482:3:527)-time_offset;
 %time = (450:3:495)-time_offset;
-%time = (465:1:472)-time_offset;
+time = (457:1:472)-time_offset;
 %time = (471:1:480)-time_offset;
 %time = (480:3:525)-time_offset;
 %time = (420:3:465) - time_offset;
@@ -32,7 +32,7 @@ time_offset = 399;
 %time = 450:4:470;
 %time = 450:32:482;
 %time = 480;
-time = 462-time_offset;
+%time = 462-time_offset;
 %time = 440:3:485;
 %time = 440:4:500;
 %time = 430:4:490;
@@ -56,8 +56,8 @@ psi_mesh_r = grid2D.rq;
 
 % jt
 
-min_color = -1.5*1e+6;
-max_color = 1.5*1e+6;
+min_color = -1.0*1e+6;
+max_color = 1.0*1e+6;
 contour_layer_color =  min_color:(max_color-min_color)/50:max_color;
 
 
@@ -70,7 +70,7 @@ contour_layer_color =  min_color:(max_color-min_color)/50:max_color;
 if fixed_Clayer
     max_psi = 60e-3;
     min_psi = -20e-3;
-    layer_resolution = 0.1e-3;
+    layer_resolution = 0.3e-3;
     contour_layer =  min_psi:layer_resolution:max_psi;
 else
     contour_layer = layer_num;
@@ -122,7 +122,7 @@ for i = time
             contour(psi_mesh_z,psi_mesh_r,color_store(:,:,i),[0.7e6 0.64e6 0.53e6],'w-','LineWidth',0.1);
             
         end
-        contourf(psi_mesh_z,psi_mesh_r,psi_store(:,:,i),contour_layer,'Fill','off','LineWidth',0.4);
+        contourf(psi_mesh_z,psi_mesh_r,psi_store(:,:,i),contour_layer,'Fill','off','LineWidth',0.1);
     end
     
     if show_probe
@@ -140,11 +140,13 @@ for i = time
    
     xlabel('z (m)');
     ylabel('r (m)');
-    j = j+1;
-    xlim([-0.08 0.08]);
-    ylim([0.15 0.33]);
+    
+    xlim([-0.05 0.05]);
+    ylim([0.1 0.25]);
+
 
     daspect([1 1 1])
+    j = j+1;
     hold off
     
 end

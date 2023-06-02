@@ -17,12 +17,12 @@ function h = plot_psi_multi_pcb_for_axis(data2D,grid2D,fill,fixed_Clayer,shot,n,
 
 %h = figure('Position', [0 0 800 1500],'visible','off');
 h = figure('Position', [0 0 1500 800],'visible','on');
-row = 2;
-column = 5;
+row = 4;
+column = 4;
 time_offset = 399;
 %time = (482:3:527)-time_offset;
 %time = (450:3:495)-time_offset;
-time = (459:1:474)-time_offset;
+time = (455:1:470)-time_offset;
 %time = (471:1:480)-time_offset;
 %time = (420:3:465) - time_offset;
 %time = (464:1:475)-time_offset;
@@ -50,14 +50,15 @@ show_Et = false;
 show_Bt = false;
 show_xpoint = true;
 show_axis_point = true;
+show_psi_mid = true;
 
 psi_mesh_z = grid2D.zq;
 psi_mesh_r = grid2D.rq;
 
 % jt
 
-min_color = -1.4*1e+6;
-max_color = 1.4*1e+6;
+min_color = -1.3*1e+6;
+max_color = 1.3*1e+6;
 contour_layer_color =  min_color:(max_color-min_color)/50:max_color;
 
 
@@ -126,6 +127,11 @@ for i = time
     if show_xpoint
         plot(xpos(1,i),xpos(2,i),'bx')%X点
     end
+
+    if show_psi_mid
+        [psimid,mid]=min(data2D.psi,[],2);%磁気中性面
+        plot(grid2D.zq(1,squeeze(mid(:,:,i))),grid2D.rq(:,1),'b-','LineWidth',1)
+    end
     
     if show_axis_point
         plot(max_psi_left_pos(1,i),max_psi_left_pos(2,i),'r*');
@@ -154,7 +160,7 @@ tiles.Padding = 'tight';
 cb = colorbar;
 cb.Layout.Tile = 'east';
 
-colormap(whitejet)
+colormap(jet)
 axis image
 axis tight manual
 

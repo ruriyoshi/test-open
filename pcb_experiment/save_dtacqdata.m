@@ -3,8 +3,8 @@
 
 pathname.rawdata=getenv('rawdata_path'); %保存先
 
-dtacqlist=39;
-shotlist=1256;%【input】dtacqの保存番号
+dtacqlist=38;
+shotlist=3592;%【input】dtacqの保存番号
 tfshotlist=zeros(1,223);
 date = 230409;%【input】計測日
 n=numel(shotlist);%計測データ数

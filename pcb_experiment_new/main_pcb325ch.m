@@ -18,9 +18,9 @@ pathname.rawdata=getenv('rawdata_path');%dtacqのrawdataの保管場所
 %%%%実験オペレーションの取得
 %直接入力の場合
 dtacqlist=[38 39];
-shotlist=[10314 255];%【input】dtacqの保存番号
-tfshotlist=[10312 253];
-date = 230103;%【input】計測日
+shotlist=[10707 645];%【input】dtacqの保存番号
+tfshotlist=[10646 584];
+date = 230127;%【input】計測日
 n_data=numel(shotlist(:,1));%計測データ数
 
 i_EF = 150;%【input】EF電流

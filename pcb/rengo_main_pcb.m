@@ -34,7 +34,7 @@ end
 
 %%%%getinput:実験ログ（T）からshot番号（IDX）におけるオペレーションの値を出力
 %出力は構造体に変更しても良いかも
-function [date, shot, TF_shot, offset_TF, i_EF, start, Doppler_t, d_tacq, d_tacqTF, trange, t, n] = getinput(T,IDX)
+function [date, shot, TF_shot, offset_TF, i_EF, start,  d_tacq, d_tacqTF, trange, t, n] = getinput(T,IDX)
 date=T.date(IDX);
 shot=T.shot(IDX);
 TF_shot=T.TFoffset(IDX);
@@ -46,15 +46,15 @@ else  %NaNなら150をとりあえず代入、記入されているときはそ�
     i_EF=T.EF_A_(IDX);
 end
 
-start=T.Period_StartTime_(IDX);
-Doppler_t=T.DopplerDelay(IDX);
+start=400;%T.Period_StartTime_(IDX);
+%Doppler_t=T.DopplerDelay(IDX);
 
 d_tacq=T.d_tacq(IDX);
 d_tacqTF=T.TFdtacq(IDX);
 
-trange=460:510;
-t=T.DopplerDelay(IDX);
-n=70; %rz方向のメッシュ数
+trange=400:600;
+%t=T.DopplerDelay(IDX);
+n=40; %rz方向のメッシュ数
 end
 
 

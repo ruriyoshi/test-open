@@ -1,0 +1,285 @@
+%%%%%%%%%%%%%%%%%%%%%%%%
+%125ch秋光プローブのみでの磁気面（Bz）
+%dtacqのshot番号を直接指定する場合
+%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%ここが各PCのパス
+%【※コードを使用する前に】環境変数を設定しておくか、matlab内のコマンドからsetenv('パス名','アドレス')で指定してから動かす
+pathname.ts3u=getenv('ts3u_path');%old-koalaのts-3uまでのパス（mrdなど）
+pathname.fourier=getenv('fourier_path');%fourierのmd0（データックのショットが入ってる）までのpath
+pathname.NIFS=getenv('NIFS_path');%resultsまでのpath（ドップラー、SXR）
+pathname.save=getenv('savedata_path');%outputデータ保存先
+
+pathname.rawdata038=getenv('rawdata038_path');%dtacq a038のrawdataの保管場所
+pathname.woTFdata=getenv('woTFdata_path');%rawdata（TFoffset引いた）の保管場所
+
+pathname.rawdata=getenv('rawdata_path');%dtacqのrawdataの保管場所
+
+%%%%実験オペレーションの取得
+%直接入力の場合
+dtacqlist=[38 39];
+shotlist=[10707 645];%【input】dtacqの保存番号
+tfshotlist=[10646 584];
+date = 230127;%【input】計測日
+n_data=numel(shotlist(:,1));%計測データ数
+
+i_EF = 150;%【input】EF電流
+trange=400:600;%【input】計算時間範囲
+n=40; %【input】rz方向のメッシュ数
+
+for i=1:n_data
+    dtacq_num=dtacqlist(i,:);
+    shot=shotlist(i,:);
+    tfshot=tfshotlist(i,:);
+    plot_psi325ch(date, dtacq_num, shot, tfshot, pathname,n,i_EF,trange); 
+    disp(['pcb:',num2str(i),'/',num2str(n_data)]);
+end
+
+%%%%%%%%%%%%%%%%%%%%%%%%
+%以下、local関数
+%%%%%%%%%%%%%%%%%%%%%%%%
+
+function plot_psi325ch(date, dtacq_num, shot, tfshot, pathname, n,i_EF,trange)
+
+
+% load each data----------------------------------------------------------
+%a038の読み込み
+filename1=strcat(pathname.rawdata,'rawdata_dtacq',num2str(dtacq_num(1)),'_shot',num2str(shot(1)),'_tfshot',num2str(tfshot(1)),'.mat');
+if exist(filename1,"file")==0
+    disp('a038file does not exit');
+    return
+end
+load(filename1,'rawdata');%a038
+rawdata1=rawdata;
+clear rawdata
+
+
+%a039の読み込み
+filename2=strcat(pathname.rawdata,'rawdata_dtacq',num2str(dtacq_num(2)),'_shot',num2str(shot(2)),'_tfshot',num2str(tfshot(2)),'.mat');
+if exist(filename2,"file")==0
+    disp('a039file does not exit');
+    return
+end
+load(filename2,'rawdata');%a039
+rawdata2=rawdata;
+clear rawdata
+%--------------------------------------------------------------------------
+
+
+
+
+
+%正しくデータ取得できていない場合はreturn
+if numel(rawdata1)< 500
+    disp('Unable to extract a038data from file');
+    return
+elseif numel(rawdata2)<500
+    disp('Unable to extract a039dara from file');
+    return 
+end
+
+
+%較正係数のバージョンを日付で判別a038
+sheets1 = sheetnames('coeff125ch.xlsx');
+sheets1 = str2double(sheets1);
+sheet_date1=max(sheets1(sheets1<=date));
+
+
+%較正係数のバージョンを日付で判別a039
+sheets2 = sheetnames('coeff200ch.xlsx');
+sheets2 = str2double(sheets2);
+sheet_date2=max(sheets2(sheets2<=date));
+
+C1 = readmatrix('coeff125ch.xlsx','Sheet',num2str(sheet_date1));
+C2 = readmatrix('coeff200ch.xlsx','Sheet',num2str(sheet_date2));
+
+%a038----------------------------------------------------------------------
+ok1 = logical(C1(:,14));
+P1=C1(:,13);
+coeff1=C1(:,12);
+zpos1=C1(:,9);
+rpos1=C1(:,10);
+probe_num1=C1(:,5);
+probe_ch1=C1(:,6);
+ch1=C1(:,7);
+p_ch= readmatrix('coeff125ch.xlsx','Sheet','p_ch');
+
+b1=rawdata1.*coeff1';%較正係数RC/NS
+b1=b1.*P1';%極性揃え
+b1=double(b1);
+%b1=smoothdata(b1);→補完しすぎ
+%デジタイザchからプローブ通し番号順への変換
+bz1=zeros(1000,126);%126では？
+ok_bz1=true(100,1);
+rpos_bz1=zeros(126,1);
+zpos_bz1=rpos_bz1;
+%--------------------------------------------------------------------------
+
+
+
+%a039----------------------------------------------------------------------
+ok2 = logical(C2(:,14));
+P2=C2(:,13);
+coeff2=C2(:,12);
+zpos2=C2(:,9);
+rpos2=C2(:,10);
+probe_num2=C2(:,5);
+probe_ch2=C2(:,6);
+ch2=C2(:,7);
+
+b2=rawdata2.*coeff2';%較正係数RC/NS
+b2=b2.*P2';%極性揃え
+
+%デジタイザchからプローブ通し番号順への変換
+bz2=zeros(1000,100);
+bt=bz2;
+ok_bz2=false(100,1);
+ok_bt=ok_bz2;
+zpos_bz2=zeros(100,1);
+rpos_bz2=zpos_bz2;
+zpos_bt=zpos_bz2;
+rpos_bt=zpos_bz2;
+
+%--------------------------------------------------------------------------
+
+
+
+
+%digital filter
+windowSize = 3;
+bb = (1/windowSize)*ones(1,windowSize);
+aa = 1;
+
+%a038-----------------------------------------------------------------------
+for i=1:128
+    b1(:,i) = filter(bb,aa,b1(:,i));
+    b1(:,i) = b1(:,i) - mean(b1(1:40,i));
+    if(ch1(i) > 0)
+    bz1(:,ch1(i)) = b1(:,i); 
+    ok_bz1(ch1(i))=ok1(i);
+    rpos_bz1(ch1(i))=rpos1(i);
+    zpos_bz1(ch1(i))=zpos1(i);
+    end
+   
+end
+bz1(:,63)=[];
+ok_bz1(63)=[];
+rpos_bz1(63)=[];
+zpos_bz1(63)=[];
+
+
+%a039----------------------------------------------------------------------
+for i=1:192
+    b2(:,i) = filter(bb,aa,b2(:,i));
+    b2(:,i) = b2(:,i) - mean(b2(1:40,i));
+    if rem(ch2(i),2)==1
+        bz2(:,ceil(ch2(i)/2))=b2(:,i);
+        ok_bz2(ceil(ch2(i)/2))=ok2(i);
+        zpos_bz2(ceil(ch2(i)/2))=zpos2(i);
+        rpos_bz2(ceil(ch2(i)/2))=rpos2(i);
+    elseif rem(ch2(i),2)==0
+        bt(:,ch2(i)/2)=b2(:,i);
+        ok_bt(ceil(ch2(i)/2))=ok2(i);
+        zpos_bt(ceil(ch2(i)/2))=zpos2(i);
+        rpos_bt(ceil(ch2(i)/2))=rpos2(i);
+    end
+end
+%--------------------------------------------------------------------------
+
+
+%データ統合
+bz=[bz1 bz2];%time1000×ch
+zpos_bz=[zpos_bz1; zpos_bz2];
+rpos_bz=[rpos_bz1; rpos_bz2];
+ok_bz=[ok_bz1;ok_bz2];
+
+
+
+% ok_bz1([1 26 51 76 101])=false;
+r_shift = 0.00;
+zprobepcb    = [-0.17 -0.1275 -0.0850 -0.0315 -0.0105 0.0105 0.0315 0.0850 0.1275 0.17 -0.0525 -0.021 0 0.021 0.0525];
+rprobepcb    = [0.06,0.09,0.12,0.15,0.18,0.27,0.30,0.33 0.08,0.1,0.12,0.14,0.15,0.155,0.16,0.165,0.17,0.175,0.18,0.185,0.19,0.195,0.2,0.205,0.21,0.215,0.22,0.225,0.23,0.235,0.24,0.245];
+
+rprobepcb_t  = [0.07,0.10,0.13,0.16,0.19,0.22,0.25,0.28,0.31,0.34]+r_shift;
+[zq,rq]      = meshgrid(linspace(min(zpos_bz),max(zpos_bz),n),linspace(min(rpos_bz),max(rpos_bz),n));
+% [zq,rq]      = meshgrid(zprobepcb,rprobepcb);
+[zq_probepcb,rq_probepcb]=meshgrid(zprobepcb,rprobepcb);
+
+ok_bz_matrix = false(length(zprobepcb),length(rprobepcb));
+for i = 1:length(ok_bz)
+   
+    index_r = (abs(rpos_bz(i)-rprobepcb)<0.001);index_z = (zpos_bz(i)==zprobepcb);
+    ok_bz_matrix = ok_bz_matrix + rot90(rot90(index_r,-1)*index_z*ok_bz(i));
+end
+
+grid2D=struct(...
+    'zq',zq,...
+    'rq',rq,...
+    'zprobepcb',zprobepcb,...
+    'rprobepcb',rprobepcb,...
+    'ok_bz_matrix',ok_bz_matrix);
+grid2D_probe = struct('zq',zq_probepcb,'rq',rq_probepcb);
+
+clear zq rq zprobepcb rprobepcb zq_probepcb rq_probepcb rprobepcb_t ok_bz_matrix ok_bt_matrix
+
+
+%data2Dcalc.m
+r_EF   = 0.5 ;
+n_EF   = 234. ;
+%i_EF    =i_EF;
+
+if date<221119
+    z1_EF   = 0.875;%0.68;
+    z2_EF   = -0.830;%-0.68;
+else
+    z1_EF   = 0.78;
+    z2_EF   = -0.78;
+end
+[Bz_EF,~] = B_EF(z1_EF,z2_EF,r_EF,i_EF,n_EF,grid2D.rq,grid2D.zq,false);
+clear EF r_EF n_EF i_EF z_EF
+
+data2D=struct('psi',zeros(size(grid2D.rq,1),size(grid2D.rq,2),size(trange,2)), ...
+    'Bz',zeros(size(grid2D.rq,1),size(grid2D.rq,2),size(trange,2)), ...
+    'Br',zeros(size(grid2D.rq,1),size(grid2D.rq,2),size(trange,2)), ...
+    'Jt',zeros(size(grid2D.rq,1),size(grid2D.rq,2),size(trange,2)), ...
+    'Et',zeros(size(grid2D.rq,1),size(grid2D.rq,2),size(trange,2)), ...
+    'trange',trange);
+
+
+
+
+
+
+
+for i=1:size(trange,2)
+    t=trange(i);
+    %%Bzの二次元補間(線形)
+    vq = bz_rbfinterp(rpos_bz1, zpos_bz1, grid2D, bz1, ok_bz1, t);
+    B_z = -Bz_EF+vq;
+    %%PSI計算
+    data2D.psi(:,:,i) = flip(get_psi(flip(B_z,1),flip(grid2D.rq(:,1)),1),1);
+    %data2D.psi(:,:,i) = cumtrapz(grid2D.rq(:,1),2.*pi.*grid2D.rq(:,1).*B_z,1);
+    %このままだと1/2πrが計算されてないので
+    [data2D.Br(:,:,i),data2D.Bz(:,:,i)]=gradient(data2D.psi(:,:,i),grid2D.zq(1,:),grid2D.rq(:,1)) ;
+    data2D.Br(:,:,i)=-data2D.Br(:,:,i)./(2.*pi.*grid2D.rq);
+    data2D.Bz(:,:,i)=data2D.Bz(:,:,i)./(2.*pi.*grid2D.rq);
+    data2D.Jt(:,:,i)= curl(grid2D.zq(1,:),grid2D.rq(:,1),data2D.Bz(:,:,i),data2D.Br(:,:,i))./(4*pi*1e-7);
+end
+data2D.Et=diff(data2D.psi,1,3).*1e+6; 
+%diffは単なる差分なので時間方向のsizeが1小さくなる %ステップサイズは1us
+data2D.Et=-1.*data2D.Et./(2.*pi.*grid2D.rq);
+
+ok_z = zpos_bz1(ok_bz1); %z方向の生きているチャンネル
+ok_r = rpos_bz1(ok_bz1); %r方向の生きているチャンネル
+
+if isstruct(grid2D)==0 %もしdtacqデータがない場合次のloopへ(データがない場合NaNを返しているため)
+    return
+end
+
+
+clearvars -except data2D grid2D shot data2D.Et;
+filename = strcat('C:\Users\uswk0\OneDrive - g.ecc.u-tokyo.ac.jp\data\before_picture\a038039_',num2str(shot(1)),'.mat');
+save(filename)
+
+
+end

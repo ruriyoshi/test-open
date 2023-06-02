@@ -17,10 +17,10 @@ pathname.rawdata=getenv('rawdata_path');%dtacqのrawdataの保管場所
 
 %%%%実験オペレーションの取得
 %直接入力の場合
-dtacqlist=39;
-shotlist=1330;%【input】dtacqの保存番号
+dtacqlist=40;
+shotlist=13;%【input】dtacqの保存番号
 tfshotlist=0;
-date = 230428;%【input】計測日
+date = 230520;%【input】計測日
 n=numel(shotlist);%計測データ数
 
 % %磁気面出す場合は適切な値を入力、磁場信号のみプロットする場合は変更不要

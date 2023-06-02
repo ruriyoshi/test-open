@@ -14,32 +14,32 @@ pathname.rawdata038=getenv('rawdata038_path');%dtacq a038のrawdataの保管場�
 pathname.woTFdata=getenv('woTFdata_path');%rawdata（TFoffset引いた）の保管場所
 
 pathname.rawdata=getenv('rawdata_path');%dtacqのrawdataの保管場所
-
-%%%%実験オペレーションの取得
-DOCID='1wG5fBaiQ7-jOzOI-2pkPAeV6SDiHc_LrOdcbWlvhHBw';%スプレッドシートのID
-T=getTS6log(DOCID);
-node='date';
-pat=230127;
-T=searchlog(T,node,pat);
-IDXlist=[68:81];%230128%[4:6 8:11 13 15:19 21:23 24:30 33:37 39:40 42:51 53:59 61:63 65:69 71:74];%230119
-date=pat;
-n_data=numel(IDXlist);%計測データ数
-shotlist=T.d_tacq(IDXlist);
-tfshotlist=T.TFdtacq(IDXlist);
-EFlist=T.EF_A_(IDXlist);
-TFlist=T.TF_kV_(IDXlist);
-dtacqlist=38.*ones(n_data,1);
+% 
+% %%%%実験オペレーションの取得
+% DOCID='1wG5fBaiQ7-jOzOI-2pkPAeV6SDiHc_LrOdcbWlvhHBw';%スプレッドシートのID
+% T=getTS6log(DOCID);
+% node='date';
+% pat=230127;
+% T=searchlog(T,node,pat);
+% IDXlist=[68:81];%230128%[4:6 8:11 13 15:19 21:23 24:30 33:37 39:40 42:51 53:59 61:63 65:69 71:74];%230119
+% date=pat;
+% n_data=numel(IDXlist);%計測データ数
+% shotlist=T.d_tacq(IDXlist);
+% tfshotlist=T.TFdtacq(IDXlist);
+% EFlist=T.EF_A_(IDXlist);
+% TFlist=T.TF_kV_(IDXlist);
+% dtacqlist=38.*ones(n_data,1);
 
 % %直接入力の場合
-% dtacqlist=38;
-% shotlist=10695;%【input】dtacqの保存番号
-% tfshotlist=0;%10646;
-% date = 230127;%【input】計測日
-% n_data=numel(shotlist);%計測データ数
+ dtacqlist=38;
+ shotlist=3592;%【input】dtacqの保存番号
+ tfshotlist=3581;%10646;
+ date = 221223;%【input】計測日
+ n_data=numel(shotlist);%計測データ数
 
 i_EF = 0;%【input】EF電流
-trange=450:500;%【input】計算時間範囲
-n=51; %【input】rz方向のメッシュ数
+trange=400:600;%【input】計算時間範囲
+n=40; %【input】rz方向のメッシュ数
 
 for i=1:n_data
     dtacq_num=dtacqlist(i);
@@ -55,7 +55,7 @@ end
 function plot_psi125ch(date, dtacq_num, shot, tfshot, pathname, n,i_EF,trange)
 
 % filename1=strcat(pathname.woTFdata,'rawdata_dtacq',num2str(shot(1)),'.mat');
-filename1=strcat(pathname.rawdata,'rawdata_dtacq',num2str(dtacq_num(1)),'_shot',num2str(shot(1)),'_tfshot',num2str(tfshot(1)),'.mat');
+filename1=strcat(pathname.rawdata038,'rawdata_dtacq',num2str(dtacq_num(1)),'_shot',num2str(shot(1)),'_tfshot',num2str(tfshot(1)),'.mat');
 load(filename1,'rawdata');%a038
 rawdata1=rawdata;
 clear rawdata
@@ -66,10 +66,10 @@ if numel(rawdata1)< 500
 end
 
 %較正係数のバージョンを日付で判別
-sheets1 = sheetnames('C:\Users\kuru1\OneDrive - g.ecc.u-tokyo.ac.jp\labo\experiment\coeff125ch.xlsx');
+sheets1 = sheetnames('coeff125ch.xlsx');
 sheets1 = str2double(sheets1);
 sheet_date1=max(sheets1(sheets1<=date));
-C1 = readmatrix('C:\Users\kuru1\OneDrive - g.ecc.u-tokyo.ac.jp\labo\experiment\coeff125ch.xlsx','Sheet',num2str(sheet_date1));
+C1 = readmatrix('coeff125ch.xlsx','Sheet',num2str(sheet_date1));
 
 %a038
 ok1 = logical(C1(:,14));
@@ -80,8 +80,8 @@ rpos1=C1(:,10);
 probe_num1=C1(:,5);
 probe_ch1=C1(:,6);
 ch1=C1(:,7);
-p_ch= readmatrix('C:\Users\kuru1\OneDrive - g.ecc.u-tokyo.ac.jp\labo\experiment\coeff125ch.xlsx','Sheet','p_ch');
-coeff039= readmatrix('C:\Users\kuru1\OneDrive - g.ecc.u-tokyo.ac.jp\labo\experiment\coeff125ch.xlsx','Sheet','a039coeff');
+p_ch= readmatrix('coeff125ch.xlsx','Sheet','p_ch');
+coeff039= readmatrix('coeff125ch.xlsx','Sheet','a039coeff');
 coeff039=[coeff039(:,1);coeff039(:,2);coeff039(:,3);coeff039(:,4);coeff039(:,5)];
 
 b1=rawdata1.*coeff1'./1.1976;%較正係数RC/NS

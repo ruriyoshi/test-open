@@ -15,10 +15,10 @@ pathname.rawdata=getenv('rawdata_path');%dtacqのrawdataの保管場所
 
 % %直接入力の場合
 dtacqlist=39;
-shotlist=330;%[1333,1336:1340,1342:1345];%[1346:1348,1350,1352];%[935:983];%240;%【input】dtacqの保存番号
+shotlist=1337;%[1333,1336:1340,1342:1345];%[1346:1348,1350,1352];%[935:983];%240;%【input】dtacqの保存番号
 %tfshotlist=zeros(size(shotlist));
-tfshotlist=326*ones(size(shotlist));%0;
-date = 230111;%【input】計測日
+tfshotlist=1330*ones(size(shotlist));%0;
+date = 230428;%【input】計測日
 n_data=numel(shotlist);%計測データ数
 EFlist = 150;%150;%【input】EF電流
 TFlist = 4;
@@ -56,11 +56,11 @@ if numel(rawdata)< 500
 end
 
 %較正係数のバージョンを日付で判別
-sheets = sheetnames('coeff200ch.xlsx');
+sheets = sheetnames('coeff200ch_old.xlsx');
 sheets = str2double(sheets);
 sheet_date=max(sheets(sheets<=date));
 %disp(sheet_date);
-C = readmatrix('coeff200ch.xlsx','Sheet',num2str(sheet_date));
+C = readmatrix('coeff200ch_old.xlsx','Sheet',num2str(sheet_date));
 %disp(C);
 ok = logical(C(:,14));
 P=C(:,13);
@@ -74,7 +74,7 @@ d2p=C(:,15);
 d2bz=C(:,16);
 d2bt=C(:,17);
 
-    b=rawdata.*coeff';%較正係数RC/NS
+b=rawdata.*coeff';%較正係数RC/NS
 b=b.*P';%極性揃え
 b=smoothdata(b,1);%%生信号にsmoothingどれくらいかけるか
 
