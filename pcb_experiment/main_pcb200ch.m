@@ -5,15 +5,15 @@
 
 %%%%%ここが各PCのパス
 %【※コードを使用する前に】環境変数を設定しておくか、matlab内のコマンドからsetenv('パス名','アドレス')で指定してから動かす
-pathname.ts3u=getenv('ts3u_path');%old-koalaのts-3uまでのパス（mrdなど）
-pathname.fourier=getenv('fourier_path');%fourierのmd0（データックのショットが入ってる）までのpath
+% pathname.ts3u=getenv('ts3u_path');%old-koalaのts-3uまでのパス（mrdなど）
+% pathname.fourier=getenv('fourier_path');%fourierのmd0（データックのショットが入ってる）までのpath
 pathname.NIFS=getenv('NIFS_path');%resultsまでのpath（ドップラー、SXR）
-pathname.save=getenv('savedata_path');%outputデータ保存先
+% pathname.save=getenv('savedata_path');%outputデータ保存先
 
-pathname.rawdata38=getenv('rawdata038_path');%dtacq a038のrawdataの保管場所
-pathname.woTFdata=getenv('woTFdata_path');%rawdata（TFoffset引いた）の保管場所
+% pathname.rawdata38=getenv('rawdata038_path');%dtacq a038のrawdataの保管場所
+% pathname.woTFdata=getenv('woTFdata_path');%rawdata（TFoffset引いた）の保管場所
 
-pathname.rawdata='/Users/yunhancai/Google Drive/Data/pcb/raw';%dtacqのrawdataの保管場所
+pathname.rawdata=getenv('rawdata_path');%dtacqのrawdataの保管場所
 
 % %%%%実験オペレーションの取得
 % DOCID='1wG5fBaiQ7-jOzOI-2pkPAeV6SDiHc_LrOdcbWlvhHBw';%スプレッドシートのID
@@ -31,12 +31,12 @@ pathname.rawdata='/Users/yunhancai/Google Drive/Data/pcb/raw';%dtacqのrawdata�
 
 % %直接入力の場合
 dtacqlist=39;
-shotlist=989;%240;%【input】dtacqの保存番号
-tfshotlist=988;%0;
-date = 230217;%【input】計測日
+shotlist=1346;%240;%【input】dtacqの保存番号
+tfshotlist=1330;%0;
+date = 230428;%【input】計測日
 n_data=numel(shotlist);%計測データ数
-EFlist = 150;%150;%【input】EF電流
-TFlist = 0;
+EFlist = 160;%150;%【input】EF電流
+TFlist = 4;
 
 trange=430:590;%【input】計算時間範囲
 n=50; %【input】rz方向のメッシュ数
@@ -55,7 +55,7 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%
 
 function plot_psi200ch(date, dtacq_num, shot, tfshot, pathname, n,i_EF,trange,TF)
-filename=strcat(pathname.rawdata,'/rawdata_dtacq',num2str(dtacq_num),'_shot',num2str(shot),'_tfshot',num2str(tfshot),'.mat');
+filename=strcat(pathname.rawdata,'rawdata_dtacq',num2str(dtacq_num),'_shot',num2str(shot),'_tfshot',num2str(tfshot),'.mat');
 if exist(filename,"file")==0
     disp(strcat(filename,' does not exist.'));
     return
@@ -188,31 +188,20 @@ dt = 4;
      i=start+m.*dt; %end
      t=trange(i);
      subplot(4,4,m)
-%     contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.Bz(:,:,i),30,'LineStyle','none')
-%     contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.psi(:,:,i),40,'LineStyle','none')
-    contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.Bt(:,:,i),-100e-3:0.5e-3:100e-3,'LineStyle','none')
-%     contourf(grid2D.zq(1,:),grid2D.rq(:,1),-1.*data2D.Jt(:,:,i),30,'LineStyle','none')
-%     contourf(grid2D.zq(1,:),grid2D.rq(:,1),-1.*data2D.Et(:,:,i),20,'LineStyle','none')
-    colormap(jet)
-    axis image
-    axis tight manual
-%     caxis([-0.8*1e+6,0.8*1e+6]) %jt%カラーバーの軸の範囲
-%     caxis([-0.01,0.01])%Bz
-     caxis([-0.1,0.1])%Bt
-%     caxis([-5e-3,5e-3])%psi
-%     caxis([-500,400])%Et
-%     colorbar('Location','eastoutside')
-    %カラーバーのラベル付け
-%     c = colorbar;
-%     c.Label.String = 'Jt [A/m^{2}]';
+    % This is included in original one: contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.Bt(:,:,i),-100e-3:0.5e-3:100e-3,'LineStyle','none')
+    % colormap(jet)
+    % axis image
+    % axis tight manual
+    % caxis([-0.1,0.1])
     hold on
 %     plot(grid2D.zq(1,squeeze(mid(:,:,i))),grid2D.rq(:,1))
 %     contour(grid2D.zq(1,:),grid2D.rq(:,1),squeeze(data2D.psi(:,:,i)),20,'black')
 %     contour(grid2D.zq(1,:),grid2D.rq(:,1),squeeze(data2D.psi(:,:,i)),20,'black')
-    contour(grid2D.zq(1,:),grid2D.rq(:,1),squeeze(data2D.psi(:,:,i)),[-20e-3:0.2e-3:40e-3],'black','LineWidth',1)
+    contour(grid2D.zq(1,:),grid2D.rq(:,1),squeeze(data2D.psi(:,:,i)),[-20e-3:0.4e-3:40e-3],'black','LineWidth',0.2)
+%    This line was included in the original one instead of the upper. contour(grid2D.zq(1,:),grid2D.rq(:,1),squeeze(data2D.psi(:,:,i)),[-20e-3:0.2e-3:40e-3],'black','LineWidth',0.2)
 %     plot(grid2D.zq(1,squeeze(mid(opoint(:,:,i),:,i))),grid2D.rq(opoint(:,:,i),1),"bo")
 %     plot(grid2D.zq(1,squeeze(mid(xpoint(:,:,i),:,i))),grid2D.rq(xpoint(:,:,i),1),"bx")
-     plot(ok_z,ok_r,"k.",'MarkerSize', 6)%測定位置
+     plot(ok_z,ok_r,"k.",'MarkerSize', 3)%測定位置
     hold off
     title(string(t)+' us')
 %     xlabel('z [m]')

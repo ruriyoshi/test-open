@@ -56,7 +56,6 @@ for i=1:n_data
     [grid2D,data2D] = process_PCBdata(date, dtacq_num, shot, tfshot, pathname, n,i_EF,trange);
 %     shot_SXR = IDXlist(i);
     shot_SXR = 14; % 放電番号
-    % この前に.tifのファイル名を変更する必要があると思う，デフォルトは日付.tifだけど変えないとだめでしょ
     SXRfilename = strcat('G:/マイドライブ/X-ray/Data/TIF/',num2str(date),'/shot',num2str(shot_SXR,'%03i'),'.tif');
     [EE_high,EE_low] = plot_SXR_at_t(grid2D,data2D,date,shot_SXR,t,show_xpoint,show_localmax,start,interval,save,SXRfilename,filter,NL);
     Brec = clc_Breconnection(grid2D,data2D);

@@ -24,11 +24,11 @@ pathname.rawdata=getenv('rawdata_path');%dtacqのrawdataの保管場所
 
 % %直接入力の場合【注意】全て同じサイズの行列になるように記入
 dtacqlist=39;
-shotlist=395;%【input】実験ログのa039の番号
-tfshotlist=391;%【input】実験ログのa039_TFの番号
-date = 230119;%【input】計測日
+shotlist=1336;%【input】実験ログのa039の番号
+tfshotlist=1330;%【input】実験ログのa039_TFの番号
+date = 230428;%【input】計測日
 n_data=numel(shotlist);%計測データ数
-EFlist = 150;%【input】EF電流
+EFlist = 160;%【input】EF電流
 
 trange=450:510;%【input】計算時間範囲
 n=50; %【input】rz方向のメッシュ数
@@ -38,7 +38,8 @@ for i=1:n_data
     shot=shotlist(i);
     tfshot=tfshotlist(i);
     i_EF=EFlist(i);
-    TF=TFlist(i);
+    TF=4; %unit == kV
+    disp(i);
     plot_psi200ch(date, dtacq_num, shot, tfshot, pathname,n,i_EF,trange,TF); 
 end
 
@@ -49,13 +50,14 @@ end
 function plot_psi200ch(date, dtacq_num, shot, tfshot, pathname, n,i_EF,trange,TF)
 filename=strcat(pathname.rawdata,'rawdata_dtacq',num2str(dtacq_num),'_shot',num2str(shot),'_tfshot',num2str(tfshot),'.mat');
 if exist(filename,"file")==0
-    return
+    error('Rawdata not found.');
 end
+
 load(filename,'rawdata');%1000×192
 
 %正しくデータ取得できていない場合はreturn
 if numel(rawdata)< 500
-    return
+    error('Something wrong with rawdata.');
 end
 
 %較正係数のバージョンを日付で判別
@@ -63,7 +65,7 @@ sheets = sheetnames('coeff200ch.xlsx');
 sheets = str2double(sheets);
 sheet_date=max(sheets(sheets<=date));
 
-C = readmatrix('coeff200ch.xlsx','Sheet',num2str(sheet_date));
+C = readmatrix('coeff200ch.xlsx','Sheet',num2str(sheet_date));disp('readmatrix');
 ok = logical(C(:,14));
 P=C(:,13);
 coeff=C(:,12);
@@ -145,10 +147,12 @@ data2D.Et=diff(data2D.psi,1,3).*1e+6;
 data2D.Et=data2D.Et./(2.*pi.*grid2D.rq);
 
 if isstruct(grid2D)==0 %もしdtacqデータがない場合次のloopへ(データがない場合NaNを返しているため)
+    disp('isstruct(grid2D) == 0');
     return
 end
 
- %カラーコンターなし
+ % カラーコンターなし
+ % 
 figure('Position', [0 0 1500 1500],'visible','on');
 start=30;
  for m=1:10 %図示する時間
