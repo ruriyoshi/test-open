@@ -1,8 +1,10 @@
-function [centers,radii]=FindFibers(IM)
+function [centers,radii]=FindFibers(IM,radiusRange)
 
-% figure;imagesc(IM);
-[centers,radii] = imfindcircles(IM,[70,130],'Sensitivity',0.98);
-% viscircles(centers,radii);
+figure;imagesc(IM);
+[centers,radii] = imfindcircles(IM,radiusRange,'Sensitivity',0.98);
+viscircles(centers,radii);
+hold on
+plot(centers(:,1),centers(:,2),'*');
 % disp(centers);
 % disp(radii);
 

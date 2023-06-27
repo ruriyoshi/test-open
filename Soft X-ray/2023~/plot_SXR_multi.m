@@ -1,4 +1,4 @@
-function [] = plot_SXR_multi(B_z,r_probe,z_probe,date,shot,show_xpoint,show_localmax,start,interval,save,SXRfilename,filter,NL)
+function [] = plot_SXR_multi(grid2D,data2D,date,shot,show_xpoint,show_localmax,start,interval,save,SXRfilename,filter,NL)
 % plot SXR emission on psi in rz plane
 % input:
 %   3d array of double: B_z (r,z,t), offsetted at zero and smoothed
@@ -69,8 +69,13 @@ end
 times = start:interval:(start+interval*7);
 plot_flag = false;
 
+f = figure;
+f.Units = 'normalized';
+f.Position = [0.1,0.2,0.8,0.4];
+
 for t = times
     number = (t-start)/interval+1;
+    % disp(clc_flag);
     
     if clc_flag
 %         ベクトル形式の画像データの読み込み
@@ -96,7 +101,7 @@ for t = times
         EE_low = readmatrix(loadpath_low);
     end
     
-    plot_save_SXR(B_z,r_probe,z_probe,range,date,shot,t,EE_high,EE_low,show_localmax,show_xpoint,save,filter,NL);
+    plot_save_SXR(grid2D,data2D,range,date,shot,t,EE_high,EE_low,show_localmax,show_xpoint,save,filter,NL);
 
 end
 

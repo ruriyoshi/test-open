@@ -100,6 +100,15 @@ else
     EE_low = readmatrix(loadpath_low);
 end
 
+% subplot(1,2,1);
+% imagesc(EE_high);
+% subplot(1,2,2);
+% imagesc(EE_low);
+
+f = figure;
+f.Units = 'normalized';
+f.Position = [0.1,0.2,0.8,0.4];
+
 plot_save_SXR(grid2D,data2D,range,date,shot,t,EE_high,EE_low,show_localmax,show_xpoint,save,filter,NL);
 
 end

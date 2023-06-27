@@ -74,9 +74,11 @@ subplot('Position',pos1);
 [SXR_mesh_z1,SXR_mesh_r1] = meshgrid(z_space_SXR1,r_space_SXR1);
 [~,h1] = contourf(SXR_mesh_z1,SXR_mesh_r1,EE1,20);
 h1.LineStyle = 'none';
-caxis([0,0.2]);
-% caxis([0,1]);
-c=colorbar('westoutside');c.Label.String='Intensity [a.u.]';c.FontSize=18;
+clim([0,0.2]);
+% clim([0,0.4]);
+% c=colorbar('westoutside');
+c=colorbar;
+c.Label.String='Intensity [a.u.]';c.FontSize=18;
 hold on
 
 [~,hp1]=contourf(psi_mesh_z,psi_mesh_r,psi,contour_layer,'-k','Fill','off');
@@ -117,8 +119,9 @@ subplot('Position',pos2);
 [SXR_mesh_z2,SXR_mesh_r2] = meshgrid(z_space_SXR2,r_space_SXR2);
 [~,h2] = contourf(SXR_mesh_z2,SXR_mesh_r2,EE2,20);
 h2.LineStyle = 'none';
-% caxis([0,0.15]);
-caxis([0,0.1]);
+% clim([0,0.15]);
+clim([0,0.2]);
+% clim([0,0.1]);
 c=colorbar;c.Label.String='Intensity [a.u.]';c.FontSize=18;
 hold on
 

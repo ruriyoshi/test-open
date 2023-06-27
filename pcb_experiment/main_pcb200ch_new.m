@@ -17,7 +17,7 @@ pathname.rawdata=getenv('rawdata_path');%dtacqのrawdataの保管場所
 DOCID='1wG5fBaiQ7-jOzOI-2pkPAeV6SDiHc_LrOdcbWlvhHBw';%スプレッドシートのID
 T=getTS6log(DOCID);
 node='date';
-date=230315;
+date=230428;
 T=searchlog(T,node,date);
 IDXlist= 20; %[5:50 52:55 58:59];%[4:6 8:11 13 15:19 21:23 24:30 33:37 39:40 42:51 53:59 61:63 65:69 71:74];
 n_data=numel(IDXlist);%計測データ数
@@ -37,7 +37,7 @@ dtacqlist=39.*ones(n_data,1);
 % TFlist = 0;
 
 trange=400:600;%【input】計算時間範囲
-n=10; %【input】rz方向のメッシュ数
+n=50; %【input】rz方向のメッシュ数
 
 for i=1:n_data
     dtacq_num=dtacqlist;
@@ -190,7 +190,7 @@ dt = 4;
 %     contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.Bz(:,:,i),30,'LineStyle','none')
     contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.psi(:,:,i),40,'LineStyle','none')
     % contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.Bt(:,:,i),-100e-3:0.5e-3:100e-3,'LineStyle','none')
-%     contourf(grid2D.zq(1,:),grid2D.rq(:,1),-1.*data2D.Jt(:,:,i),30,'LineStyle','none')
+    % contourf(grid2D.zq(1,:),grid2D.rq(:,1),-1.*data2D.Jt(:,:,i),30,'LineStyle','none')
 %     contourf(grid2D.zq(1,:),grid2D.rq(:,1),-1.*data2D.Et(:,:,i),20,'LineStyle','none')
     colormap(jet)
     axis image
@@ -198,7 +198,7 @@ dt = 4;
 %     caxis([-0.8*1e+6,0.8*1e+6]) %jt%カラーバーの軸の範囲
 %     caxis([-0.01,0.01])%Bz
      % clim([-0.1,0.1])%Bt
-    clim([-5e-3,5e-3])%psi
+    % clim([-5e-3,5e-3])%psi
 %     caxis([-500,400])%Et
 %     colorbar('Location','eastoutside')
     %カラーバーのラベル付け
