@@ -54,12 +54,12 @@ if clc_flag
         load(filepath, 'gm2d1', 'gm2d2', 'U1', 'U2', 's1', 's2', 'v1', 'v2', 'M', 'K', 'range','N_projection', 'N_grid');
         if N_projection_new ~= N_projection || N_grid_new ~= N_grid
             disp('Different parameters - Start calculation!');
-            clc_parameters(N_projection_new,N_grid_new);
+            clc_parameters_old(N_projection_new,N_grid_new);
             load(filepath, 'gm2d1', 'gm2d2', 'U1', 'U2', 's1', 's2', 'v1', 'v2', 'M', 'K', 'range');
         end
     else
         disp('No parameter - Start calculation!');
-        clc_parameters(N_projection_new,N_grid_new);
+        clc_parameters_old(N_projection_new,N_grid_new);
         load(filepath, 'gm2d1', 'gm2d2', 'U1', 'U2', 's1', 's2', 'v1', 'v2', 'M', 'K', 'range');
     end
 else

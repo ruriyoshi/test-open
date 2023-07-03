@@ -23,8 +23,12 @@ zmin2 = range(3);
 zmax2 = range(4);
 rmin = range(5);
 rmax = range(6);
+rmin2 = range(5);
+rmax2 = range(6);
+% rmin2 = range(5)-0.01;
+% rmax2 = range(6)-0.01;
 r_space_SXR1 = linspace(rmin,rmax,size(EE1,1));
-r_space_SXR2 = linspace(rmin,rmax,size(EE1,1));
+r_space_SXR2 = linspace(rmin2,rmax2,size(EE2,1));
 z_space_SXR1 = linspace(zmin1,zmax1,size(EE1,2));
 z_space_SXR2 = linspace(zmin2,zmax2,size(EE2,2));
 
@@ -47,6 +51,7 @@ z_space = linspace(z_probe(1),z_probe(end),50);
 r_space = linspace(r_probe(1),r_probe(end),50);
 [psi_mesh_z,psi_mesh_r] = meshgrid(z_space,r_space);
 
+% psi = get_psi(B_z,r_probe,t+4);
 % psi = get_psi(B_z,r_probe,t+2);
 psi = get_psi(B_z,r_probe,t);
 psi = griddata(z_probe,r_probe,psi,psi_mesh_z,psi_mesh_r,'cubic');
@@ -74,9 +79,11 @@ subplot('Position',pos1);
 [SXR_mesh_z1,SXR_mesh_r1] = meshgrid(z_space_SXR1,r_space_SXR1);
 [~,h1] = contourf(SXR_mesh_z1,SXR_mesh_r1,EE1,20);
 h1.LineStyle = 'none';
-caxis([0,0.2]);
-% caxis([0,1]);
-c=colorbar('westoutside');c.Label.String='Intensity [a.u.]';c.FontSize=18;
+clim([0,0.2]);
+% clim([0,0.4]);
+% c=colorbar('westoutside');
+c=colorbar;
+c.Label.String='Intensity [a.u.]';c.FontSize=18;
 hold on
 
 [~,hp1]=contourf(psi_mesh_z,psi_mesh_r,psi,contour_layer,'-k','Fill','off');
@@ -117,8 +124,9 @@ subplot('Position',pos2);
 [SXR_mesh_z2,SXR_mesh_r2] = meshgrid(z_space_SXR2,r_space_SXR2);
 [~,h2] = contourf(SXR_mesh_z2,SXR_mesh_r2,EE2,20);
 h2.LineStyle = 'none';
-% caxis([0,0.15]);
-caxis([0,0.1]);
+% clim([0,0.15]);
+clim([0,0.2]);
+% clim([0,0.1]);
 c=colorbar;c.Label.String='Intensity [a.u.]';c.FontSize=18;
 hold on
 

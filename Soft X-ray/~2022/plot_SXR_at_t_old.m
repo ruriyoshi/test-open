@@ -65,12 +65,12 @@ if clc_flag
 %         load(filepath);
         if N_projection_new ~= N_projection || N_grid_new ~= N_grid
             disp('Different parameters - Start calculation!');
-            clc_parameters(N_projection_new,N_grid_new);
+            clc_parameters_old(N_projection_new,N_grid_new);
             load(filepath, 'gm2d1', 'gm2d2', 'U1', 'U2', 's1', 's2', 'v1', 'v2', 'M', 'K', 'range');
         end
     else
         disp('No parameter - Start calculation!');
-        clc_parameters(N_projection_new,N_grid_new);
+        clc_parameters_old(N_projection_new,N_grid_new);
         load(filepath, 'gm2d1', 'gm2d2', 'U1', 'U2', 's1', 's2', 'v1', 'v2', 'M', 'K', 'range');
     end
 else
@@ -83,10 +83,10 @@ plot_flag = false;
 if clc_flag
 %         ベクトル形式の画像データの読み込み
     if date <= 210924
-        [VectorImage1,VectorImage2] = get_SXRImage(date,number,SXRfilename,filter);
+        [VectorImage1,VectorImage2] = get_SXRImage_old(date,number,SXRfilename,filter);
 %         return
     else
-        [VectorImage2,VectorImage1] = get_SXRImage(date,number,SXRfilename,filter);
+        [VectorImage2,VectorImage1] = get_SXRImage_old(date,number,SXRfilename,filter);
     end
 
 %         再構成計算
