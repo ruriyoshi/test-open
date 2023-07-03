@@ -23,8 +23,12 @@ zmin2 = range(3);
 zmax2 = range(4);
 rmin = range(5);
 rmax = range(6);
+rmin2 = range(5);
+rmax2 = range(6);
+% rmin2 = range(5)-0.01;
+% rmax2 = range(6)-0.01;
 r_space_SXR1 = linspace(rmin,rmax,size(EE1,1));
-r_space_SXR2 = linspace(rmin,rmax,size(EE1,1));
+r_space_SXR2 = linspace(rmin2,rmax2,size(EE2,1));
 z_space_SXR1 = linspace(zmin1,zmax1,size(EE1,2));
 z_space_SXR2 = linspace(zmin2,zmax2,size(EE2,2));
 
@@ -47,6 +51,7 @@ z_space = linspace(z_probe(1),z_probe(end),50);
 r_space = linspace(r_probe(1),r_probe(end),50);
 [psi_mesh_z,psi_mesh_r] = meshgrid(z_space,r_space);
 
+% psi = get_psi(B_z,r_probe,t+4);
 % psi = get_psi(B_z,r_probe,t+2);
 psi = get_psi(B_z,r_probe,t);
 psi = griddata(z_probe,r_probe,psi,psi_mesh_z,psi_mesh_r,'cubic');
