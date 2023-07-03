@@ -219,4 +219,5 @@ dt = 4;
 % saveas(gcf,strcat('/Users/yunhancai/Downloads/files/a039_',num2str(shot)))
 % saveas(gcf,strcat('/Users/yunhancai/Downloads/a039_',num2str(shot),'.png'))
 % close
+ save C:\Users\yuleo\Documents\GitHub\test-open\pcb_experiment\sandbox\data2D.mat data2D;
 end

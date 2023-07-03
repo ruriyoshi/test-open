@@ -76,7 +76,6 @@ f.Position = [0.1,0.2,0.8,0.4];
 for t = times
     number = (t-start)/interval+1;
     % disp(clc_flag);
-    
     if clc_flag
 %         ベクトル形式の画像データの読み込み
         if date <= 210924
@@ -84,11 +83,9 @@ for t = times
         else
             [VectorImage2,VectorImage1] = get_SXRImage(date,number,SXRfilename,filter);
         end
-        
 %         再構成計算
         EE_high = clc_distribution(M,K,gm2d1,U1,s1,v1,VectorImage1,plot_flag,NL);
         EE_low = clc_distribution(M,K,gm2d2,U2,s2,v2,VectorImage2,plot_flag,NL);
-        
 %         再構成結果を保存するファイルを作成、保存
         savepath_high = strcat(savefolder,'/',num2str(number),'_high.txt');
         writematrix(EE_high,savepath_high);
@@ -100,9 +97,7 @@ for t = times
         EE_high = readmatrix(loadpath_high);
         EE_low = readmatrix(loadpath_low);
     end
-    
     plot_save_SXR(grid2D,data2D,range,date,shot,t,EE_high,EE_low,show_localmax,show_xpoint,save,filter,NL);
-
 end
 
 end

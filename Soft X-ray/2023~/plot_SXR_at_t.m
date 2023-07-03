@@ -37,7 +37,7 @@ elseif filter & ~NL
 else
     options = 'LF_LR';
 end
-savefolder = strcat('/Users/shinjirotakeda/OneDrive - The University of Tokyo/Documents/result_matrix/',options,'/',num2str(date),'/shot',num2str(shot));
+savefolder = strcat('G:/My Drive/X-ray/Data/SXROUT/result_matrix/',options,'/',num2str(date),'/shot',num2str(shot));
 % 非線形再構成では計算精度を落としたい→グリッド数を落とす
 % 投影数は変えない？非線形フィルタなら落とす？
 % グリッド数以下の投影数だと正則化する意味もなさそう
@@ -56,7 +56,7 @@ else
 end
 
 % 再構成計算に必要なパラメータを計算するなら読み込む、しない場合も範囲に関しては読み込む
-filepath = '/Users/shinjirotakeda/Documents/GitHub/test-open/Soft X-ray/2023~/parameters.mat';
+filepath = '/Users/yuleo/Documents/GitHub/test-open/Soft X-ray/2023~/parameters.mat';
 if clc_flag
     N_projection_new = 80;
     N_grid_new = 100;
@@ -84,12 +84,11 @@ if clc_flag
 %         ベクトル形式の画像データの読み込み
 %     if date <= 210924
 %         [VectorImage1,VectorImage2] = get_SXRImage(date,number,SXRfilename,filter);
-% %         return
+%         return
 %     else
 %         [VectorImage2,VectorImage1] = get_SXRImage(date,number,SXRfilename,filter);
 %     end
 [VectorImage1,VectorImage2] = get_SXRImage(date,number,SXRfilename,filter);
-
 %         再構成計算
     EE_high = clc_distribution(M,K,gm2d1,U1,s1,v1,VectorImage1,plot_flag,NL);
     EE_low = clc_distribution(M,K,gm2d2,U2,s2,v2,VectorImage2,plot_flag,NL);
@@ -99,16 +98,13 @@ else
     EE_high = readmatrix(loadpath_high);
     EE_low = readmatrix(loadpath_low);
 end
-
 % subplot(1,2,1);
 % imagesc(EE_high);
 % subplot(1,2,2);
 % imagesc(EE_low);
-
 f = figure;
 f.Units = 'normalized';
 f.Position = [0.1,0.2,0.8,0.4];
-
 plot_save_SXR(grid2D,data2D,range,date,shot,t,EE_high,EE_low,show_localmax,show_xpoint,save,filter,NL);
 
 end

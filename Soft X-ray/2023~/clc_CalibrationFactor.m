@@ -1,17 +1,14 @@
 function CalibrationFactor = clc_CalibrationFactor(date,N_projection)
 
-CalibrationPath = strcat('/Users/shinjirotakeda/OneDrive - The University of Tokyo/Documents/SXR_Images/',num2str(date));
+CalibrationPath = strcat('G:/My Drive/X-ray/Data/TIF/',num2str(date));
 CalibrationImage = imread(strcat(CalibrationPath,'/PositionCheck.tif'));
 [centers,radii]=FindFibers(CalibrationImage);
 IW = round(mean(radii));
 centers = round(centers);
-
 Center = zeros(2,8,2);
 TimeRapsImage = zeros(2,8,2*IW,2*IW);
-
 Center(1,:,:) = centers([1,3,6,8,9,11,14,16],:);
 Center(2,:,:) = centers([2,4,5,7,10,12,13,15],:);
-
 RawImage = CalibrationImage;
 
 for i = 1:8
