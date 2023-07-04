@@ -1,13 +1,12 @@
 function [centers,radii]=FindFibers(IM,radiusRange)
 
 figure;imagesc(IM);
-[centers,radii] = imfindcircles(IM,radiusRange,'Sensitivity',0.98);
-viscircles(centers,radii);
+[centers,radii] = imfindcircles(IM,radiusRange,'Sensitivity',0.995);
+viscircles(centers(1:16,:),radii(1:16,:));
 hold on
-plot(centers(:,1),centers(:,2),'*');
+plot(centers(1:16,1),centers(1:16,2),'*');
 % disp(centers);
 % disp(radii);
-
 CircleData = [centers,radii];
 [~,I] = sort(CircleData(:,1),'descend');
 A = CircleData(I,:);
@@ -30,5 +29,4 @@ CircleData_New = [First;Second;Third;Fourth];
 
 centers = fliplr(CircleData_New(:,1:2));
 radii = CircleData_New(:,3);
-
 end

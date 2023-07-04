@@ -16,6 +16,10 @@ function [EE_high,EE_low] = plot_SXR_at_t(grid2D,data2D,date,shot,t,show_xpoint,
 %   boolean: filter, option for applying non-linear mean (NLM) filter
 %   boolean: NL, option for using non-linear reconstruction
 
+% 再構成パラメータを定めます．_newと付け加えているのは，既に.matファイルに保存されたデータと区別するためです．
+N_projection_new = 80;
+N_grid_new = 80;
+
 % 実行結果（行列）を保存するフォルダの確認
 % なければ作成＆計算、あれば読み込みsave
 % 単一時間の場合は保存しない？残りの処理が面倒
@@ -28,16 +32,17 @@ function [EE_high,EE_low] = plot_SXR_at_t(grid2D,data2D,date,shot,t,show_xpoint,
 % else
 %     savefolder = strcat('/Users/shinjirotakeda/OneDrive - The University of Tokyo/Documents/result_matrix/LF_LR/',num2str(date),'/shot',num2str(shot));
 % end
-if filter & NL
+
+if filter && NL
     options = 'NLF_NLR';
-elseif ~filter & NL
+elseif ~filter && NL
     options = 'LF_NLR';
-elseif filter & ~NL
+elseif filter && ~NL
     options = 'NLF_LR';
 else
     options = 'LF_LR';
 end
-savefolder = strcat('G:/My Drive/X-ray/Data/SXROUT/result_matrix/',options,'/',num2str(date),'/shot',num2str(shot));
+
 % 非線形再構成では計算精度を落としたい→グリッド数を落とす
 % 投影数は変えない？非線形フィルタなら落とす？
 % グリッド数以下の投影数だと正則化する意味もなさそう
@@ -48,28 +53,27 @@ savefolder = strcat('G:/My Drive/X-ray/Data/SXROUT/result_matrix/',options,'/',n
 % savefolder = strcat('/Users/shinjirotakeda/OneDrive - The University of Tokyo/Documents/result_matrix/',options,'/',num2str(date),'/shot',num2str(shot));
 % filepath = strcat('/Users/shinjirotakeda/Documents/GitHub/test-open/Soft X-ray/parameters/',options,'.mat');
 
+% 過去に同じTIF画像を再構成している場合，再構成の計算を行わず直接結果画像を表示させようとします．
+% exist(path,'dir')はディレクトリが存在するとき7,存在しないとき0を返します．
+savefolder = strcat('G:/My Drive/X-ray/Data/SXROUT/result_matrix/',options,'/',num2str(date),'/shot',num2str(shot));
 if exist(savefolder,'dir') == 0
     clc_flag = true;
-%     mkdir(savefolder);
 else
     clc_flag = false;
 end
 
-% 再構成計算に必要なパラメータを計算するなら読み込む、しない場合も範囲に関しては読み込む
+% 再構成計算に必要なパラメータを計算するなら読み込む、しない場合も時間の範囲に関しては読み込む
 filepath = '/Users/yuleo/Documents/GitHub/test-open/Soft X-ray/2023~/parameters.mat';
 if clc_flag
-    N_projection_new = 80;
-    N_grid_new = 100;
     if isfile(filepath)
         load(filepath, 'gm2d1', 'gm2d2', 'U1', 'U2', 's1', 's2', 'v1', 'v2', 'M', 'K', 'range','N_projection', 'N_grid');
-%         load(filepath);
         if N_projection_new ~= N_projection || N_grid_new ~= N_grid
-            disp('Different parameters - Start calculation!');
+            disp('Calcurate parameters given in plot_SXR_at_t.m didnt match existing parameters in parameters.mat. Recalcurating...' );
             clc_parameters(N_projection_new,N_grid_new,filepath);
             load(filepath, 'gm2d1', 'gm2d2', 'U1', 'U2', 's1', 's2', 'v1', 'v2', 'M', 'K', 'range');
         end
     else
-        disp('No parameter - Start calculation!');
+        disp('No existing parameters found. Calcurating...');
         clc_parameters(N_projection_new,N_grid_new,filepath);
         load(filepath, 'gm2d1', 'gm2d2', 'U1', 'U2', 's1', 's2', 'v1', 'v2', 'M', 'K', 'range');
     end
@@ -81,18 +85,19 @@ number = (t-start)/interval+1;
 plot_flag = false;
 
 if clc_flag
-%         ベクトル形式の画像データの読み込み
 %     if date <= 210924
 %         [VectorImage1,VectorImage2] = get_SXRImage(date,number,SXRfilename,filter);
 %         return
 %     else
 %         [VectorImage2,VectorImage1] = get_SXRImage(date,number,SXRfilename,filter);
 %     end
+% TIF画像から再構成されるべき画像をベクトル画像形式で取り出します．ここでフィルタ処理が行われます．
 [VectorImage1,VectorImage2] = get_SXRImage(date,number,SXRfilename,filter);
-%         再構成計算
+% 再構成計算を行います．ここでペナルティ関数の選択が行われます．
     EE_high = clc_distribution(M,K,gm2d1,U1,s1,v1,VectorImage1,plot_flag,NL);
     EE_low = clc_distribution(M,K,gm2d2,U2,s2,v2,VectorImage2,plot_flag,NL);
 else
+    % 過去に一度でも再構成を行っている場合，過去のX線分布画像を直接参照しそのまま返そうとします．
     loadpath_high = strcat(savefolder,'/',num2str(number),'_high.txt');
     loadpath_low = strcat(savefolder,'/',num2str(number),'_low.txt');
     EE_high = readmatrix(loadpath_high);
