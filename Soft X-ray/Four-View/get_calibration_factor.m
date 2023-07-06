@@ -2,7 +2,7 @@ function CalibrationFactor = get_calibration_factor(date,N_projection)
 
 CalibrationPath = strcat('/Users/shinjirotakeda/OneDrive - The University of Tokyo/Documents/SXR_Images/',num2str(date));
 CalibrationImage = imread(strcat(CalibrationPath,'/PositionCheck.tif'));
-[centers,radii]=FindFibers(CalibrationImage);
+[centers,radii]=find_fibers(CalibrationImage);
 IW = round(mean(radii));
 centers = round(centers);
 
