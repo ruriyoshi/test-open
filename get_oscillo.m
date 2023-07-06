@@ -1,4 +1,4 @@
-function [ch1,ch2,ch3,ch4,ch5,ch6,ch7,ch8] = get_oscillo(date,TF_only,shot,offset_TF,offset_EF)
+function [ch1,ch2,ch3,ch4,ch5,ch6,ch7,ch8] = get_oscillo(date,TF_only,shot,offset_TF,offset_EF,folder_path)
 %GET_IP 
 % input:
 %   date:実験日, TF_only:未使用, shot：ショット番号, offset_TF:未使用, offset_EF:未使用
@@ -7,15 +7,17 @@ function [ch1,ch2,ch3,ch4,ch5,ch6,ch7,ch8] = get_oscillo(date,TF_only,shot,offse
 
 % read file
 
-if shot < 10
-    data_dir = ['/Users/keisukemiki/koala_mnt/experiment/results/ts-3u/',num2str(date),'/',num2str(date),'00',num2str(shot),'.rgw'];
-elseif shot < 100
-    data_dir = ['/Users/keisukemiki/koala_mnt/experiment/results/ts-3u/',num2str(date),'/',num2str(date),'0',num2str(shot),'.rgw'];
-elseif shot < 1000
-    data_dir = ['/Users/keisukemiki/koala_mnt/experiment/results/ts-3u/',num2str(date),'/',num2str(date),num2str(shot),'.rgw'];
-else
-    disp('More than 999 shots! You need some rest!!!')
-end
+% if shot < 10
+%     data_dir = ['/Users/keisukemiki/koala_mnt/experiment/results/ts-3u/',num2str(date),'/',num2str(date),'00',num2str(shot),'.rgw'];
+% elseif shot < 100
+%     data_dir = ['/Users/keisukemiki/koala_mnt/experiment/results/ts-3u/',num2str(date),'/',num2str(date),'0',num2str(shot),'.rgw'];
+% elseif shot < 1000
+%     data_dir = ['/Users/keisukemiki/koala_mnt/experiment/results/ts-3u/',num2str(date),'/',num2str(date),num2str(shot),'.rgw'];
+% else
+%     disp('More than 999 shots! You need some rest!!!')
+% end
+data_dir =fullfile(folder_path,num2str(date),[num2str(date),num2str(shot,'%03i'),'.rgw']);
+
 data=dlmread(data_dir,'\t',1,1);
 
 % set data

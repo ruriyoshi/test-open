@@ -1,17 +1,17 @@
 clear all
-
-date=211230;
-TF_shot = 15 ;
+folder_path=getenv('ts3u_path');%ts-3uまでのパス
+date=211224;
+TF_shot = 1 ;
 offset_TF = true;
-shot = 17 ;
-
+shot = 6;
+i_EF=150;
 % ********* ALWAYS RUN THIS FUNCTION FIRST ***********
 % parameters:(date,TF_shot,shot,offset_TF,offset_EF)
 %[B_z,r_probe,z_probe,ch_dist,data] = get_B_z(200130,4,12,true,150);
 %[B_z,r_probe,z_probe,ch_dist,data] = get_B_z(200202,7,6,true,0);
 %[B_z,r_probe,z_probe,ch_dist,data,data_raw] = get_B_z(200718,27,30,true,70);
-[B_z,r_probe,z_probe,ch_dist,data,data_raw,shot_num] = get_B_z(date,TF_shot,shot,true,true);
-
+%[B_z,r_probe,z_probe,ch_dist,data,data_raw,shot_num] = get_B_z(date,TF_shot,shot,true,true);
+[B_z,r_probe,z_probe,ch_dist,data,data_raw,shot_num] =get_B_z(date,TF_shot,shot,offset_TF,i_EF,folder_path);
 %########## Raed oscilloscope (DL716) file ##########
 % parameters:(date,shot,TF_shot,offset_TF)
 %[low_n_data] = low_n_mode(date,shot,TF_shot,offset_TF);
@@ -43,15 +43,19 @@ r_probe = r_probe([2,3,4,6,7,8]);
 
 % ************* PLOTTING FUNCTIONS *******************
 % parameters:(B_z,ch_dist,start_time,end_time)
-%plot_B_z_in_time(B_z,ch_dist,350,600);
+% plot_B_z_in_time(B_z,ch_dist,350,600);
 
-plot_psi_multi(B_z,r_probe,z_probe,461:1:480,true,true,true,false,shot);
+plot_psi_multi(B_z,r_probe,z_probe,461:1:475,true,true,true,false);
+% plot_psi_multi(B_z,r_probe,z_probe,476:1:491,true,true,true,false);
+% plot_psi_multi(B_z,r_probe,z_probe,492:1:507,true,true,true,false);
+% plot_psi_multi(B_z,r_probe,z_probe,508:1:523,true,true,true,false);
+%plot_psi_multi(B_z,r_probe,z_probe,461:1:480,true,true,true,false,shot);
 
 % parameters:(B_z,r_probe,z_probe,t,fitting,fill,fixed_Clayer,show_probe)
-% plot_psi_at_t(B_z,r_probe,z_probe,440,true,true,true,true);
+% plot_psi_at_t(B_z,r_probe,z_probe,476,true,true,true,true);
 
 %parameters:(B_z,r_probe)
-%plot_fitrate(B_z,r_probe,shot);
+% plot_fitrate(B_z,r_probe,shot);
 
 
 
