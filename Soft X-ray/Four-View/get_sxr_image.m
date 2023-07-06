@@ -1,4 +1,4 @@
-function [VectorImage1,VectorImage2] = get_sxr_image(date,number,projectionNumber,sxrFilename,doFilter)
+function [imageVector1,imageVector2,imageVector3,imageVector4] = get_sxr_image(date,number,projectionNumber,sxrFilename,doFilter)
 
 % 画像を切り取ってベクトル形式で出力
 % 全時間帯の画像を全て出力するかどうか
@@ -32,19 +32,21 @@ end
 fiberPositionFile = strcat('/Users/shinjirotakeda/OneDrive - The University of Tokyo/Documents/SXR_Images/',num2str(date),'/PositionCheck.tif');
 calibrationImage = imread(fiberPositionFile);
 
-% 校正用画像からファイバーの位置（＋半径）を取得
-[centers,radii]=find_fibers(calibrationImage,[70,130]);
-IW = 85;
-% IW = round(mean(radii));
-centers = round(centers);
+% % 校正用画像からファイバーの位置（＋半径）を取得
+% [centers,radii]=find_fibers(calibrationImage,[70,130]);
+% IW = 85;
+% % IW = round(mean(radii));
+% centers = round(centers);
+% % それぞれのファイバーの中心を格納するための配列を定義（ここまでFindFibersでやれば良くない？）
+% Center = zeros(2,8,2);
+% Center(1,:,:) = centers([1,3,6,8,9,11,14,16],:);
+% Center(2,:,:) = centers([2,4,5,7,10,12,13,15],:);
 
-% それぞれのファイバーの中心を格納するための配列を定義（ここまでFindFibersでやれば良くない？）
-Center = zeros(2,8,2);
-Center(1,:,:) = centers([1,3,6,8,9,11,14,16],:);
-Center(2,:,:) = centers([2,4,5,7,10,12,13,15],:);
+% 校正用画像からファイバーの位置（＋半径）を取得
+[Center,IW] = find_fibers2(calibrationImage,[65,75]);
 
 % 切り取った画像を格納するための配列
-timeRapsImage = zeros(2,8,2*IW,2*IW);
+timeSeries = zeros(2,8,2*IW,2*IW);
 
 % % 各時間帯ごとに画像を切り取って格納
 % for i = 1:8
@@ -59,12 +61,12 @@ timeRapsImage = zeros(2,8,2*IW,2*IW);
 % end
 
 % バックグラウンドノイズのデータを取得
-BackGround = cast(rawImage(650-IW+1:650+IW,120-IW+1:120+IW,1),'double');
-BackGround = ones(size(BackGround))*mean(BackGround,'all');
+backgroundImage = cast(rawImage(1:1+2*IW,1:1+2*IW,1),'double');
+backgroundNoise = ones(size(backgroundImage))*mean(backgroundImage,'all');
 
 % 切り取った画像のうち実際に使う部分（ファイバー部分）を切り出し
-k = FindCircle(projectionNumber/2);
-image_vectors = zeros(2,8,numel(k));
+k = find_circle(projectionNumber/2);
+imageVectors = zeros(4,8,numel(k));
 
 if doCheck
     f1=figure;
@@ -91,26 +93,38 @@ for i=1:8
     horizontalRange1 = Center(1,i,2)-IW+1:Center(1,i,2)+IW;
     verticalRange2 = Center(2,i,1)-IW+1:Center(2,i,1)+IW;
     horizontalRange2 = Center(2,i,2)-IW+1:Center(2,i,2)+IW;
+    verticalRange3 = Center(3,i,1)-IW+1:Center(3,i,1)+IW;
+    horizontalRange3 = Center(3,i,2)-IW+1:Center(3,i,2)+IW;
+    verticalRange4 = Center(4,i,1)-IW+1:Center(4,i,1)+IW;
+    horizontalRange4 = Center(4,i,2)-IW+1:Center(4,i,2)+IW;
     % 生画像を切り取ってファイバー数×フレーム数×IW×IWの配列に格納
-    timeRapsImage(1,i,:,:) = rawImage(verticalRange1,horizontalRange1,1);
-    timeRapsImage(2,i,:,:) = rawImage(verticalRange2,horizontalRange2,1);
-    % timeRapsImage(1,i,:,:) = rot90(timeRapsImage(1,i,:,:),2);
-    % timeRapsImage(2,i,:,:) = rot90(timeRapsImage(2,i,:,:),2);
+    timeSeries(1,i,:,:) = rawImage(verticalRange1,horizontalRange1,1);
+    timeSeries(2,i,:,:) = rawImage(verticalRange2,horizontalRange2,1);
+    timeSeries(3,i,:,:) = rawImage(verticalRange3,horizontalRange3,1);
+    timeSeries(4,i,:,:) = rawImage(verticalRange4,horizontalRange4,1);
 
     % バックグラウンドノイズ成分を差し引く
-    singleImage1 = squeeze(timeRapsImage(1,i,:,:))-BackGround;
-    singleImage2 = squeeze(timeRapsImage(2,i,:,:))-BackGround;
-    % GrayImage1 = fliplr(SingleImage1(:,:));
-    % GrayImage2 = fliplr(SingleImage2(:,:));
+    singleImage1 = squeeze(timeSeries(1,i,:,:))-backgroundNoise;
+    singleImage2 = squeeze(timeSeries(2,i,:,:))-backgroundNoise;
+    singleImage3 = squeeze(timeSeries(3,i,:,:))-backgroundNoise;
+    singleImage4 = squeeze(timeSeries(4,i,:,:))-backgroundNoise;
     grayImage1 = flipud(singleImage1(:,:));
     grayImage2 = flipud(singleImage2(:,:));
+    grayImage3 = flipud(singleImage3(:,:));
+    grayImage4 = flipud(singleImage4(:,:));
     grayImage1(grayImage1<0) = 0;
     grayImage2(grayImage2<0) = 0;
+    grayImage3(grayImage3<0) = 0;
+    grayImage4(grayImage4<0) = 0;
     % 再構成計算に使用可能なサイズに変換
     roughImage1 = imresize(grayImage1, resolution, 'nearest');
     roughImage1 = cast(roughImage1,'double');
     roughImage2 = imresize(grayImage2, resolution, 'nearest');
     roughImage2 = cast(roughImage2,'double');
+    roughImage3 = imresize(grayImage3, resolution, 'nearest');
+    roughImage3 = cast(roughImage3,'double');
+    roughImage4 = imresize(grayImage4, resolution, 'nearest');
+    roughImage4 = cast(roughImage4,'double');
 
     % 校正データを用いた明るさの修正（カメラの影の補正とか）や入射角度の補正をここでやりたい
     % figure;imagesc(RoughImage1);
@@ -141,20 +155,24 @@ for i=1:8
     end
 
     % ベクトル化
-    image_vectors(1,i,:) = roughImage1(k);
-    image_vectors(2,i,:) = roughImage2(k);
-    % VectorImages(1,i,:) = RoughImage1(k).*squeeze(CalibrationFactor(1,i,:));
-    % VectorImages(2,i,:) = RoughImage2(k).*squeeze(CalibrationFactor(2,i,:));
+    imageVectors(1,i,:) = roughImage1(k);
+    imageVectors(2,i,:) = roughImage2(k);
+    imageVectors(3,i,:) = roughImage3(k);
+    imageVectors(4,i,:) = roughImage4(k);
 end
 
-VectorImages1 = squeeze(image_vectors(1,:,:));
-VectorImages2 = squeeze(image_vectors(2,:,:));
-VectorImage1 = VectorImages1(number,:);
-VectorImage2 = VectorImages2(number,:);
+imageVectors1 = squeeze(imageVectors(1,:,:));
+imageVectors2 = squeeze(imageVectors(2,:,:));
+imageVectors3 = squeeze(imageVectors(3,:,:));
+imageVectors4 = squeeze(imageVectors(4,:,:));
+imageVector1 = imageVectors1(number,:);
+imageVector2 = imageVectors2(number,:);
+imageVector3 = imageVectors3(number,:);
+imageVector4 = imageVectors4(number,:);
 end
 
 
-function k = FindCircle(L)
+function k = find_circle(L)
 R = zeros(2*L);
 for i = 1:2*L
     for j = 1:2*L
