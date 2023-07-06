@@ -19,10 +19,9 @@ addpath(genpath('/Users/shinjirotakeda/Documents/GitHub/test-open'));
 DOCID='1wG5fBaiQ7-jOzOI-2pkPAeV6SDiHc_LrOdcbWlvhHBw';%スプレッドシートのID
 T=getTS6log(DOCID);
 node='date';
-pat = 230315;
+pat = 230706;
 date = pat;
 T=searchlog(T,node,pat);
-% IDXlist=[23,24,26,27,32,35:40,42:51,53:59,61:69];%[4:6 8:11 13 15:19 21:23 24:30 33:37 39:40 42:51 53:59 61:63 65:69 71:74];
 IDXlist = [33,35:40];
 n_data=numel(IDXlist);%計測データ数
 shotlist=T.a039(IDXlist);
