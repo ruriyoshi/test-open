@@ -29,7 +29,7 @@ plot_profile = true;%【input】イオン温度R分布をプロット
 plot_CH_spectra = false;%【input】CHごとのスペクトルをプロット(cal_CH = trueが必要)
 plot_LineInt_interp = false;%【input】死んだCHの補間Ti,Emをプロット(cal_LineInt = trueが必要)
 plot_2D_interp = false;%【input】補間スペクトルをプロット(cal_2D = trueが必要)
-plot_2D_spectra = 'all';%【input】('off','all','true','false')2次元スペクトル分布をプロット(cal_2D = trueが必要)
+plot_2D_spectra = 'off';%【input】('off','all','good','bad')2次元スペクトル分布をプロット(cal_2D = trueが必要)
 
 hw_lambda = 50;%【input】波長切り出し半幅
 hw_ch = 5;%【input】CH方向切り出し半幅
@@ -403,12 +403,12 @@ if cal_2D
     col_subp2 = 2;%サブプロット行数
     raw_subp2 = 2;%サブプロット列数
     n_subp2 = col_subp2*raw_subp2;
-    col_subp_f = 5;%サブプロット行数
-    raw_subp_f = 5;%サブプロット列数
+    col_subp_f = 2;%サブプロット行数
+    raw_subp_f = 2;%サブプロット列数
     n_subp_f = col_subp_f*raw_subp_f;
     idx_f_fit = 1;
-    col_subp_t = 5;%サブプロット行数
-    raw_subp_t = 5;%サブプロット列数
+    col_subp_t = 2;%サブプロット行数
+    raw_subp_t = 2;%サブプロット列数
     n_subp_t = col_subp_t*raw_subp_t;
     idx_t_fit = 1;
     for j=1:numel(z)
@@ -469,12 +469,12 @@ if cal_2D
                             title(sprintf("(%.1f,%.1f)",z(j)*1e3,r(i)*1e3))
                             drawnow
                         end
-                    case 'true'
+                    case 'good'
                         if checker(i,j) == 1
                             idx_subp_t = mod(idx_t_fit-1,n_subp_t)+1;%サブプロット位置番号
                             if idx_t_fit == 1
-                                figure('Position',[0 500 1000 1000]);
-                                sgtitle('True Spectra at (Z,R) [mm]')
+                                figure('Position',[400 500 400 300]);
+                                sgtitle('Good Spectra at (Z,R) [mm]')
                             end
                             subplot(col_subp_t,raw_subp_t,idx_subp_t)
                             if idx_t_fit <= n_subp_t
@@ -503,12 +503,12 @@ if cal_2D
                             end
                             idx_t_fit = idx_t_fit + 1;
                         end
-                    case 'false'
+                    case 'bad'
                         if checker(i,j) == 0
                             idx_subp_f = mod(idx_f_fit-1,n_subp_f)+1;%サブプロット位置番号
                             if idx_f_fit == 1
-                                figure('Position',[200 500 1000 1000])
-                                sgtitle('False Spectra at (Z,R) [mm]')
+                                figure('Position',[400 500 400 300])
+                                sgtitle('Bad Spectra at (Z,R) [mm]')
                             end
                             subplot(col_subp_f,raw_subp_f,idx_subp_f)
                             if idx_f_fit <= n_subp_f
