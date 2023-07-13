@@ -29,7 +29,7 @@ plot_profile = true;%【input】イオン温度R分布をプロット
 plot_CH_spectra = false;%【input】CHごとのスペクトルをプロット(cal_CH = trueが必要)
 plot_LineInt_interp = false;%【input】死んだCHの補間Ti,Emをプロット(cal_LineInt = trueが必要)
 plot_2D_interp = false;%【input】補間スペクトルをプロット(cal_2D = trueが必要)
-plot_2D_spectra = 'off';%【input】('off','all','true','false')2次元スペクトル分布をプロット(cal_2D = trueが必要)
+plot_2D_spectra = 'all';%【input】('off','all','true','false')2次元スペクトル分布をプロット(cal_2D = trueが必要)
 
 hw_lambda = 50;%【input】波長切り出し半幅
 hw_ch = 5;%【input】CH方向切り出し半幅
@@ -413,7 +413,7 @@ if cal_2D
     idx_t_fit = 1;
     for j=1:numel(z)
         for i=1:numel(r)
-            idx_fit = (i-1)*numel(z)+j;%スペクトル番号
+            idx_fit = (j-1)*numel(r)+i;%スペクトル番号
             input = local_spectra(:,i,j);
             for l=1:numel(lambdaA)
                 if input(l) < 0
@@ -504,40 +504,38 @@ if cal_2D
                             idx_t_fit = idx_t_fit + 1;
                         end
                     case 'false'
-                        if plot_2D_f_spectra
-                            if checker(i,j) == 0
-                                idx_subp_f = mod(idx_f_fit-1,n_subp_f)+1;%サブプロット位置番号
+                        if checker(i,j) == 0
+                            idx_subp_f = mod(idx_f_fit-1,n_subp_f)+1;%サブプロット位置番号
+                            if idx_f_fit == 1
+                                figure('Position',[200 500 1000 1000])
+                                sgtitle('False Spectra at (Z,R) [mm]')
+                            end
+                            subplot(col_subp_f,raw_subp_f,idx_subp_f)
+                            if idx_f_fit <= n_subp_f
                                 if idx_f_fit == 1
-                                    figure('Position',[200 500 1000 1000])
-                                    sgtitle('True Spectra at (Z,R) [mm]')
-                                end
-                                subplot(col_subp_f,raw_subp_f,idx_subp_f)
-                                if idx_f_fit <= n_subp_f
-                                    if idx_f_fit == 1
-                                        fit_x = lambdaA;
-                                        fit_y = feval(f,fit_x);
-                                        pfit_f1 = plot(fit_x,fit_y,'r-',lambdaA,input,'b+');
-                                        pfit_f = repmat(pfit_f1,[1,1,n_subp_f]);
-                                    else
-                                        fit_y = feval(f,fit_x);
-                                        pfit_f(:,:,idx_subp_f) = plot(fit_x,fit_y,'r-',lambdaA,input,'b+');
-                                    end
-                                    title(sprintf("(%.1f,%.1f)",z(j)*1e3,r(i)*1e3))
-                                    xline(lambda0)
-                                    xlabel('Wavelength [nm]')
-                                    ylabel('Strength [a.u.]')
-                                    xlim([min(lambdaA) max(lambdaA)])
-                                    ylim([0 inf])
-                                    legend('off')
+                                    fit_x = lambdaA;
+                                    fit_y = feval(f,fit_x);
+                                    pfit_f1 = plot(fit_x,fit_y,'r-',lambdaA,input,'b+');
+                                    pfit_f = repmat(pfit_f1,[1,1,n_subp_f]);
                                 else
                                     fit_y = feval(f,fit_x);
-                                    pfit_f(1,:,idx_subp_f).YData = fit_y;
-                                    pfit_f(2,:,idx_subp_f).YData = input;
-                                    title(sprintf("(%.1f,%.1f)",z(j)*1e3,r(i)*1e3))
-                                    drawnow
+                                    pfit_f(:,:,idx_subp_f) = plot(fit_x,fit_y,'r-',lambdaA,input,'b+');
                                 end
-                                idx_f_fit = idx_f_fit + 1;
+                                title(sprintf("(%.1f,%.1f)",z(j)*1e3,r(i)*1e3))
+                                xline(lambda0)
+                                xlabel('Wavelength [nm]')
+                                ylabel('Strength [a.u.]')
+                                xlim([min(lambdaA) max(lambdaA)])
+                                ylim([0 inf])
+                                legend('off')
+                            else
+                                fit_y = feval(f,fit_x);
+                                pfit_f(1,:,idx_subp_f).YData = fit_y;
+                                pfit_f(2,:,idx_subp_f).YData = input;
+                                title(sprintf("(%.1f,%.1f)",z(j)*1e3,r(i)*1e3))
+                                drawnow
                             end
+                            idx_f_fit = idx_f_fit + 1;
                         end
                     otherwise
                         warning('Input error in plot_2D_spectra.')%ICCD.lineの入力エラー
@@ -585,44 +583,44 @@ if cal_2D
     negative = find(Ti_local<0);
     Ti_local(negative) = zeros(size(negative));
 end
-    if plot_2D_result
-        figure('Position',[0 600 700 400])
-        tiledlayout(1,2)
-        ax1 = nexttile;
-        [~,h] = contourf(z,r,Ti_local,100);
-        daspect([1 1 1])
-        h.LineStyle = 'none';
-        colormap(ax1,jet)
-        title('Local Ion Temperature')
-        xlabel('Z [m]')
-        ylabel('R [m]')
-        c1 = colorbar;
-        c1.Label.String = 'Ion Temperature [eV]';
-        ax2 = nexttile;
-        [~,h] = contourf(z,r,Em_local,100);
-        daspect([1 1 1])
-        h.LineStyle = 'none';
-        colormap(ax2,pink)
-        title('Local Ion Emission')
-        xlabel('Z [m]')
-        ylabel('R [m]')
-        c2 = colorbar;
-        c2.Label.String = 'Ion Emission [a.u.]';
+if plot_2D_result
+    figure('Position',[0 600 700 400])
+    tiledlayout(1,2)
+    ax1 = nexttile;
+    [~,h] = contourf(z,r,Ti_local,100);
+    daspect([1 1 1])
+    h.LineStyle = 'none';
+    colormap(ax1,jet)
+    title('Local Ion Temperature')
+    xlabel('Z [m]')
+    ylabel('R [m]')
+    c1 = colorbar;
+    c1.Label.String = 'Ion Temperature [eV]';
+    ax2 = nexttile;
+    [~,h] = contourf(z,r,Em_local,100);
+    daspect([1 1 1])
+    h.LineStyle = 'none';
+    colormap(ax2,pink)
+    title('Local Ion Emission')
+    xlabel('Z [m]')
+    ylabel('R [m]')
+    c2 = colorbar;
+    c2.Label.String = 'Ion Emission [a.u.]';
+end
+if plot_profile
+    figure('Position',[1000 1000 600 450])
+    colororder(hsv(numel(z)))
+    for j=1:numel(z)
+        leg = ['Z = ',num2str(z(j)),' [m]'];
+        errorbar(Ti_local(:,j),r,(Ti_local_max(:,j)-Ti_local_min(:,j))/2,'horizontal','+-','LineWidth',1,'DisplayName',leg)
+        hold on
     end
-    if plot_profile
-        figure('Position',[1000 1000 600 450])
-        colororder(hsv(numel(z)))
-        for j=1:numel(z)
-            leg = ['Z = ',num2str(z(j)),' [m]'];
-            errorbar(Ti_local(:,j),r,(Ti_local_max(:,j)-Ti_local_min(:,j))/2,'horizontal','+-','LineWidth',1,'DisplayName',leg)
-            hold on
-        end
-        legend
-        title('Radial plofile of T_i in Z plane')
-        xlabel('Ion Temperature [eV]')
-        ylabel('R [m]')
-        xlim([0 inf])
-        ylim([min(r) max(r)])
-    end
+    legend
+    title('Radial plofile of T_i in Z plane')
+    xlabel('Ion Temperature [eV]')
+    ylabel('R [m]')
+    xlim([0 inf])
+    ylim([min(r) max(r)])
+end
 
-    toc
+toc
