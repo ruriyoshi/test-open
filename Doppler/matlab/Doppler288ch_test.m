@@ -12,11 +12,11 @@ pathname.IDS288ch=[pathname.NIFS,'/Doppler/Andor/320CH'];
 date = 210924;%【input】実験日
 ICCD.line = 'Ar';%【input】ドップラー発光ライン('Ar')
 
-read_data = false;%【input】データをascファイルから読み込む
+read_data = true;%【input】データをascファイルから読み込む
 
 plot_ICCD = false;%【input】ICCD画像をプロット
 
-cal_CH = false;%【input】CHごとのスペクトルを取得
+cal_CH = true;%【input】CHごとのスペクトルを取得
 
 cal_LineInt = false;%【input】線積分イオン温度、発光強度分布を計算
 plot_LineInt_result = false;%【input】線積分イオン温度、発光強度分布をプロット
