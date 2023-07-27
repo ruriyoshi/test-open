@@ -4,8 +4,8 @@ NL = false;
 
 N_projection_new = 80;
 N_grid_new = 100;
-% N_projection_new = 40;
-% N_grid_new = 50;
+% N_projection_new = 4;
+% N_grid_new = 5;
 
 % 'econ'の有無で実行時間比較
 % 基本N_projection>N_gridなので'econ'でいい
@@ -30,11 +30,12 @@ else
 end
     
 % number = (t-start)/interval+1;
-plot_flag = false;
+plot_flag = true;
 % [~,Iwgn1] = Assumption(N_projection,gm2d1,true);
 % [~,Iwgn2] = Assumption(N_projection,gm2d2,false);
 % [~,Iwgn3] = Assumption(N_projection,gm2d3,false);
 % [~,Iwgn4] = Assumption(N_projection,gm2d4,false);
+% こっちを使う時は N_projection_new = 80, N_grid_new = 100
 [~,Iwgn1] = Assumption_2(N_projection,gm2d1,true);
 [~,Iwgn2] = Assumption_2(N_projection,gm2d2,false);
 [~,Iwgn3] = Assumption_2(N_projection,gm2d3,false);
