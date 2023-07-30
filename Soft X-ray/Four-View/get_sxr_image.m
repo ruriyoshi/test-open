@@ -15,8 +15,8 @@ function [imageVector1,imageVector2,imageVector3,imageVector4] = get_sxr_image(d
 % % 画像を切り取る
 % N_projection = 80;
 % VectorImages = CutImage(date,shot,N_projection/230,false);
-doCheck = true;
-% doCheck = false;
+% doCheck = true;
+doCheck = false;
 
 % 生画像の取得
 rawImage = imread(sxrFilename);
@@ -44,6 +44,7 @@ calibrationImage = imread(fiberPositionFile);
 
 % 校正用画像からファイバーの位置（＋半径）を取得
 [Center,IW] = find_fibers2(calibrationImage,[65,75]);
+Center = round(Center);
 
 % 切り取った画像を格納するための配列
 timeSeries = zeros(2,8,2*IW,2*IW);
@@ -61,7 +62,7 @@ timeSeries = zeros(2,8,2*IW,2*IW);
 % end
 
 % バックグラウンドノイズのデータを取得
-backgroundImage = cast(rawImage(1:1+2*IW,1:1+2*IW,1),'double');
+backgroundImage = cast(rawImage(1:2*IW,1:2*IW,1),'double');
 backgroundNoise = ones(size(backgroundImage))*mean(backgroundImage,'all');
 
 % 切り取った画像のうち実際に使う部分（ファイバー部分）を切り出し
@@ -76,7 +77,7 @@ if doCheck
 end
 
 % 校正用データ（matファイル）が存在する場合はそれを取得、しなければ計算
-CalibrationPath = strcat('/Users/shinjirotakeda/OneDrive - The University of Tokyo/Documents/SXR_Images/',num2str(date),'/CalibrationFactor.mat');
+CalibrationPath = strcat(getenv('SXR_IMAGE_DIR'),'/',num2str(date),'/CalibrationFactor.mat');
 if exist(CalibrationPath,'file')
     load(CalibrationPath,'CalibrationFactor');
 else
@@ -89,14 +90,14 @@ resolution = projectionNumber/(IW*2);
 % 画像データの行列化
 for i=1:8
     % 画像切り取りの縦方向・横方向範囲を指定
-    verticalRange1 = Center(1,i,1)-IW+1:Center(1,i,1)+IW;
-    horizontalRange1 = Center(1,i,2)-IW+1:Center(1,i,2)+IW;
-    verticalRange2 = Center(2,i,1)-IW+1:Center(2,i,1)+IW;
-    horizontalRange2 = Center(2,i,2)-IW+1:Center(2,i,2)+IW;
-    verticalRange3 = Center(3,i,1)-IW+1:Center(3,i,1)+IW;
-    horizontalRange3 = Center(3,i,2)-IW+1:Center(3,i,2)+IW;
-    verticalRange4 = Center(4,i,1)-IW+1:Center(4,i,1)+IW;
-    horizontalRange4 = Center(4,i,2)-IW+1:Center(4,i,2)+IW;
+    horizontalRange1 = Center(1,i,1)-IW+1:Center(1,i,1)+IW;
+    verticalRange1 = Center(1,i,2)-IW+1:Center(1,i,2)+IW;
+    horizontalRange2 = Center(2,i,1)-IW+1:Center(2,i,1)+IW;
+    verticalRange2 = Center(2,i,2)-IW+1:Center(2,i,2)+IW;
+    horizontalRange3 = Center(3,i,1)-IW+1:Center(3,i,1)+IW;
+    verticalRange3 = Center(3,i,2)-IW+1:Center(3,i,2)+IW;
+    horizontalRange4 = Center(4,i,1)-IW+1:Center(4,i,1)+IW;
+    verticalRange4 = Center(4,i,2)-IW+1:Center(4,i,2)+IW;
     % 生画像を切り取ってファイバー数×フレーム数×IW×IWの配列に格納
     timeSeries(1,i,:,:) = rawImage(verticalRange1,horizontalRange1,1);
     timeSeries(2,i,:,:) = rawImage(verticalRange2,horizontalRange2,1);
@@ -137,10 +138,14 @@ for i=1:8
         i_str = num2str(i);
         title1 = strcat('1,',i_str);
         title2 = strcat('2,',i_str);
-        subplot(4,4,2*(i-1)+1);imagesc(roughImage1);title(title1);
+        title3 = strcat('3,',i_str);
+        title4 = strcat('4,',i_str);
+        subplot(4,8,4*(i-1)+1);imagesc(roughImage1);title(title1);
 %         caxis([50,60]);
-        subplot(4,4,2*(i-1)+2);imagesc(roughImage2);title(title2);
+        subplot(4,8,4*(i-1)+2);imagesc(roughImage2);title(title2);
 %         caxis([50,60]);
+        subplot(4,8,4*(i-1)+3);imagesc(roughImage3);title(title3);
+        subplot(4,8,4*(i-1)+4);imagesc(roughImage4);title(title4);
 %         if i == 8
 %             colorbar;
 %         end

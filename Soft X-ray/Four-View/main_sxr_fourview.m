@@ -8,7 +8,8 @@ clear
 %%%%%ここが各PCのパス
 %【※コードを使用する前に】環境変数を設定しておくか、matlab内のコマンドからsetenv('パス名','アドレス')で指定してから動かす
 pathname.NIFS=getenv('NIFS_path');%192.168.1.111
-pathname.rawdata=getenv('rawdata_path');%dtacqのrawdataの保管場所
+pathname.rawdata=getenv('rawdata_path');%dtacqのrawdataの保管場所;
+pathname.pre_processed_directory = getenv('pre_processed_directory_path');%計算結果の保存先（どこでもいい）
 
 %【※コードを使用する前に】Change the addpath() command below to access the
 % test-open folder on your computer.
@@ -19,10 +20,11 @@ addpath(genpath('/Users/shinjirotakeda/Documents/GitHub/test-open'));
 DOCID='1wG5fBaiQ7-jOzOI-2pkPAeV6SDiHc_LrOdcbWlvhHBw';%スプレッドシートのID
 T=getTS6log(DOCID);
 node='date';
-pat = 230706;
+pat = 230721;
 date = pat;
 T=searchlog(T,node,pat);
-IDXlist = [33,35:40];
+% IDXlist = [33,35:40];
+IDXlist = 21;
 n_data=numel(IDXlist);%計測データ数
 shotlist=T.a039(IDXlist);
 tfshotlist=T.a039_TF(IDXlist);
@@ -31,7 +33,7 @@ TFlist=T.TF_kV_(IDXlist);
 dtacqlist=39.*ones(n_data,1);
 startlist = T.SXRStart(IDXlist);
 intervallist = T.SXRInterval(IDXlist);
-% 
+
 % % %直接入力の場合【注意】全て同じサイズの行列になるように記入
 % dtacqlist=39;
 % shotlist=1118;%【input】実験ログのa039の番号
@@ -62,10 +64,14 @@ for i=1:n_data
     interval = intervallist(i);
     % TF=4;
 %     plot_psi200ch(date, dtacq_num, shot, tfshot, pathname,n,i_EF,trange,TF); 
-    [grid2D,data2D] = process_PCBdata(date, dtacq_num, shot, tfshot, pathname, n,i_EF,trange);
+    % [grid2D,data2D] = process_PCBdata(date, dtacq_num, shot, tfshot, pathname, n,i_EF,trange);
+    [grid2D,data2D] = process_PCBdata_280ch(date, shot, tfshot, pathname, n,i_EF,trange);
+    % grid2D = NaN;
+    % data2D = NaN;
     shot_SXR = IDXlist(i);
     % shot_SXR = 14;
-    SXRfilename = strcat('/Users/shinjirotakeda/OneDrive - The University of Tokyo/Documents/SXR_Images/',num2str(date),'/shot',num2str(shot_SXR,'%03i'),'.tif');
+    % SXRfilename = strcat('/Users/shinjirotakeda/OneDrive - The University of Tokyo/Documents/SXR_Images/',num2str(date),'/shot',num2str(shot_SXR,'%03i'),'.tif');
+    SXRfilename = strcat(getenv('SXR_IMAGE_DIR'),'/',num2str(date),'/shot',num2str(shot_SXR,'%03i'),'.tif');
     % [EE_high,EE_low] = plot_SXR_at_t(grid2D,data2D,date,shot_SXR,t,show_xpoint,show_localmax,start,interval,save,SXRfilename,filter,NL);
     plot_sxr_multi(grid2D,data2D,date,shot_SXR,show_xpoint,show_localmax,start,interval,save,SXRfilename,filter,NL);
     % Brec = clc_Breconnection(grid2D,data2D);

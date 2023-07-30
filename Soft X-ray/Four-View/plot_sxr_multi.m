@@ -1,4 +1,4 @@
-function [] = plot_SXR_multi(grid2D,data2D,date,shot,show_xpoint,show_localmax,start,interval,save,SXRfilename,filter,NL)
+function [] = plot_sxr_multi(grid2D,data2D,date,shot,show_xpoint,show_localmax,start,interval,save,SXRfilename,filter,NL)
 % plot SXR emission on psi in rz plane
 % input:
 %   3d array of double: B_z (r,z,t), offsetted at zero and smoothed
@@ -37,7 +37,9 @@ elseif filter & ~NL
 else
     options = 'LF_LR';
 end
-savefolder = strcat('/Users/shinjirotakeda/OneDrive - The University of Tokyo/Documents/result_matrix/',options,'/',num2str(date),'/shot',num2str(shot));
+savepath = getenv('SXR_MATRIX_DIR');
+savefolder = strcat(savepath,'/',options,'/',num2str(date),'/shot',num2str(shot));
+% savefolder = strcat('/Users/shinjirotakeda/OneDrive - The University of Tokyo/Documents/result_matrix/',options,'/',num2str(date),'/shot',num2str(shot));
 if exist(savefolder,'dir') == 0
     clc_flag = true;
     mkdir(savefolder);
@@ -46,7 +48,7 @@ else
 end
 
 % 再構成計算に必要なパラメータを計算するなら読み込む
-filepath = '/Users/shinjirotakeda/Documents/GitHub/test-open/Soft X-ray/2023~/parameters.mat';
+filepath = 'parameters.mat';
 if clc_flag
     N_projection_new = 80;
     N_grid_new = 100;
@@ -76,9 +78,9 @@ end
 times = start:interval:(start+interval*7);
 plot_flag = false;
 
-f = figure;
-f.Units = 'normalized';
-f.Position = [0.1,0.2,0.8,0.4];
+% f = figure;
+% f.Units = 'normalized';
+% f.Position = [0.1,0.2,0.8,0.4];
 
 for t = times
     number = (t-start)/interval+1;
@@ -86,13 +88,8 @@ for t = times
     
     if clc_flag
 %         ベクトル形式の画像データの読み込み
-%         %%%                                       v    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        if date <= 210924
-            [VectorImage1,VectorImage2, VectorImage3, VectorImage4] = get_sxr_image(date,number,SXRfilename,filter);
-        else
-            [VectorImage2,VectorImage1, VectorImage3, VectorImage4] = get_sxr_image(date,number,SXRfilename,filter);
-        end
-        
+        [VectorImage1,VectorImage2, VectorImage3, VectorImage4] = get_sxr_image(date,number,N_projection_new,SXRfilename,filter);
+
 %         再構成計算
         EE1 = get_distribution(M,K,gm2d1,U1,s1,v1,VectorImage1,plot_flag,NL);
         EE2 = get_distribution(M,K,gm2d2,U2,s2,v2,VectorImage2,plot_flag,NL);

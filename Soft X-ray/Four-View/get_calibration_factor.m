@@ -1,7 +1,7 @@
 function CalibrationFactor = get_calibration_factor(date,N_projection)
 
-CalibrationPath = strcat('/Users/shinjirotakeda/OneDrive - The University of Tokyo/Documents/SXR_Images/',num2str(date));
-CalibrationImage = imread(strcat(CalibrationPath,'/PositionCheck.tif'));
+CalibrationPath = strcat(getenv('SXR_IMAGE_DIR'),'/',num2str(date));
+calibrationImage = imread(strcat(CalibrationPath,'/PositionCheck.tif'));
 % [centers,radii]=find_fibers(CalibrationImage);
 % IW = round(mean(radii));
 % centers = round(centers);
@@ -15,8 +15,9 @@ CalibrationImage = imread(strcat(CalibrationPath,'/PositionCheck.tif'));
 % 校正用画像からファイバーの位置（＋半径）を取得
 [Center,IW] = find_fibers2(calibrationImage,[65,75]);
 timeSeries = zeros(2,8,2*IW,2*IW);
+Center = round(Center);
 
-RawImage = CalibrationImage;
+rawImage = calibrationImage;
 
 % for i = 1:8
 %     UpRangeV = Center(1,i,1)-IW+1:Center(1,i,1)+IW;
@@ -30,7 +31,7 @@ RawImage = CalibrationImage;
 % end
 
 % バックグラウンドノイズのデータを取得
-backgroundImage = cast(rawImage(1:1+2*IW,1:1+2*IW,1),'double');
+backgroundImage = cast(rawImage(1:2*IW,1:2*IW,1),'double');
 backgroundNoise = ones(size(backgroundImage))*mean(backgroundImage,'all');
 
 % N_projection = 80;
@@ -42,14 +43,14 @@ resolution = N_projection/(IW*2);
 % 画像データの行列化
 for i=1:8
     % 画像切り取りの縦方向・横方向範囲を指定
-    verticalRange1 = Center(1,i,1)-IW+1:Center(1,i,1)+IW;
-    horizontalRange1 = Center(1,i,2)-IW+1:Center(1,i,2)+IW;
-    verticalRange2 = Center(2,i,1)-IW+1:Center(2,i,1)+IW;
-    horizontalRange2 = Center(2,i,2)-IW+1:Center(2,i,2)+IW;
-    verticalRange3 = Center(3,i,1)-IW+1:Center(3,i,1)+IW;
-    horizontalRange3 = Center(3,i,2)-IW+1:Center(3,i,2)+IW;
-    verticalRange4 = Center(4,i,1)-IW+1:Center(4,i,1)+IW;
-    horizontalRange4 = Center(4,i,2)-IW+1:Center(4,i,2)+IW;
+    horizontalRange1 = Center(1,i,1)-IW+1:Center(1,i,1)+IW;
+    verticalRange1 = Center(1,i,2)-IW+1:Center(1,i,2)+IW;
+    horizontalRange2 = Center(2,i,1)-IW+1:Center(2,i,1)+IW;
+    verticalRange2 = Center(2,i,2)-IW+1:Center(2,i,2)+IW;
+    horizontalRange3 = Center(3,i,1)-IW+1:Center(3,i,1)+IW;
+    verticalRange3 = Center(3,i,2)-IW+1:Center(3,i,2)+IW;
+    horizontalRange4 = Center(4,i,1)-IW+1:Center(4,i,1)+IW;
+    verticalRange4 = Center(4,i,2)-IW+1:Center(4,i,2)+IW;
     % 生画像を切り取ってファイバー数×フレーム数×IW×IWの配列に格納
     timeSeries(1,i,:,:) = rawImage(verticalRange1,horizontalRange1,1);
     timeSeries(2,i,:,:) = rawImage(verticalRange2,horizontalRange2,1);
