@@ -15,11 +15,11 @@ imageFile = imadjust(imageFile);
 % numberに許される最大値はnumel(radii)で，TIF画像によりますがおよそ200程度ぽいです．優先度の低い円を考慮から外すためにnumberをある程度小さくする必要があります．
 % こちらを整理前のcentersとします．numberを調整したので検出に漏れはありませんがダブりがあります．
 
-figure;hold on;
-number = 60;
-imagesc(imageFile);viscircles(centers(1:number,:),radii(1:number,:));
-plot(centers(1:number,1),centers(1:number,2),'*','Color','red');
-hold off;
+% figure;hold on;
+% number = 60;
+% imagesc(imageFile);viscircles(centers(1:number,:),radii(1:number,:));
+% plot(centers(1:number,1),centers(1:number,2),'*','Color','red');
+% hold off;
 
 % ダブりで検出した円を整理します．
 % 中心が近く同じ円を指すと判断されるものをgroupnumberでまとめます
@@ -62,12 +62,12 @@ for i = 1:groupnumber-1
 end
 radii = circleInformation(:,3);circleInformation = circleInformation(:,1:2);
 
-% 整理後のcentersです．ただし時系列には整列されていません．
-figure;hold on;
-imagesc(imageFile);
-viscircles(circleInformation,radii);
-plot(circleInformation(:,1),circleInformation(:,2),'*','Color','red');
-hold off;
+% % 整理後のcentersです．ただし時系列には整列されていません．
+% figure;hold on;
+% imagesc(imageFile);
+% viscircles(circleInformation,radii);
+% plot(circleInformation(:,1),circleInformation(:,2),'*','Color','red');
+% hold off;
 
 % centersを時系列に整理します．
 % まず横軸x座標を基準に並び替えます
@@ -88,17 +88,29 @@ end
 % CentersTimeRaps(3,4,:)はX線フィルタ3の時系列4番目のxy座標です．
 % 蛇順のため原始的なコードが入りますが，次のブロックで上手くいっていることが確かめられます．
 centerInformation = zeros(4,8,3);
-for i = 1:4
-    if i==1 || i==2
-    j = i-1;
-    centerInformation(i,:,:) = circleInformation([1+j,3+j,11+j, ...
-        9+j,17+j,19+j,27+j,25+j],:);
-    else
-    j=i-3;
-    centerInformation(i,:,:) = circleInformation([5+j,7+j,15+j, ...
-        13+j,21+j,23+j,31+j,29+j],:);    
-    end
-end
+centerInformation(1,:,:) = circleInformation([4,2,10,12,20,18,26,28],:);
+centerInformation(2,:,:) = circleInformation([3,1,9,11,19,17,25,27],:);
+centerInformation(3,:,:) = circleInformation([8,6,14,16,24,22,30,32],:);
+centerInformation(4,:,:) = circleInformation([7,5,13,15,23,21,29,31],:);
+% for i = 1:4
+%     % i = 1
+%     % 4,2,10,12,20,18,26,28
+%     % i = 2
+%     % 3,1,9,11,19,17,25,27
+%     % i = 3
+%     % 8,6,14,16,24,22,30,32
+%     % i = 4
+%     % 7,5,13,15,23,21,29,31
+%     if i==1 || i==2
+%     j = i-1;
+%     centerInformation(i,:,:) = circleInformation([1+j,3+j,11+j, ...
+%         9+j,17+j,19+j,27+j,25+j],:);
+%     else
+%     j=i-3;
+%     centerInformation(i,:,:) = circleInformation([5+j,7+j,15+j, ...
+%         13+j,21+j,23+j,31+j,29+j],:);    
+%     end
+% end
 
 % radius = mean(centerInformation(:,:,3),'all');
 radius = min(centerInformation(:,:,3),[],'all');

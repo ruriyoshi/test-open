@@ -15,8 +15,8 @@ function [imageVector1,imageVector2,imageVector3,imageVector4] = get_sxr_image(d
 % % 画像を切り取る
 % N_projection = 80;
 % VectorImages = CutImage(date,shot,N_projection/230,false);
-% doCheck = true;
-doCheck = false;
+doCheck = true;
+% doCheck = false;
 
 % 生画像の取得
 rawImage = imread(sxrFilename);
@@ -43,11 +43,21 @@ calibrationImage = imread(fiberPositionFile);
 % Center(2,:,:) = centers([2,4,5,7,10,12,13,15],:);
 
 % 校正用画像からファイバーの位置（＋半径）を取得
-[Center,IW] = find_fibers2(calibrationImage,[65,75]);
+if date == 230721
+    positionPath = '/Users/shinjirotakeda/Documents/GitHub/test-open/Soft X-ray/Four-View/fiberPositions.xlsx';
+    centers = readmatrix(positionPath,'Sheet','230721','Range','C2:D33');
+    Center = zeros(4,8,2);
+    for i = 1:4
+        Center(i,:,:) = centers(1+8*(i-1):8+8*(i-1),:);
+    end
+    IW = 60;
+else
+    [Center,IW] = find_fibers2(calibrationImage,[65,75]);
+end
 Center = round(Center);
 
 % 切り取った画像を格納するための配列
-timeSeries = zeros(2,8,2*IW,2*IW);
+timeSeries = zeros(4,8,2*IW,2*IW);
 
 % % 各時間帯ごとに画像を切り取って格納
 % for i = 1:8
@@ -71,7 +81,8 @@ imageVectors = zeros(4,8,numel(k));
 
 if doCheck
     f1=figure;
-    f1.Position = [900,200,500,500];
+    % f1.Position = [900,200,500,500];
+    f1.Position = [200,250,1060,500];
     % f2=figure;
     % f2.Position = [900,200,500,500];
 end
