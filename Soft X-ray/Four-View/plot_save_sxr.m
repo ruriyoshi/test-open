@@ -1,8 +1,8 @@
 function plot_save_sxr(grid2D,data2D,range,date,shot,t,EE1,EE2,EE3,EE4,show_localmax,show_xpoint,save,filter,NL)
 
-f = figure;
-f.Units = 'normalized';
-f.Position = [0.1,0.2,0.8,0.8];
+% f = figure;
+% f.Units = 'normalized';
+% f.Position = [0.1,0.2,0.8,0.8];
 
 range = range./1000;
 zmin = range(1);
@@ -59,6 +59,7 @@ if show_xpoint
     r.LineWidth = 1.5;
 end
 title('1');
+hold off;
 
 subplot(2,2,2);
 [~,h2] = contourf(SXR_mesh_z,SXR_mesh_r,EE2,20);
@@ -86,6 +87,7 @@ if show_xpoint
     r.LineWidth = 1.5;
 end
 title('2');
+hold off;
 
 subplot(2,2,3);
 [~,h3] = contourf(SXR_mesh_z,SXR_mesh_r,EE3,20);
@@ -113,6 +115,7 @@ if show_xpoint
     r.LineWidth = 1.5;
 end
 title('3');
+hold off;
 
 subplot(2,2,4);
 [~,h4] = contourf(SXR_mesh_z,SXR_mesh_r,EE4,20);
@@ -140,6 +143,7 @@ if show_xpoint
     r.LineWidth = 1.5;
 end
 title('4');
+hold off;
 
 if save
     pathname = getenv('SXR_RECONSTRUCTED_DIR');

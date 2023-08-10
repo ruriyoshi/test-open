@@ -1,3 +1,4 @@
+clear
 addpath '/Users/shinjirotakeda/Documents/GitHub/test-open/pcb_experiment'; %getMDSdata.mとcoeff200ch.xlsxのあるフォルダへのパス
 
 %%%%%%%%%%%%%%%%%%%%%%%%
@@ -47,6 +48,7 @@ n=40; %【input】rz方向のメッシュ数
 doCheck = false;
 % doCheck = true;
 
+figure('Position', [0 0 1500 1500],'visible','on');
 for i=1:n_data
     dtacq_num=dtacqlist;
     shot=shotlist(i,:);
@@ -54,8 +56,8 @@ for i=1:n_data
     if shot == tfshot
         tfshot = [0,0];
     end
-    i_EF=EFlist;
-    TF=TFlist;
+    i_EF=EFlist(i);
+    TF=TFlist(i);
     if doCheck
         check_signal(date, dtacq_num, shot, tfshot, pathname);
     else
@@ -260,7 +262,7 @@ if isstruct(grid2D)==0 %もしdtacqデータがない場合次のloopへ(デー�
 end
 
 % プロット部分
-figure('Position', [0 0 1500 1500],'visible','on');
+% figure('Position', [0 0 1500 1500],'visible','on');
 start=50;
 dt = 4;
 %  t_start=470+start;
@@ -295,13 +297,17 @@ dt = 4;
      % plot(ok_z,ok_r,"k.",'MarkerSize', 6)%測定位置
     hold off
     title(string(t)+' us')
+    drawnow
 %     xlabel('z [m]')
 %     ylabel('r [m]')
  end
 
-clearvars -except data2D grid2D shot pathname;
-filename = strcat(pathname.pre_processed_directory,'/a039_',num2str(shot(1)),'.mat');
-save(filename)
+if doCalculation
+    clearvars -except data2D grid2D shot pathname;
+    filename = strcat(pathname.pre_processed_directory,'/a039_',num2str(shot(1)),'.mat');
+    save(filename)
+end
+
 end
 
 function save_dtacq_data(dtacq_num,shot,tfshot,rawdataPath)

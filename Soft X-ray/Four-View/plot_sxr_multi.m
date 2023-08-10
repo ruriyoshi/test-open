@@ -81,6 +81,9 @@ plot_flag = false;
 % f = figure;
 % f.Units = 'normalized';
 % f.Position = [0.1,0.2,0.8,0.4];
+f = figure;
+f.Units = 'normalized';
+f.Position = [0.1,0.2,0.8,0.8];
 
 for t = times
     number = (t-start)/interval+1;
