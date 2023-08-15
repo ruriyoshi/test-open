@@ -17,14 +17,14 @@ pathname.save=getenv('savedata_path');%outputデータ保存先
 pathname.rawdata38=getenv('rawdata038_path');%dtacq a038のrawdataの保管場所
 pathname.woTFdata=getenv('woTFdata_path');%rawdata（TFoffset引いた）の保管場所
 
-pathname.rawdata=[getenv("rsOnedrive") '/mat/pcb_raw']; %保存先
+%pathname.rawdata=[getenv("rsOnedrive") '/mat/pcb_raw']; %保存先
 
 %%%%実験オペレーションの取得
 %直接入力の場合
 dtacqlist=39;
-shotlist=1444;%【input】dtacqの保存番号
-tfshotlist=0;
-date = 230524;%【input】計測日
+shotlist=2175;%【input】dtacqの保存番号
+tfshotlist=0;%変えない
+date = 230815;%【input】計測日
 n=numel(shotlist);%計測データ数
 
 % %磁気面出す場合は適切な値を入力、磁場信号のみプロットする場合は変更不要

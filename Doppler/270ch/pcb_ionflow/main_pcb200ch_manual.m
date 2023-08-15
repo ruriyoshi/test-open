@@ -7,9 +7,9 @@
 run define_path.m
 
 %------【input】-------
-date = 230712;%【input】実験日(yymmdd)
-shotlist = 1904;%991:992;%【input】dtacqの保存番号
-tfshotlist = 1903;%【input】dtacqのtfonly保存番号
+date = 230815;%【input】実験日(yymmdd)
+shotlist = 2175;%991:992;%【input】dtacqの保存番号
+tfshotlist = 2170;%【input】dtacqのtfonly保存番号
 EFlist = 150;%150;%【input】EF電流
 n_plot = 4;%【input】磁気面subplot枚数(16以下の4の倍数or3以下)
 t_start = 477;%【input】磁気面subplot開始時間(us)
