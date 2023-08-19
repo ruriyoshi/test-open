@@ -57,7 +57,7 @@ p = importdata("r.txt")*1e-3;%計測視線と中心軸の距離P[m]
 edge = 0.33;%Rの最大値[m](2022/7　解析～　ポテンシャルの範囲より仮定)
 calib = importdata("Ar_calibration.0916_remake.txt");%ICCD校正ファイル
 %------------------------------------------------------------------
-%%
+
 if read_data
     %データ読み込み(GUI)
     dir = [pathname.IDS288ch,'/20',num2str(date)];%実験日ディレクトリ
@@ -76,7 +76,7 @@ if read_data
     data = data(:,2:1025);%1列目は分光データではないので削除
 end
 tic
-%%
+
 %校正ファイル読み込み
 ch = calib.data(:,1);
 center = calib.data(:,2);
@@ -132,7 +132,7 @@ if plot_ICCD
     ylim([0 inf])
     hold off
 end
-
+%%
 %-------CHごとの線積分温度、線積分発光強度を計算--------
 if cal_CH
     hw_plot_px = hw_lambda;%プロット範囲半幅
@@ -145,7 +145,7 @@ if cal_CH
     passive_Em = zeros(numel(ch),1);%CH発光強度[a.u.]
     spectra = zeros(2*hw_lambda+1,numel(ch));%CHスペクトル
     for i=1:numel(ch)
-        spectra(:,i) = sum(data(idx_l0(i)-hw_lambda:idx_l0(i)+hw_lambda,center(i)-hw_ch:center(i)+hw_ch),2)*relative(i);
+        spectra(:,i) = sum(data(idx_l0(i)-hw_lambda:idx_l0(i)+hw_lambda,center(i)-hw_ch:center(i)+hw_ch),2)*relative(i);%binningと相対感度
         offset = min(movmean(spectra(:,i),20));
         spectra(:,i) = spectra(:,i) - offset;%オフセットを引く
         f = fit(lambda(hw_lambda+1-hw_fit:hw_lambda+1+hw_fit,i),spectra(hw_lambda+1-hw_fit:hw_lambda+1+hw_fit,i),'gauss1');
