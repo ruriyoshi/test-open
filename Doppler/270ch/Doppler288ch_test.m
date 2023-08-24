@@ -4,7 +4,7 @@ close all
 
 %各PCのパスを定義
 % run define_path.m
-setenv("NIFS_path","N:\")%NIFSのresultsまでのパスを入れる
+%setenv("NIFS_path","N:\")%NIFSのresultsまでのパスを入れる
 pathname.NIFS=getenv('NIFS_path');%resultsまでのpath（ドップラー、SXR）
 pathname.IDS288ch=[pathname.NIFS,'/Doppler/Andor/270CH'];
 
