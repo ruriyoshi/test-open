@@ -1,5 +1,5 @@
 close all
-% clear all
+clear all
 % load("230712_base.mat","data")
 
 %各PCのパスを定義
@@ -39,23 +39,23 @@ hw_lambdaA = 40;%【input】lambdaA半幅(< hw_lambda)
 %------------------------------------------------------------------
 
 %物理定数
-% switch ICCD.line
-%     case 'Ar'
-%         lambda0 = 480.6;%471.3;656.3;480.6;587.562;486.133;656.3;486.133;468.57;486.133;nm%線スペクトル波長
-%         mass = 39.95;%4.;12.01%イオン質量数
-%     otherwise
-%         warning('Input error in ICCD.line.')%ICCD.lineの入力エラー
-%         return;
-% end
+switch ICCD.line
+    case 'Ar'
+        lambda0 = 480.6;%471.3;656.3;480.6;587.562;486.133;656.3;486.133;468.57;486.133;nm%線スペクトル波長
+        mass = 39.95;%4.;12.01%イオン質量数
+    otherwise
+        warning('Input error in ICCD.line.')%ICCD.lineの入力エラー
+        return;
+end
 
 %------校正値(1つのファイルにまとめたい)---------------------------------
-% separation = [0 15 31 45 57 73 89 105 120 136 152 164 180 196 211 226 240 255];%CHをZ方向で切り分けるための値
-% resolution = -1.420387E-12*lambda0^3 - 2.156031E-09*lambda0^2 + 1.250038E-06*lambda0 + 3.830769E-03;0.0037714;...
-%     %-0.000000000001420387*lambda0^3 - 0.000000002156031*lambda0^2 + 0.000001250038*lambda0 + 0.003830769
-% z = importdata("z_negative.txt")*1e-3;%計測視線Z[m]
-% p = importdata("r.txt")*1e-3;%計測視線と中心軸の距離P[m]
-% edge = 0.33;%Rの最大値[m](2022/7　解析～　ポテンシャルの範囲より仮定)
-% calib = importdata("Ar_calibration.0916_remake.txt");%ICCD校正ファイル
+separation = [0 15 31 45 57 73 89 105 120 136 152 164 180 196 211 226 240 255];%CHをZ方向で切り分けるための値
+resolution = -1.420387E-12*lambda0^3 - 2.156031E-09*lambda0^2 + 1.250038E-06*lambda0 + 3.830769E-03;0.0037714;...
+    %-0.000000000001420387*lambda0^3 - 0.000000002156031*lambda0^2 + 0.000001250038*lambda0 + 0.003830769
+z = importdata("z_negative.txt")*1e-3;%計測視線Z[m]
+p = importdata("r.txt")*1e-3;%計測視線と中心軸の距離P[m]
+edge = 0.33;%Rの最大値[m](2022/7　解析～　ポテンシャルの範囲より仮定)
+calib = importdata("Ar_calibration.0916_remake.txt");%ICCD校正ファイル
 %------------------------------------------------------------------
 
 if read_data
@@ -78,49 +78,59 @@ end
 tic
 
 %校正ファイル読み込み
-% ch = calib.data(:,1);
-% center = calib.data(:,2);
-% smile = calib.data(:,3);
-% relative = calib.data(:,5);
-% instru = calib.data(:,6);
-% Ti_instru_CH = 1.69e8*mass*(2.*resolution*instru*sqrt(2.*log(2.))/lambda0).^2;
+ch = calib.data(:,1);
+center = calib.data(:,2);
+smile = calib.data(:,3);
+relative = calib.data(:,5);
+instru = calib.data(:,6);
+Ti_instru_CH = 1.69e8*mass*(2.*resolution*instru*sqrt(2.*log(2.))/lambda0).^2;
 
 %各CHの波長軸を生成
-% lambda = zeros(2*hw_lambda+1,numel(ch));
-% idx_l0 = zeros(numel(ch),1);
-% px = transpose(linspace(1,1024,1024));
-% for i=1:numel(ch)
-%     lx=(px-1-smile(i))*resolution+lambda0;%+0.13
-%     idx_l0(i) = knnsearch(lx,lambda0);%lambdaの中で最もlambda0に近いセル番号を取得
-%     lambda(:,i) = lx(idx_l0(i)-hw_lambda:idx_l0(i)+hw_lambda);
-% end
+lambda = zeros(2*hw_lambda+1,numel(ch));
+idx_l0 = zeros(numel(ch),1);
+px = transpose(linspace(1,1024,1024));
+for i=1:numel(ch)
+    lx=(px-1-smile(i))*resolution+lambda0;%+0.13
+    idx_l0(i) = knnsearch(lx,lambda0);%lambdaの中で最もlambda0に近いセル番号を取得
+    lambda(:,i) = lx(idx_l0(i)-hw_lambda:idx_l0(i)+hw_lambda);
+end
 %%
 %ICCD生画像を描画(目視で確認用)
-
+% データをちょっとみてみる
+max(data(:))
+[i,j,v] = find(data==max(data(:)))
 % ピーク検出
 sum_data = sum(data(350:420,:),1);
-[pks,locs] = findpeaks(sum_data,MinPeakDistance=10);
-center=locs(locs>=739);
 
+% [pks,locs] = findpeaks(sum_data,MinPeakDistance=10);
+% center=locs(locs>=739);
+% p=FastPeakFind(data,0.3*max(data(:)),(fspecial('gaussian', 7,1)),3,1,fopen(["Channelcheck.txt"], 'w+'));
+p=FastPeakFind(data,0.3*max(data(:)),(fspecial('gaussian', 7,1)),3,1);
+xy=sort([p(2:2:end) p(1:2:end)],1,'descend')%降順並び替え
+% 手動書き換え
+%%
+% プロット
 if plot_ICCD
     f1=figure(1);
-    f1.Position=[0 300 400 550];
+    f1.Position=[0 0 1000 1000];
     subplot(1,2,1)
-    contourf(px,px,data')
+    contourf(px,px,data,30,'LineStyle','none')
     title('ICCD Raw Image')
     xlabel('X　(lambda) [px]')
     ylabel('Y (position) [px]')
     hold on
     for i=1:numel(center)
-        hol_X = linspace(350,420);
-        hol_Y = center(i)*ones(100,1);
-        plot(hol_X,hol_Y,'r')
+        % hol_X = linspace(350,420);
+        % hol_Y = center(i)*ones(100,1);
+        % plot(hol_X,hol_Y,'r')
         hold on
         % ver_X = smile(i)*ones(100,1);
         % ver_Y = linspace(center(i)-hw_ch,center(i)+hw_ch);
         % plot(ver_X,ver_Y,'r','LineWidth',1)
+        plot(xy(:,2),xy(:,1),'r+')
     end
     % ylim([900 1024])
+    view([90 -90])%x-y座標
     hold off
 
 % f2=figure(2);
@@ -130,7 +140,7 @@ if plot_ICCD
 
     plot(sum_data)
     hold on
-    plot(locs,pks,"o")
+    % plot(locs,pks,"o")
     % offset_sum = min(movmean(sum_data,10));
     % sum_data = sum_data - offset_sum;
 
@@ -145,8 +155,11 @@ if plot_ICCD
     % ylabel('Strength [a.u.]')
     xlim([1 1024])
     % ylim([0 inf])
-    view([90 -90]) % 軸の方向を変更する
+    view([90 -90]) %y-x座標(xy反転)で描画
     hold off
 end
+
+% 変数の保存
+save("z1","xy")
 
 toc
