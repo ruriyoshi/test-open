@@ -77,6 +77,10 @@ if read_data
 end
 tic
 %%
+fig_num=1;%グラフ番号の初期化
+screensize=get(0,'screensize');
+fig_position=[0,50,screensize(3)-50,screensize(4)-150];
+
 %校正ファイル読み込み
 ch = calib.data(:,1);
 center = calib.data(:,2);
@@ -97,9 +101,11 @@ end
 
 %ICCD生画像を描画(目視で確認用)
 if plot_ICCD
-    figure('Position',[0 300 400 550])
-    subplot(2,1,1)
-    contour(px,px,data')
+    fig_num=fig_num+1;
+    f=figure(fig_num);
+    f.Position=fig_position;
+    subplot(1,2,1)
+    contourf(px,px,data')
     title('ICCD Raw Image')
     xlabel('X　(lambda) [px]')
     ylabel('Y (position) [px]')
@@ -123,7 +129,7 @@ if plot_ICCD
     coeff5=coeffvalues(f);
     % centerL = [coeff5(2),coeff5(5),coeff5(8),coeff5(11),coeff5(14)];
     % centerL = round(sort(centerL));
-    subplot(2,1,2)
+    subplot(1,2,2)
     plot(f,px,sum_data')
     title('ICCD Integrated Image')
     xlabel('X [px]')
@@ -132,7 +138,7 @@ if plot_ICCD
     ylim([0 inf])
     hold off
 end
-
+%%
 %-------CHごとの線積分温度、線積分発光強度を計算--------
 if cal_CH
     hw_plot_px = hw_lambda;%プロット範囲半幅
