@@ -108,7 +108,7 @@ if plot_ICCD
 
     %1枚目(左)
     subplot(1,2,1)
-    contourf(px,px,data','LineStyle','none')
+    contourf(px,px,data',50,'LineStyle','none')%変える
     colormap turbo
     colorbar
     

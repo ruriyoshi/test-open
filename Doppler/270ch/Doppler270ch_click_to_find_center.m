@@ -111,7 +111,7 @@ if plot_ICCD
 
     %1枚目(左)
     subplot(1,2,1)
-    contourf(px,px,data','LineStyle','none')
+    contourf(px,px,data',100,'LineStyle','none')%'は複素共役転置
     colormap turbo
     colorbar
     
