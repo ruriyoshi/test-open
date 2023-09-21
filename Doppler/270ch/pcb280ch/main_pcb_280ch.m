@@ -1,4 +1,5 @@
-clear
+%close all
+clearvars -except date IDXlist doCheck
 % addpath '/Users/rsomeya/Documents/GitHub/test-open'; %getMDSdata.mとcoeff200ch.xlsxのあるフォルダへのパス
 
 %%%%%%%%%%%%%%%%%%%%%%%%
@@ -7,7 +8,7 @@ clear
 
 run define_path.m
 % %%%%%ここが各PCのパス
-% %【※コードを使用する前に】環境変数を設定しておくか、matlab内のコマンドからsetenv('パス名','アドレス')で指定してから動かす
+% %【※コードを使用する前に】環境変数定しておくか、matlab内のコマンドからsetenv('パス名','アドレス')で指定してから動かす
 % pathname.ts3u=getenv('ts3u_path');%old-koalaのts-3uまでのパス（mrdなど）
 % pathname.fourier=getenv('fourier_path');%fourierのmd0（データックのショットが入ってる）までのpath
 % pathname.NIFS=getenv('NIFS_path');%resultsまでのpath（ドップラー、SXR）
@@ -18,13 +19,20 @@ run define_path.m
 % pathname.pre_processed_directory = getenv('pre_processed_directory_path');%計算結果の保存先（どこでもいい）
 
 %%%%実験オペレーションの取得
-prompt = {'Date:','Shot number:'};
+prompt = {'Date:','Shot number:','doCheck:'};
 dlgtitle = 'Input';
 dims = [1 35];
-definput = {'',''};
+if exist('date','var') && exist('IDXlist','var') && exist('doCheck','var')
+    definput = {num2str(date),num2str(IDXlist+1),num2str(doCheck)};
+else
+    definput = {'','',''};
+end
+% definput = {'','',''};
+% definput = {num2str(date),num2str(IDXlist),num2str(doCheck)};
 answer = inputdlg(prompt,dlgtitle,dims,definput);
 date = str2double(cell2mat(answer(1)));
-IDXlist = str2num(cell2mat(answer(2)));%本日のショット番号
+IDXlist = str2num(cell2mat(answer(2)));
+doCheck = logical(str2num(cell2mat(answer(3))));
 
 DOCID='1wG5fBaiQ7-jOzOI-2pkPAeV6SDiHc_LrOdcbWlvhHBw';%スプレッドシートのID
 T=getTS6log(DOCID);
@@ -47,7 +55,7 @@ trange=400:800;%【input】計算時間範囲
 n=40; %【input】rz方向のメッシュ数
 
 %【input】プローブチェックか磁気面か
-doCheck = false;
+%doCheck = false;
 %doCheck = true;
 
 % figure('Position', [0 0 1500 1500],'visible','on');
@@ -266,7 +274,7 @@ end
 % プロット部分
 %figure('Name',num2str(IDXlist),'Position', [0 0 1500 1500],'visible','on');
 figure('Name',num2str(IDXlist),'Position', get(0,'screensize'),'visible','on');
-start=70;%【変える】
+start=50;%【変える】
 dt = 2;
 
 %  for m=1:50 %図示する時間
@@ -312,7 +320,7 @@ dt = 2;
 % %     ylabel('r [m]')
 %  end
 
- t_start=470+start;
+ %t_start=470+start;
  tate=4;%【変える】
  yoko=4;%【変える】
  maisu=tate*yoko;
@@ -343,7 +351,8 @@ dt = 2;
 %     plot(grid2D.zq(1,squeeze(mid(:,:,i))),grid2D.rq(:,1))
 %     contour(grid2D.zq(1,:),grid2D.rq(:,1),squeeze(data2D.psi(:,:,i)),20,'black')
 %     contour(grid2D.zq(1,:),grid2D.rq(:,1),squeeze(data2D.psi(:,:,i)),20,'black')
-    contour(grid2D.zq(1,:),grid2D.rq(:,1),squeeze(data2D.psi(:,:,i)),[-20e-3:0.08e-3:40e-3],'black','LineWidth',1)%[:ここがプロット間隔:]【たまに変える】
+contour(grid2D.zq(1,:),grid2D.rq(:,1),squeeze(data2D.psi(:,:,i)),50,'black','LineWidth',1)
+%    contour(grid2D.zq(1,:),grid2D.rq(:,1),squeeze(data2D.psi(:,:,i)),[-20e-3:0.1e-3:40e-3],'black','LineWidth',1)%[:ここがプロット間隔:]【たまに変える】
 %     plot(grid2D.zq(1,squeeze(mid(opoint(:,:,i),:,i))),grid2D.rq(opoint(:,:,i),1),"bo")
 %     plot(grid2D.zq(1,squeeze(mid(xpoint(:,:,i),:,i))),grid2D.rq(xpoint(:,:,i),1),"bx")
      % plot(ok_z,ok_r,"k.",'MarkerSize', 6)%測定位置
