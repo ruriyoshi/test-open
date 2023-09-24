@@ -27,9 +27,9 @@ plot_profile = true;%【input】イオン温度R分布をプロット
 
 %-----------------------解析オプション【input】----------------------------
 plot_CH_spectra = true;%【input】CHごとのスペクトルをプロット(cal_CH = trueが必要)
-plot_LineInt_interp = true;%【input】死んだCHの補間Ti,Emをプロット(cal_LineInt = trueが必要)
+plot_LineInt_interp = false;%【input】死んだCHの補間Ti,Emをプロット(cal_LineInt = trueが必要)
 plot_2D_interp = false;%【input】補間スペクトルをプロット(cal_2D = trueが必要)
-plot_2D_spectra = 'off';%【input】('off','all','good','bad')2次元スペクトル分布をプロット(cal_2D = trueが必要)
+plot_2D_spectra = 'all';%【input】('off','all','good','bad')2次元スペクトル分布をプロット(cal_2D = trueが必要)
 
 hw_lambda = 50;%【input】波長切り出し半幅
 hw_ch = 5;%【input】CH方向切り出し半幅
@@ -49,12 +49,12 @@ switch ICCD.line
 end
 
 %------校正値(1つのファイルにまとめたい)---------------------------------
-separation = [0 15 31 45 57 73 89 105 120 136 152 164 180 196 211 226 240 255];%CHをZ方向で切り分けるための値%todo
+%separation = [0 15 31 45 57 73 89 105 120 136 152 164 180 196 211 226 240 255];%CHをZ方向で切り分けるための値%todo
 resolution = -1.420387E-12*lambda0^3 - 2.156031E-09*lambda0^2 + 1.250038E-06*lambda0 + 3.830769E-03;0.0037714;...
     %-0.000000000001420387*lambda0^3 - 0.000000002156031*lambda0^2 + 0.000001250038*lambda0 + 0.003830769
 %z = importdata("z_negative.txt")*1e-3;%計測視線Z[m]
 %p = importdata("r.txt")*1e-3;%計測視線と中心軸の距離P[m]
-edge = 0.33;%Rの最大値[m](2022/7　解析～　ポテンシャルの範囲より仮定)
+edge = 0.36;%0.33;%Rの最大値[m](2022/7　解析～　ポテンシャルの範囲より仮定)
 %calib = importdata("Ar_calibration.0916_remake.txt");%ICCD校正ファイル
 
 %較正係数のバージョンを日付で判別
@@ -90,11 +90,16 @@ screensize=get(0,'screensize');
 fig_position=[0,50,screensize(3)-50,screensize(4)-150];
 
 %校正ファイル読み込み
-ch=C(:,1);
-center=round(C(:,2),0);%calibファイルが小数なので，四捨五入
-smile=round(C(:,3))+35;%4175に合わせてsmileを作ったので，手動で定数を足して合わせている
-relative=C(:,4);
-instru=C(:,5);
+is_alive=find(C(:,9));%生きているチャンネルのインデックスのみ抜き出す
+%以下生きているチャンネルしか扱わない
+ch=C(is_alive,1);
+center=round(C(is_alive,2),0);%calibファイルが小数なので，四捨五入
+smile=round(C(is_alive,3))+35;%4175に合わせてsmileを作ったので，手動で定数を足して合わせている
+relative=C(is_alive,4);
+instru=C(is_alive,5);
+p=C(is_alive,8)*1e-3;
+separation=cat(1,0,find(ischange(C(is_alive,6)))-1);%そのzで最後のインデックス(notチャンネル番号)
+
 Ti_instru_CH = 1.69e8*mass*(2.*resolution*instru*sqrt(2.*log(2.))/lambda0).^2;
 
 %各CHの波長軸を生成
@@ -165,7 +170,7 @@ if cal_CH
     passive_Em = zeros(numel(ch),1);%CH発光強度[a.u.]
     spectra = zeros(2*hw_lambda+1,numel(ch));%CHスペクトル
     for i=1:numel(ch)
-        spectra(:,i) = sum(data(idx_l0(i)-hw_lambda:idx_l0(i)+hw_lambda,center(i)-hw_ch:center(i)+hw_ch),2)*relative(i);
+        spectra(:,i) = sum(data(idx_l0(i)-hw_lambda:idx_l0(i)+hw_lambda,center(i)-hw_ch:center(i)+hw_ch),2)*relative(i);%todo:relativeが正しくないはずなのでいずれ直す
         offset = min(movmean(spectra(:,i),20));
         spectra(:,i) = spectra(:,i) - offset;%オフセットを引く
         f = fit(lambda(hw_lambda+1-hw_fit:hw_lambda+1+hw_fit,i),spectra(hw_lambda+1-hw_fit:hw_lambda+1+hw_fit,i),'gauss1');
@@ -182,9 +187,8 @@ if cal_CH
             if i == 1
                 %figureの設定
                 fig_num=2;
-                % fig=figure(fig_num);
-                % fig.Position=fig_position;
-                figure('Number',fig_num,'Position',[0 500 400 300])
+                figure(fig_num);
+                gcf.Position=[0 500 400 300];
                 sgtitle('Line Integrated Spectra')
             end
             subplot(col_subp1,raw_subp1,idx_subp1)
@@ -219,24 +223,28 @@ end
 %%
 %%----------線積分温度、線積分発光強度二次元分布を計算------------
 if cal_LineInt
-    Ti_LineInt = zeros(numel(p),numel(z));%二次元温度[eV]
-    Em_LineInt = zeros(numel(p),numel(z));%二次元発光強度[a.u.]
+    Ti_LineInt = zeros(270,1);%二次元温度[eV]
+    Em_LineInt = zeros(270,1);%二次元発光強度[a.u.]
     %死んだCHを補間
+    %ch_for_z:各zが(欠けがなければ)何チャンネルからなるのが理想かを示す
+    ch_for_z=[16,16,28,30,30,30,30,30,28,16,16];
+    ind=1;
     for i = 1:numel(z)
         if i < numel(z)
-            Ti_LineInt(:,i) = pchip(ch(separation(i)+1:separation(i+1))-ch(separation(i)+1)+1,passive_Ti(separation(i)+1:separation(i+1)),linspace(1,numel(p),numel(p)));
-            Em_LineInt(:,i) = pchip(ch(separation(i)+1:separation(i+1))-ch(separation(i)+1)+1,passive_Em(separation(i)+1:separation(i+1)),linspace(1,numel(p),numel(p)));
+            Ti_LineInt(ind:ind+ch_for_z(i)-1) = pchip(ch(separation(i)+1:separation(i+1))-ch(separation(i)+1)+1,passive_Ti(separation(i)+1:separation(i+1)),linspace(1,ch_for_z(i),ch_for_z(i)));
+            Em_LineInt(ind:ind+ch_for_z(i)-1) = pchip(ch(separation(i)+1:separation(i+1))-ch(separation(i)+1)+1,passive_Em(separation(i)+1:separation(i+1)),linspace(1,ch_for_z(i),ch_for_z(i)));
+            ind=ind+ch_for_z(i);
         else
-            Ti_LineInt(:,i) = pchip(ch(separation(i)+1:end)-ch(separation(i)+1)+1,passive_Ti(separation(i)+1:end),linspace(1,numel(p),numel(p)));
-            Em_LineInt(:,i) = pchip(ch(separation(i)+1:end)-ch(separation(i)+1)+1,passive_Em(separation(i)+1:end),linspace(1,numel(p),numel(p)));
+            Ti_LineInt(ind:ind+ch_for_z(i)-1) = pchip(ch(separation(i)+1:end)-ch(separation(i)+1)+1,passive_Ti(separation(i)+1:end),linspace(1,ch_for_z(i),ch_for_z(i)));
+            Em_LineInt(ind:ind+ch_for_z(i)-1) = pchip(ch(separation(i)+1:end)-ch(separation(i)+1)+1,passive_Em(separation(i)+1:end),linspace(1,ch_for_z(i),ch_for_z(i)));
         end
     end
-    %補間結果をプロット
+    %補間結果をプロットtodo
     if plot_LineInt_interp
         %figureの設定
         fig_num=3;
-        f=figure(fig_num);
-        f.Position=fig_position;
+        figure(fig_num);
+        gcf.Position=fig_position;
         % figure('Position',[1000 1000 600 200])
         tiledlayout(1,2)
         nexttile;
@@ -278,36 +286,43 @@ if cal_LineInt
         end
     end
     %偶数列を上下反転(CHの順序が偶数列で反転するため)
-    for i = 1:numel(z)
-        if mod(i,2) == 0
-            Ti_LineInt(:,i) = flipud(Ti_LineInt(:,i));
-            Em_LineInt(:,i) = flipud(Em_LineInt(:,i));
-        end
-    end
+%     for i = 1:numel(z)
+%         if mod(i,2) == 0
+%             Ti_LineInt(:,i) = flipud(Ti_LineInt(:,i));
+%             Em_LineInt(:,i) = flipud(Em_LineInt(:,i));
+%         end
+%     end
 end
 %%
 if plot_LineInt_result
     % figure('Position',[0 0 700 350])
     %figureの設定
     fig_num=4;
-    f=figure(fig_num);
-    f.Position=fig_position;
+    figure(fig_num);
+    gcf.Position=fig_position;
+    
     tiledlayout(1,2)
     ax1 = nexttile;
-    [~,h] = contourf(z,p,Ti_LineInt,100);
-    h.LineStyle = 'none';
-    daspect([1 1 1])
-    colormap(ax1,jet)
+    % [~,h] = contourf(z,p,Ti_LineInt,100);
+    % h.LineStyle = 'none';
+    % daspect([1 1 1])
+    [xq,yq] = meshgrid(z,linspace(0.08,0.350,50));
+    vq = griddata(C(:,7)*1e-3,C(:,8)*1e-3,Ti_LineInt,xq,yq);
+    contourf(xq,yq,vq,50,'LineStyle','none');
+
+    colormap(ax1,turbo)
     title('Line Integrated Ion Temperature')
     xlabel('Z [m]')
     ylabel('P [m]')
     c1 = colorbar;
     c1.Label.String = 'Ion Temperature [eV]';
-    ax2 = nexttile;
-    [~,h] = contourf(z,p,Em_LineInt,100);
-    h.LineStyle = 'none';
-    daspect([1 1 1])
-    colormap(ax2,pink)
+    
+    ax2=nexttile;
+    [xq,yq] = meshgrid(z,linspace(0.08,0.350,50));
+    vq = griddata(C(:,7)*1e-3,C(:,8)*1e-3,Em_LineInt,xq,yq);
+    contourf(xq,yq,vq,50,'LineStyle','none');
+
+    colormap(ax1,turbo)
     title('Line Integrated Ion Emission')
     xlabel('Z [m]')
     ylabel('P [m]')
@@ -318,7 +333,7 @@ end
 %%----------アーベル変換線積分温度、発光二次元分布を計算------------
 if cal_2D
     %三角グリッドの補間によりアーベル変換に用いる2次元(λ,P)スペクトルを用意
-    r = transpose(linspace(min(p),edge,num_r));
+    r = transpose(linspace(min(C(:,8))*1e-3,edge,num_r));
     dr = r(2) - r(1);
     lambdaA = linspace(-hw_lambdaA*resolution,hw_lambdaA*resolution,2*hw_lambdaA+1) + lambda0;
     lambdaA = transpose(lambdaA);
@@ -332,7 +347,7 @@ if cal_2D
                     tri_x(:,k) = lambda(hw_lambda+1-hw_lambdaA:hw_lambda+1+hw_lambdaA,idx_ch);
                 end
                 tri_x(:,end) = tri_x(:,end-1);
-                tri_y = [p(ch(separation(i)+1:separation(i+1))-ch(separation(i)+1)+1);edge];
+                tri_y = [p(separation(i)+1:separation(i+1));edge];
                 tri_z = [spectra(hw_lambda+1-hw_lambdaA:hw_lambda+1+hw_lambdaA,separation(i)+1:separation(i+1)),zeros(numel(lambdaA),1)];
             else
                 for k = 1:separation(i+1)-separation(i)
@@ -340,7 +355,7 @@ if cal_2D
                     tri_x(:,k+1) = lambda(hw_lambda+1-hw_lambdaA:hw_lambda+1+hw_lambdaA,idx_ch);
                 end
                 tri_x(:,1) = tri_x(:,2);
-                tri_y = [edge;flipud(p(ch(separation(i)+1:separation(i+1))-ch(separation(i)+1)+1))];
+                tri_y = [edge;flipud(p(separation(i)+1:separation(i+1)))];
                 tri_z = [zeros(numel(lambdaA),1),spectra(hw_lambda+1-hw_lambdaA:hw_lambda+1+hw_lambdaA,separation(i)+1:separation(i+1))];
             end
         else
@@ -351,7 +366,7 @@ if cal_2D
                     tri_x(:,k) = lambda(hw_lambda+1-hw_lambdaA:hw_lambda+1+hw_lambdaA,idx_ch);
                 end
                 tri_x(:,end) = tri_x(:,end-1);
-                tri_y = [p(ch(separation(i)+1:end)-ch(separation(i)+1)+1);edge];
+                tri_y = [p(separation(i)+1:end);edge];
                 tri_z = [spectra(hw_lambda+1-hw_lambdaA:hw_lambda+1+hw_lambdaA,separation(i)+1:end),zeros(numel(lambdaA),1)];
             else
                 for k = 1:numel(ch)-separation(i)
@@ -359,7 +374,7 @@ if cal_2D
                     tri_x(:,k+1) = lambda(hw_lambda+1-hw_lambdaA:hw_lambda+1+hw_lambdaA,idx_ch);
                 end
                 tri_x(:,1) = tri_x(:,2);
-                tri_y = [edge;flipud(p(ch(separation(i)+1:end)-ch(separation(i)+1)+1))];
+                tri_y = [edge;flipud(p(separation(i)+1:end))];
                 tri_z = [zeros(numel(lambdaA),1),spectra(hw_lambda+1-hw_lambdaA:hw_lambda+1+hw_lambdaA,separation(i)+1:end)];
             end
         end
@@ -376,7 +391,7 @@ if cal_2D
         F = scatteredInterpolant(buf_x,buf_y,buf_z);
         grid_z = F(grid_x, grid_y);
         spectra_interp(:,:,i) = transpose(grid_z);
-        if plot_2D_interp
+        % if plot_2D_interp%todo
             if i == 1
                 figure('Position',[1000 0 500 300])
                 [~,h] = contourf(grid_x,grid_y,grid_z);
@@ -399,7 +414,7 @@ if cal_2D
                 drawnow
             end
             title(['Interpolated Spectra at Z = ',num2str(z(i)), '[m]'])
-        end
+        % end
     end
     %---アーベル変換----
     local_spectra = zeros(numel(lambdaA),numel(r),numel(z));
@@ -428,14 +443,16 @@ if cal_2D
     RSQ = zeros(numel(r),numel(z));
     for i=1:numel(z)
         if i <numel(z)
-            Ti_instru_local(i) = sum(Ti_instru_CH(separation(i)+1:separation(i+1)+1)/(separation(i+1)-separation(i)));
+            %todo:確認
+            % Ti_instru_local(i) = sum(Ti_instru_CH(separation(i)+1:separation(i+1)+1)/(separation(i+1)-separation(i)));
+            Ti_instru_local(i) = sum(Ti_instru_CH(separation(i)+1:separation(i+1)-1)/(separation(i+1)-separation(i)));
         else
             Ti_instru_local(i) = sum(Ti_instru_CH(separation(i)+1:end)/(numel(ch)-separation(i)));
         end
     end
     %----フィッティング----
-    col_subp2 = 2;%サブプロット行数
-    raw_subp2 = 2;%サブプロット列数
+    col_subp2 = 5;%サブプロット行数
+    raw_subp2 = 9;%サブプロット列数
     n_subp2 = col_subp2*raw_subp2;
     col_subp_f = 2;%サブプロット行数
     raw_subp_f = 2;%サブプロット列数
@@ -473,9 +490,10 @@ if cal_2D
                 switch plot_2D_spectra
                     case 'off'
                     case 'all'
+                        %todo:local spectraにチャンネル番号と温度表示する
                         idx_subp2 = mod(idx_fit-1,n_subp2)+1;%サブプロット位置番号
-                        if idx_fit == 1
-                            figure('Position',[400 500 400 300]);
+                        if mod(idx_fit-1,N == 1
+                            figure('Position',fig_position);
                             sgtitle('Local Spectra at (Z,R) [mm]')
                         end
                         subplot(col_subp2,raw_subp2,idx_subp2)
@@ -490,7 +508,7 @@ if cal_2D
                                 pfit(:,:,idx_subp2) = plot(fit_x,fit_y,'r-',lambdaA,input,'b+');
                             end
                             xline(lambda0)
-                            title(sprintf("(%.1f,%.1f)",z(j)*1e3,r(i)*1e3))
+                            title(sprintf("(%.1f,%.1f), T_i=%.1f",z(j)*1e3,r(i)*1e3,Ti_local(i,j)))
                             xlabel('Wavelength [nm]')
                             ylabel('Strength [a.u.]')
                             xlim([min(lambdaA) max(lambdaA)])
@@ -500,7 +518,7 @@ if cal_2D
                             fit_y = feval(f,fit_x);
                             pfit(1,:,idx_subp2).YData = fit_y;
                             pfit(2,:,idx_subp2).YData = input;
-                            title(sprintf("(%.1f,%.1f)",z(j)*1e3,r(i)*1e3))
+                            title(sprintf("(%.1f,%.1f), T_i=%.1f",z(j)*1e3,r(i)*1e3,Ti_local(i,j)))
                             drawnow
                         end
                     case 'good'
@@ -625,6 +643,7 @@ if plot_2D_result
     daspect([1 1 1])
     h.LineStyle = 'none';
     colormap(ax1,jet)
+    clim([0,20]);
     title('Local Ion Temperature')
     xlabel('Z [m]')
     ylabel('R [m]')
