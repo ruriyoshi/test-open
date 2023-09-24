@@ -9,7 +9,7 @@ pathname.NIFS=getenv('NIFS_path');%resultsまでのpath（ドップラー、SXR�
 pathname.IDS270ch=[pathname.NIFS,'/Doppler/Andor/270CH'];
 
 %------【input】---------------------------------------------------
-date = 230913;%【input】実験日
+date = 230920;%【input】実験日
 ICCD.line = 'Ar';%【input】ドップラー発光ライン('Ar')
 
 read_data = true;%【input】データをascファイルから読み込む
@@ -18,16 +18,16 @@ plot_ICCD = true;%【input】ICCD画像をプロット
 
 cal_CH = true;%【input】CHごとのスペクトルを取得
 
-cal_LineInt = false;%【input】線積分イオン温度、発光強度分布を計算
-plot_LineInt_result = false;%【input】線積分イオン温度、発光強度分布をプロット
+cal_LineInt = true;%【input】線積分イオン温度、発光強度分布を計算
+plot_LineInt_result = true;%【input】線積分イオン温度、発光強度分布をプロット
 
 cal_2D = true;%【input】アーベル変換して2次元イオン温度、発光強度分布を計算
 plot_2D_result = true;%【input】2次元イオン温度、発光強度分布をプロット
 plot_profile = true;%【input】イオン温度R分布をプロット
 
 %-----------------------解析オプション【input】----------------------------
-plot_CH_spectra = false;%【input】CHごとのスペクトルをプロット(cal_CH = trueが必要)
-plot_LineInt_interp = false;%【input】死んだCHの補間Ti,Emをプロット(cal_LineInt = trueが必要)
+plot_CH_spectra = true;%【input】CHごとのスペクトルをプロット(cal_CH = trueが必要)
+plot_LineInt_interp = true;%【input】死んだCHの補間Ti,Emをプロット(cal_LineInt = trueが必要)
 plot_2D_interp = false;%【input】補間スペクトルをプロット(cal_2D = trueが必要)
 plot_2D_spectra = 'off';%【input】('off','all','good','bad')2次元スペクトル分布をプロット(cal_2D = trueが必要)
 
@@ -52,10 +52,19 @@ end
 separation = [0 15 31 45 57 73 89 105 120 136 152 164 180 196 211 226 240 255];%CHをZ方向で切り分けるための値%todo
 resolution = -1.420387E-12*lambda0^3 - 2.156031E-09*lambda0^2 + 1.250038E-06*lambda0 + 3.830769E-03;0.0037714;...
     %-0.000000000001420387*lambda0^3 - 0.000000002156031*lambda0^2 + 0.000001250038*lambda0 + 0.003830769
-z = importdata("z_negative.txt")*1e-3;%計測視線Z[m]
-p = importdata("r.txt")*1e-3;%計測視線と中心軸の距離P[m]
+%z = importdata("z_negative.txt")*1e-3;%計測視線Z[m]
+%p = importdata("r.txt")*1e-3;%計測視線と中心軸の距離P[m]
 edge = 0.33;%Rの最大値[m](2022/7　解析～　ポテンシャルの範囲より仮定)
-calib = importdata("Ar_calibration.0916_remake.txt");%ICCD校正ファイル
+%calib = importdata("Ar_calibration.0916_remake.txt");%ICCD校正ファイル
+
+%較正係数のバージョンを日付で判別
+calib_filename='Doppler270ch_Ar_dial4820.xlsx';
+sheets = sheetnames(calib_filename);
+sheets = str2double(sheets);
+sheet_date=max(sheets(sheets<=date));
+C = readmatrix(calib_filename,'Sheet',num2str(sheet_date));
+
+z=unique(C(:,7))*1e-3;%計測点のZ座標[m]
 %------------------------------------------------------------------
 %%
 if read_data
@@ -77,16 +86,15 @@ if read_data
 end
 tic
 %%
-fig_num=1;%グラフ番号の初期化
 screensize=get(0,'screensize');
 fig_position=[0,50,screensize(3)-50,screensize(4)-150];
 
 %校正ファイル読み込み
-ch = calib.data(:,1);
-center = calib.data(:,2);
-smile = calib.data(:,3);
-relative = calib.data(:,5);
-instru = calib.data(:,6);
+ch=C(:,1);
+center=round(C(:,2),0);%calibファイルが小数なので，四捨五入
+smile=round(C(:,3))+35;%4175に合わせてsmileを作ったので，手動で定数を足して合わせている
+relative=C(:,4);
+instru=C(:,5);
 Ti_instru_CH = 1.69e8*mass*(2.*resolution*instru*sqrt(2.*log(2.))/lambda0).^2;
 
 %各CHの波長軸を生成
@@ -102,7 +110,7 @@ end
 %ICCD生画像を描画(目視で確認用)
 if plot_ICCD
     %figureの設定
-    fig_num=fig_num+1;
+    fig_num=1;
     f=figure(fig_num);
     f.Position=fig_position;
 
@@ -172,7 +180,10 @@ if cal_CH
         if plot_CH_spectra
             idx_subp1 = mod(i-1,n_subp1)+1;%サブプロット位置番号
             if i == 1
-                figure('Position',[0 500 400 300])
+                %figureの設定
+                fig_num=2;
+                figure(fig_num);
+                gcf.Position=[0 500 400 300];
                 sgtitle('Line Integrated Spectra')
             end
             subplot(col_subp1,raw_subp1,idx_subp1)
@@ -204,7 +215,7 @@ if cal_CH
         end
     end
 end
-
+%%
 %%----------線積分温度、線積分発光強度二次元分布を計算------------
 if cal_LineInt
     Ti_LineInt = zeros(numel(p),numel(z));%二次元温度[eV]
@@ -221,7 +232,11 @@ if cal_LineInt
     end
     %補間結果をプロット
     if plot_LineInt_interp
-        figure('Position',[1000 1000 600 200])
+        %figureの設定
+        fig_num=3;
+        f=figure(fig_num);
+        f.Position=fig_position;
+        % figure('Position',[1000 1000 600 200])
         tiledlayout(1,2)
         nexttile;
         p1 = plot(linspace(1,numel(p),numel(p)),Ti_LineInt(:,1),'ro-');
@@ -269,8 +284,13 @@ if cal_LineInt
         end
     end
 end
+%%
 if plot_LineInt_result
-    figure('Position',[0 0 700 350])
+    % figure('Position',[0 0 700 350])
+    %figureの設定
+    fig_num=4;
+    f=figure(fig_num);
+    f.Position=fig_position;
     tiledlayout(1,2)
     ax1 = nexttile;
     [~,h] = contourf(z,p,Ti_LineInt,100);
@@ -293,7 +313,7 @@ if plot_LineInt_result
     c2 = colorbar;
     c2.Label.String = 'Ion Emission [a.u.]';
 end
-
+%%
 %%----------アーベル変換線積分温度、発光二次元分布を計算------------
 if cal_2D
     %三角グリッドの補間によりアーベル変換に用いる2次元(λ,P)スペクトルを用意
