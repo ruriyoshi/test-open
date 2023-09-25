@@ -170,7 +170,7 @@ if cal_CH
     passive_Em = zeros(numel(ch),1);%CH発光強度[a.u.]
     spectra = zeros(2*hw_lambda+1,numel(ch));%CHスペクトル
     for i=1:numel(ch)
-        spectra(:,i) = sum(data(idx_l0(i)-hw_lambda:idx_l0(i)+hw_lambda,center(i)-hw_ch:center(i)+hw_ch),2)*relative(i);%todo:relativeが正しくないはずなのでいずれ直す
+        spectra(:,i) = sum(data(idx_l0(i)-hw_lambda:idx_l0(i)+hw_lambda,center(i)-hw_ch:center(i)+hw_ch),2)/relative(i);%todo:relativeが正しくないはずなのでいずれ直す
         offset = min(movmean(spectra(:,i),20));
         spectra(:,i) = spectra(:,i) - offset;%オフセットを引く
         f = fit(lambda(hw_lambda+1-hw_fit:hw_lambda+1+hw_fit,i),spectra(hw_lambda+1-hw_fit:hw_lambda+1+hw_fit,i),'gauss1');
@@ -677,5 +677,7 @@ if plot_profile
     xlim([0 inf])
     ylim([min(r) max(r)])
 end
+%%
+%%-----磁気面重ね書き
 
 toc
