@@ -3,7 +3,7 @@ close all
 % load("230712_base.mat","data")
 
 %各PCのパスを定義
-% run define_path.m
+run define_path.m
 %setenv("NIFS_path","N:\")%NIFSのresultsまでのパスを入れる
 pathname.NIFS=getenv('NIFS_path');%resultsまでのpath（ドップラー、SXR）
 pathname.IDS270ch=[pathname.NIFS,'/Doppler/Andor/270CH'];
@@ -32,7 +32,7 @@ plot_2D_interp = false;%【input】補間スペクトルをプロット(cal_2D =
 plot_2D_spectra = 'all';%【input】('off','all','good','bad')2次元スペクトル分布をプロット(cal_2D = trueが必要)
 
 hw_lambda = 50;%【input】波長切り出し半幅
-hw_ch = 5;%【input】CH方向切り出し半幅
+hw_ch = 4;%5;%【input】CH方向切り出し半幅
 hw_fit = 12;%【input】フィッティング波長切り出し半幅(< hw_lambda)
 num_r = 30;%【input】r分割数(比例して計算時間が増える)
 hw_lambdaA = 40;%【input】lambdaA半幅(< hw_lambda)
@@ -69,7 +69,7 @@ z=unique(C(:,7))*1e-3;%計測点のZ座標[m]
 %%
 if read_data
     %データ読み込み(GUI)
-    dir = [pathname.IDS270ch,'/20',num2str(date)];%実験日ディレクトリ
+    dir = [pathname.IDS270ch,'/',num2str(date)];%実験日ディレクトリ
     [file,path] = uigetfile('*.asc','Select a file',dir);
     if isequal(file,0)
         disp('User selected Cancel');
@@ -170,7 +170,7 @@ if cal_CH
     passive_Em = zeros(numel(ch),1);%CH発光強度[a.u.]
     spectra = zeros(2*hw_lambda+1,numel(ch));%CHスペクトル
     for i=1:numel(ch)
-        spectra(:,i) = sum(data(idx_l0(i)-hw_lambda:idx_l0(i)+hw_lambda,center(i)-hw_ch:center(i)+hw_ch),2)/relative(i);%todo:relativeが正しくないはずなのでいずれ直す
+        spectra(:,i) = sum(data(idx_l0(i)-hw_lambda:idx_l0(i)+hw_lambda,center(i)-hw_ch:center(i)+hw_ch),2)/relative(i);
         offset = min(movmean(spectra(:,i),20));
         spectra(:,i) = spectra(:,i) - offset;%オフセットを引く
         f = fit(lambda(hw_lambda+1-hw_fit:hw_lambda+1+hw_fit,i),spectra(hw_lambda+1-hw_fit:hw_lambda+1+hw_fit,i),'gauss1');
@@ -637,15 +637,17 @@ if cal_2D
     negative = find(Ti_local<0);
     Ti_local(negative) = zeros(size(negative));
 end
+%%
+%%----------局所イオン温度のプロット
 if plot_2D_result
-    figure('Position',[0 600 700 400])
+    figure('Position',fig_position)
     tiledlayout(1,2)
     ax1 = nexttile;
-    [~,h] = contourf(z,r,Ti_local,100);
+    [~,h] = contourf(z,r,Ti_local,60);
     daspect([1 1 1])
     h.LineStyle = 'none';
     colormap(ax1,jet)
-    clim([0,20]);
+    clim([0,60]);
     title('Local Ion Temperature')
     xlabel('Z [m]')
     ylabel('R [m]')
