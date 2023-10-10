@@ -15,5 +15,4 @@ connection = java.net.URL([],loginURL,handler).openConnection();
 connection.getInputStream();
 
 ts6log = webread(csvURL);
-%ts6log = readtable(csvURL,'NumHeaderLines',0);
 end
